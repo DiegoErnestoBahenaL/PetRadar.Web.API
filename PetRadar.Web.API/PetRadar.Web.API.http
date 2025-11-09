@@ -1,0 +1,6 @@
+@PetRadar.Web.API_HostAddress = http://localhost:5093
+
+GET {{PetRadar.Web.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
