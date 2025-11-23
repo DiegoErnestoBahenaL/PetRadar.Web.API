@@ -1,7 +1,7 @@
 # Etapa base (runtime) - ARM64
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy-arm64v8 AS base
 WORKDIR /app
-EXPOSE 8080
+EXPOSE 5000
 
 # Etapa de build
 FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy-arm64v8 AS build
@@ -21,8 +21,8 @@ FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# Escucha en 8080 dentro del contenedor
-ENV ASPNETCORE_URLS=http://+:8080
+# Escucha en 5000 dentro del contenedor
+ENV ASPNETCORE_URLS=http://+:5000
 ENV ASPNETCORE_ENVIRONMENT=Production
 
 ENTRYPOINT ["dotnet", "PetRadar.Web.API.dll"]
