@@ -16,12 +16,12 @@ COPY . .
 WORKDIR "/src/PetRadar.Web.API"
 RUN dotnet publish "PetRadar.Web.API.csproj" -c Release -o /app/publish
 
-# Imagen final, pequeña
+# Imagen final, pequeÃ±a
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# Escucha en 8080 dentro del contenedor
+# Escucha en 5000 dentro del contenedor
 ENV ASPNETCORE_URLS=http://+:8080
 ENV ASPNETCORE_ENVIRONMENT=Production
 
