@@ -8,7 +8,7 @@ namespace PetRadar.Web.API.Controllers
     {
         private static readonly string[] Summaries = new[]
         {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+            "Freezing-Jenkins", "Bracing-Jenkins", "Chilly-Jenkins", "Cool-Jenkins", "Mild-Jenkins", "Warm-Jenkins", "Balmy-Jenkins", "Hot-Jenkins", "Sweltering-Jenkins", "Scorching-Jenkins"
         };
 
         private readonly ILogger<WeatherForecastController> _logger;

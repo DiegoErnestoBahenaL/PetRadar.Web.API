@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetRadar.Web.API", "PetRadar.Web.API.csproj", "{27616706-D1D5-4740-B67B-F6FB95EF6575}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetRadar.Core", "..\PetRadar.Core\PetRadar.Core.csproj", "{5E98230E-31BD-4B57-B25A-F0C3834E3E32}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetRadar.DbMigrations", "..\PetRadar.DbMigrations\PetRadar.DbMigrations.csproj", "{5A1EF791-4A01-4FB7-A2CD-EF1BD9A2C552}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{27616706-D1D5-4740-B67B-F6FB95EF6575}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27616706-D1D5-4740-B67B-F6FB95EF6575}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27616706-D1D5-4740-B67B-F6FB95EF6575}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E98230E-31BD-4B57-B25A-F0C3834E3E32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E98230E-31BD-4B57-B25A-F0C3834E3E32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E98230E-31BD-4B57-B25A-F0C3834E3E32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E98230E-31BD-4B57-B25A-F0C3834E3E32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A1EF791-4A01-4FB7-A2CD-EF1BD9A2C552}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A1EF791-4A01-4FB7-A2CD-EF1BD9A2C552}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A1EF791-4A01-4FB7-A2CD-EF1BD9A2C552}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A1EF791-4A01-4FB7-A2CD-EF1BD9A2C552}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
