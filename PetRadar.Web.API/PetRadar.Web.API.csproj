@@ -17,5 +17,8 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\PetRadar.Core\PetRadar.Core.csproj" />
+	<ProjectReference Include="..\PetRadar.DbMigrations\PetRadar.DbMigrations.csproj" />
+  </ItemGroup>
 </Project>
