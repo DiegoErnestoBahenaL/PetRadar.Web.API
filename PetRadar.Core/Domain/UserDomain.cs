@@ -32,6 +32,28 @@ namespace PetRadar.Core.Domain
             return user;
         }
 
+        public async Task<UserEntity?> FindByEmailAsync(string email, CancellationToken token = default)
+        {
+            var user = await _repo.FindByEmailAsync(email, token);
+            if (user == null)
+                return default;
+
+            return user;
+        }
+        public async Task<UserEntity?> FindByEmailAndPasswordAsync(string email, string password, CancellationToken token = default)
+        {
+            var user = await _repo.FindByEmailAsync(email, token);
+            if (user == null)
+                return default;
+
+            var pwd = GenerateHash(password, user.Salt);
+
+            if (user.Password.SequenceEqual(pwd))
+                return user;
+
+            return default;
+        }
+
         public async Task<UserEntity> CreateAsync(UserCreateModel user, long createdByUserId, CancellationToken token)
         {
             if (user.Role == RoleEnum.SuperAdmin)
