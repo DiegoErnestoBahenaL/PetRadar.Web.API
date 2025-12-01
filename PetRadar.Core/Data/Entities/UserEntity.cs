@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,8 +17,11 @@ namespace PetRadar.Core.Data.Entities
         [StringLength(maximumLength: 255), Required]
         public string Email { get; set; } = string.Empty;
 
-        [StringLength(maximumLength: 255), Required]
-        public string Password { get; set; } = string.Empty;
+        [MaxLength(256), Required]
+        public byte[] Password { get; set; } = new byte[256];
+
+        [Required, MaxLength(128)]
+        public byte[] Salt { get; set; } = new byte[128];
 
         [StringLength(maximumLength: 255), Required]
         public string Name { get; set; } = string.Empty;
@@ -49,16 +53,23 @@ namespace PetRadar.Core.Data.Entities
 
         public UserEntity() { }
 
-        public UserEntity(string email, string password, string name, string lastName, string phoneNumber, RoleEnum role)
+        public UserEntity(string email, byte[] password, byte[] salt, string name, string? lastName, string? phoneNumber, 
+            string? organizationName, string? organizationAddress, string? organizationPhone, RoleEnum role, 
+            long createdBy)
         {
             Email = email;
             Password = password;
+            Salt = salt;
             Name = name;
             LastName = lastName;
             PhoneNumber = phoneNumber;
+            OrganizationName = organizationName;
+            OrganizationAddress = organizationAddress;
+            OrganizationPhone = organizationPhone;
             Role = role;
-
+            CreatedBy = createdBy;
             CreatedAt = UpdatedAt = DateTime.UtcNow;
+            IsActive = true;
         }
     }
 }
