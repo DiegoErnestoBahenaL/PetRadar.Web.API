@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetRadar.Core.Data.Entities;
+using PetRadar.Core.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,10 +23,15 @@ namespace PetRadar.Core.Data
                 .Property(x => x.Role)
                 .HasConversion<string>();
 
+            var salt = UserDomain.GenerateSalt();
+            var hashPassword = UserDomain.GenerateHash("test", salt);
+
             modelBuilder.Entity<UserEntity>()
-                .HasData(new UserEntity("sa@test.com", "test", "Super", "Admmin", "000000000", RoleEnum.SuperAdmin) 
+                .HasData(new UserEntity("sa@test.com",hashPassword,salt, "Super", "Admmin", "000000000", null,null,null, RoleEnum.SuperAdmin, 1) 
                     { 
                         Id = 1,
+                        EmailVerified = true,
+                        IsActive = true,
                     }
                 );
         }

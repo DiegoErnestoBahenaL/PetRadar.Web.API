@@ -1,10 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using PetRadar.Core.Data;
+using PetRadar.Core.Data.Repositories;
+using PetRadar.Core.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<IUserDomain, UserDomain>();
 
 builder.Services.AddDbContext<PetRadarDbContext>(options =>
     options.UseNpgsql(connectionString, x => x.MigrationsAssembly("PetRadar.DbMigrations")));
@@ -26,11 +32,10 @@ using (var scope = app.Services.CreateScope())
 
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.UseHttpsRedirection();
 
