@@ -45,17 +45,21 @@ using (var scope = app.Services.CreateScope())
 
 
 // Configure the HTTP request pipeline.
+app.UseHttpsRedirection();
+
+app.UseCors("AllowEverything");
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
 
-app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.MapHealthChecks("/api/health");
+
+
 
 app.Run();
