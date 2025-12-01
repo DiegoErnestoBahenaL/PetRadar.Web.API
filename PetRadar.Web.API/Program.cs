@@ -2,11 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using PetRadar.Core.Data;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain;
+using PetRadar.Web.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+builder.Services.AddSingleton<IJwtHelper, JwtHelper>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
