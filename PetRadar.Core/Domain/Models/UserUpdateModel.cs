@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using PetRadar.Core.Data.Entities;
+using PetRadar.Core.Data.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

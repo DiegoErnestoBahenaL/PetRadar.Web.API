@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
-using PetRadar.Core.Data.Entities;
+using PetRadar.Core.Data.Entities.Enums;
 using System.Security.Claims;
 
 namespace PetRadar.Web.API.Controllers
