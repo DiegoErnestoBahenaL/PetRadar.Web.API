@@ -4,6 +4,7 @@ using PetRadar.Core.Data;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Domain;
 using PetRadar.Core.Domain.Models;
+using PetRadar.Web.API.ViewModels;
 using System.Net.Mime;
 
 namespace PetRadar.Web.API.Controllers
@@ -26,26 +27,26 @@ namespace PetRadar.Web.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<IList<UserEntity>>> Get(CancellationToken token)
+        public async Task<ActionResult<IList<UserViewModel>>> Get(CancellationToken token)
         {
 
             var users = await _domain.GetAllAsync(token);
 
-            return Ok(users);
+            return Ok(UserViewModel.FromList(users));
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<UserEntity>> Get([FromRoute] long id, CancellationToken token)
+        public async Task<ActionResult<UserViewModel>> Get([FromRoute] long id, CancellationToken token)
         {
             var user = await _domain.FindByIdAsync(id, token);
 
             if (user == default)
                 return NotFound();
 
-            return Ok(user);
+            return Ok(new UserViewModel(user));
         }
 
 
