@@ -1,4 +1,4 @@
-﻿using PetRadar.Core.Data.Entities;
+﻿using PetRadar.Core.Data.Entities.Enums;
 
 namespace PetRadar.Web.API
 {

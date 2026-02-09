@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PetRadar.Core.Data.Entities;
+using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Domain;
 using System;
 using System.Collections.Generic;
