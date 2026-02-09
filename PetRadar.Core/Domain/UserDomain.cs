@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.VisualBasic;
 using PetRadar.Core.Data.Entities;
+using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
 using System;

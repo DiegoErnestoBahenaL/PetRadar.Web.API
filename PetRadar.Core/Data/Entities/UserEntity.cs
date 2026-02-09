@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using PetRadar.Core.Data.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
