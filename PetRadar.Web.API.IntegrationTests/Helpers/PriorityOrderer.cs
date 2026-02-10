@@ -11,8 +11,8 @@ namespace PetRadar.Web.API.IntegrationTests.Helpers
 {
     public class PriorityOrderer : ITestCaseOrderer
     {
-        public const string PriorityOrdererName = "SK.Poll.WebApi.IntegrationTests.Helpers.PriorityOrderer";
-        public const string PriorityOrdererAssemblyName = "SK.Poll.WebApi.IntegrationTests";
+        public const string PriorityOrdererName = "PetRadar.Web.API.IntegrationTests.Helpers.PriorityOrderer";
+        public const string PriorityOrdererAssemblyName = "PetRadar.Web.API.IntegrationTests";
 
         public IEnumerable<TTestCase> OrderTestCases<TTestCase>(IEnumerable<TTestCase> testCases) where TTestCase : ITestCase
         {
