@@ -29,28 +29,28 @@ namespace PetRadar.Core.Data.Entities
 
 
         [StringLength(maximumLength: 100)]
-        public string? LastName { get; set; }
+        public string? LastName { get; set; } = null;
 
         [StringLength(maximumLength: 20)]
-        public string? PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; } = null;
 
         [StringLength(maximumLength: 255)]
-        public string? ProfilePhotoURL { get; set; }
+        public string? ProfilePhotoURL { get; set; } = null;
 
         [Required]
-        public RoleEnum Role { get; set; }
+        public RoleEnum Role { get; set; } = RoleEnum.NotSet;
 
         [StringLength(maximumLength: 255)]
-        public string? OrganizationName { get; set; }
+        public string? OrganizationName { get; set; } = null;
 
         [StringLength(maximumLength: 255)]
-        public string? OrganizationAddress { get; set; }
+        public string? OrganizationAddress { get; set; } = null;
 
         [StringLength(maximumLength: 20)]
-        public string? OrganizationPhone {  get; set; }
+        public string? OrganizationPhone {  get; set; } = null;
 
         [Required]
-        public bool EmailVerified  { get; set; }
+        public bool EmailVerified  { get; set; } = false;
 
         public UserEntity() { }
 
