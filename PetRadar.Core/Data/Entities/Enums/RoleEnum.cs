@@ -5,6 +5,7 @@
         SuperAdmin = 1,
         Admin,
         User,
-        Organization
+        Organization,
+        NotSet
     }
 }
