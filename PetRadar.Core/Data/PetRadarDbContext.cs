@@ -15,6 +15,7 @@ namespace PetRadar.Core.Data
         public PetRadarDbContext(DbContextOptions<PetRadarDbContext> options) : base (options) { }
 
         public DbSet<UserEntity> Users { get; set; }
+        public DbSet<UserPetEntity> UserPets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,6 +27,18 @@ namespace PetRadar.Core.Data
 
             var salt = UserDomain.GenerateSalt();
             var hashPassword = UserDomain.GenerateHash("test", salt);
+
+            modelBuilder.Entity<UserPetEntity>()
+                .Property(x => x.Sex)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<UserPetEntity>()
+                .Property(x => x.Species)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<UserPetEntity>()
+                .Property(x => x.Size)
+                .HasConversion<string>();
 
             modelBuilder.Entity<UserEntity>()
                 .HasData(new UserEntity("sa@test.com",hashPassword,salt, "Super", "Admmin", "000000000", null,null,null, RoleEnum.SuperAdmin, 1) 
