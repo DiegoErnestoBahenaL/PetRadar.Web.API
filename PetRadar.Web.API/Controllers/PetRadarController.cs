@@ -7,7 +7,7 @@ namespace PetRadar.Web.API.Controllers
 {
     public abstract class PetRadarController : ControllerBase
     {
-        UserJwt _userJwt;
+        UserJwt? _userJwt;
 
         /// <summary>
         /// "Logged in" user

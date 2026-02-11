@@ -36,7 +36,7 @@ namespace PetRadar.Web.API.IntegrationTests.Helpers
 
         static TValue GetOrCreate<TKey, TValue>(IDictionary<TKey, TValue> dictionary, TKey key) where TValue : new()
         {
-            if (dictionary.TryGetValue(key, out TValue result)) return result;
+            if (dictionary.TryGetValue(key, out TValue? result) && result != null) return result;
 
             result = new TValue();
             dictionary[key] = result;

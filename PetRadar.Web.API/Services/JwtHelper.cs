@@ -42,6 +42,7 @@ namespace PetRadar.Web.API.Services
             _audience = audience;
             _expiration = expiration;
             _expirationHoursRefreshToken = refreshTokenExpirationHours;
+            _signingKey = "RedactedRedactedRedactedRedacted";
 
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
             _credentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256);
@@ -52,9 +53,6 @@ namespace PetRadar.Web.API.Services
         {
             var claims = new List<Claim>();
 
-            long organizationId = 0;
-            bool subGoalsAccess = false;
-
             if (isRefreshToken)
             {
                 claims.AddRange(new List<Claim>
@@ -62,7 +60,7 @@ namespace PetRadar.Web.API.Services
                 new Claim(JwtRegisteredClaimNames.Sub, userdb.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, userdb.Email),
                 new Claim(JwtRegisteredClaimNames.GivenName, userdb.Name),
-                new Claim(JwtRegisteredClaimNames.FamilyName, userdb.LastName),
+                new Claim(JwtRegisteredClaimNames.FamilyName, userdb.LastName ?? string.Empty),
 
             });
                 var jwt = new JwtSecurityToken(
@@ -81,7 +79,7 @@ namespace PetRadar.Web.API.Services
             new Claim(JwtRegisteredClaimNames.Sub, userdb.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, userdb.Email),
             new Claim(JwtRegisteredClaimNames.GivenName, userdb.Name),
-            new Claim(JwtRegisteredClaimNames.FamilyName, userdb.LastName),
+            new Claim(JwtRegisteredClaimNames.FamilyName, userdb.LastName ?? string.Empty),
 
             // TODO: hardcoded role
             new Claim("Role", userdb.Role.ToString()),
