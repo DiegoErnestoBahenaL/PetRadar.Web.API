@@ -11,7 +11,7 @@ namespace PetRadar.Web.API.Services
 
         public RefreshTokenFromUiModel()
         {
-
+            RefreshToken = string.Empty;
         }
 
         public RefreshTokenFromUiModel(string refreshToken)

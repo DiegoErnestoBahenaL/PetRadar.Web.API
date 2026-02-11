@@ -4,6 +4,7 @@ using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain;
 using PetRadar.Web.API;
 using PetRadar.Web.API.Services;
+using System.Text.Json.Serialization;
 
 
 var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -29,7 +30,13 @@ builder.Services.AddDbContext<PetRadarDbContext>(options =>
 
 // Add services to the container.
 builder.Services.AddHealthChecks();
-builder.Services.AddControllers();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

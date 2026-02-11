@@ -53,15 +53,20 @@ namespace PetRadar.Web.API.Controllers
             if (tokenModel == default)
                 return BadRequest("Invalid client request");
 
-
             var principal = _jwtHelper.GetPrincipalFromRefreshToken(tokenModel.RefreshToken);
-            
+
             if (principal == null)
                 return BadRequest("Invalid refresh token");
 
-            var username = principal.Claims.Where(x => x.Type == ClaimTypes.Email).FirstOrDefault().Value;
+            var emailClaim = principal.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
+
+            if (emailClaim == null || string.IsNullOrEmpty(emailClaim.Value))
+                return BadRequest("Invalid refresh token");
+
+            var username = emailClaim.Value;
+
             var refreshTokenIsValid = _jwtHelper.ValidateDateFromToken(tokenModel.RefreshToken);
-            
+
             var userDb = await _userDomain.FindByEmailAsync(username, token);
 
             if (userDb == default || !refreshTokenIsValid)
@@ -70,7 +75,6 @@ namespace PetRadar.Web.API.Controllers
             }
 
             var userToken = new UserTokenViewModel();
-
 
             userToken = _jwtHelper.GetToken(userDb);
 

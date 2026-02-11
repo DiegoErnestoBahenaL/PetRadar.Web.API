@@ -64,7 +64,7 @@ namespace PetRadar.Core.Domain
             var userExists = await _repo.FindByEmailAsync(user.Email, token);
 
             if (userExists != default)
-                throw new Exception("Can't create duplicated data");
+                throw new PetRadarException("Can't create duplicated data");
 
 
             var salt = GenerateSalt();
