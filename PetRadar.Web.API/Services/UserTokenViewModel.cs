@@ -2,9 +2,9 @@
 {
     public class UserTokenViewModel
     {
-        public string Token { get; set; }
+        public string Token { get; set; } = string.Empty;
         public DateTimeOffset TokenValidTo { get; set; }
-        public string RefreshToken { get; set; }
+        public string RefreshToken { get; set; } = string.Empty;
         public DateTimeOffset RefreshTokenExpiryTime { get; set; }
         public UserTokenViewModel()
         {

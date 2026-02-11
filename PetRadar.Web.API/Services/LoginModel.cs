@@ -5,9 +5,9 @@ namespace PetRadar.Web.API.Services
     public class LoginModel
     {
         [Required, StringLength(255)]
-        public string Username { get; set; }
+        public string Username { get; set; } = string.Empty;
         [Required, StringLength(255)]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
         public LoginModel()
         {

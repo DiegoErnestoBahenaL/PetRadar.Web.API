@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
+using PetRadar.Core;
 using PetRadar.Core.Data;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Domain;
@@ -58,8 +60,23 @@ namespace PetRadar.Web.API.Controllers
         public async Task<IActionResult> Post([FromBody] UserCreateModel user, CancellationToken token)
         {
             //Use the JWT info
-            var userdb = await _domain.CreateAsync(user, 1, token);
-            return CreatedAtAction(nameof(Get), new { id = userdb.Id }, userdb);
+            UserEntity userdb;
+            try 
+            {
+                userdb = await _domain.CreateAsync(user, 1, token);
+
+                return CreatedAtAction(nameof(Get), new { id = userdb.Id }, userdb);
+
+            }
+            catch (PetRadarException ex)
+            {
+                if (ex.Message.Contains("Can't create duplicated data"))
+                {
+                    return Conflict(ex.Message);
+                }     
+
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut("{id}")]
