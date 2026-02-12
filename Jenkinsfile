@@ -47,6 +47,17 @@ pipeline {
             }
         }
 
+        stage('Build imágenes QA') {
+            when { expression { env.BRANCH_NAME == 'QA' } }
+            steps {
+                sh '''
+                    set -e
+                    cd ${PROJECT_ROOT}
+                    DOCKER_BUILDKIT=${DOCKER_BUILDKIT} docker compose -f ${COMPOSE_FILE} build
+                '''
+            }
+        }
+
         stage('Run Tests QA') {
             when { expression { env.BRANCH_NAME == 'QA' } }
             steps {
@@ -60,21 +71,10 @@ pipeline {
                         -e ASPNETCORE_ENVIRONMENT=LocalIntegration \
                         -v "$(pwd)":/src \
                         -w /src \
-                        mcr.microsoft.com/dotnet/sdk:8.0 \
+                        mcr.microsoft.com/dotnet/sdk:8.0-jammy-arm64v8 \
                         dotnet test PetRadar.Web.API.IntegrationTests/PetRadar.Web.API.IntegrationTests.csproj \
                             --configuration Release \
                             --logger "trx;LogFileName=test-results.trx"
-                '''
-            }
-        }
-
-        stage('Build imágenes QA') {
-            when { expression { env.BRANCH_NAME == 'QA' } }
-            steps {
-                sh '''
-                    set -e
-                    cd ${PROJECT_ROOT}
-                    DOCKER_BUILDKIT=${DOCKER_BUILDKIT} docker compose -f ${COMPOSE_FILE} build
                 '''
             }
         }
