@@ -69,6 +69,7 @@ pipeline {
                     docker run --rm \
                         --network host \
                         -e ASPNETCORE_ENVIRONMENT=LocalIntegration \
+                        -e 'ConnectionStrings__DefaultConnection=Host=localhost;Port=5433;Database=petradar_localIntegration;Username=postgres;Password=root;' \
                         -v "$(pwd)":/src \
                         -w /src \
                         mcr.microsoft.com/dotnet/sdk:8.0-jammy-arm64v8 \
