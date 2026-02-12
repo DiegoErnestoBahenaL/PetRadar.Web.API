@@ -55,9 +55,15 @@ pipeline {
                     cd ${PROJECT_ROOT}/PetRadar.Web.API
 
                     echo "Running integration tests..."
-                    dotnet test PetRadar.Web.API.IntegrationTests/PetRadar.Web.API.IntegrationTests.csproj \
-                        --configuration Release \
-                        --logger "trx;LogFileName=test-results.trx"
+                    docker run --rm \
+                        --network host \
+                        -e ASPNETCORE_ENVIRONMENT=LocalIntegration \
+                        -v "$(pwd)":/src \
+                        -w /src \
+                        mcr.microsoft.com/dotnet/sdk:8.0 \
+                        dotnet test PetRadar.Web.API.IntegrationTests/PetRadar.Web.API.IntegrationTests.csproj \
+                            --configuration Release \
+                            --logger "trx;LogFileName=test-results.trx"
                 '''
             }
         }
