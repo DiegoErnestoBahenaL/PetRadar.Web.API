@@ -14,13 +14,16 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
     [TestCaseOrderer(PriorityOrderer.PriorityOrdererName, PriorityOrderer.PriorityOrdererAssemblyName)]
     public class UsersControllerTests : IClassFixture<TestingWebAppFactory>
     {
-        readonly TestingWebAppFactory _factory;
+        private readonly TestingWebAppFactory _factory;
+
+        private readonly HttpClient _client;
 
         static long createdUserId = 0;
 
         public UsersControllerTests(TestingWebAppFactory factory)
         {
             _factory = factory;
+            _client = _factory.CreateClient();
         }
 
         #region CRUD Operations with Priority
@@ -29,8 +32,8 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task GetAll_Returns_Users_Successfully()
         {
             // Arrange & Act
-            var client = _factory.CreateClient();
-            var result = await client.GetAsync("/api/users");
+            
+            var result = await _client.GetAsync("/api/users");
 
             // Assert
             Assert.NotNull(result);
@@ -47,11 +50,11 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task GetById_Returns_User_Successfully()
         {
             // Arrange
-            var client = _factory.CreateClient();
+            
             var userId = DefaultDataSet.DefaultUserId;
 
             // Act
-            var result = await client.GetAsync($"/api/users/{userId}");
+            var result = await _client.GetAsync($"/api/users/{userId}");
 
             // Assert
             Assert.NotNull(result);
@@ -70,7 +73,6 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task Create_Returns_Created_Successfully()
         {
             // Arrange
-            var client = _factory.CreateClient();
 
             var createModel = new UserCreateModel(
                 email: "newuser@test.com",
@@ -87,7 +89,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             var jsonModel = JsonConvert.SerializeObject(createModel);
 
             // Act
-            var result = await client.PostAsync("/api/users", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+            var result = await _client.PostAsync("/api/users", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
 
             var stringContent = await result.Content.ReadAsStringAsync();
 
@@ -109,7 +111,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task Update_Returns_NoContent_Successfully()
         {
             // Arrange
-            var client = _factory.CreateClient();
+            
 
             var updateModel = new UserUpdateModel(
                 email: null,
@@ -126,7 +128,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             var jsonModel = JsonConvert.SerializeObject(updateModel);
 
             // Act
-            var result = await client.PutAsync($"/api/users/{createdUserId}", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+            var result = await _client.PutAsync($"/api/users/{createdUserId}", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
 
             // Assert
             Assert.NotNull(result);
@@ -137,9 +139,9 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task GetById_Returns_Updated_User_Successfully()
         {
             // Arrange & Act
-            var client = _factory.CreateClient();
+            
 
-            var result = await client.GetAsync($"/api/users/{createdUserId}");
+            var result = await _client.GetAsync($"/api/users/{createdUserId}");
 
             // Assert
             Assert.NotNull(result);
@@ -159,8 +161,8 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task Delete_Returns_NoContent_Successfully()
         {
             // Arrange & Act
-            var client = _factory.CreateClient();
-            var result = await client.DeleteAsync($"/api/users/{createdUserId}");
+            
+            var result = await _client.DeleteAsync($"/api/users/{createdUserId}");
 
             // Assert
             Assert.NotNull(result);
@@ -175,11 +177,11 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task GetById_Returns_NotFound_With_Invalid_Id()
         {
             // Arrange
-            var client = _factory.CreateClient();
+            
             var invalidUserId = 999999;
 
             // Act
-            var result = await client.GetAsync($"/api/users/{invalidUserId}");
+            var result = await _client.GetAsync($"/api/users/{invalidUserId}");
 
             // Assert
             Assert.NotNull(result);
@@ -190,7 +192,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task Create_Returns_BadRequest_With_Invalid_Email()
         {
             // Arrange
-            var client = _factory.CreateClient();
+            
             var createModel = new UserCreateModel
             {
                 Email = "invalidemail",
@@ -202,7 +204,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             var jsonModel = JsonConvert.SerializeObject(createModel);
 
             // Act
-            var result = await client.PostAsync("/api/users", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+            var result = await _client.PostAsync("/api/users", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
 
             // Assert
             Assert.NotNull(result);
@@ -213,7 +215,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task Create_Returns_BadRequest_With_Missing_Required_Fields()
         {
             // Arrange
-            var client = _factory.CreateClient();
+            
 
             var createModel = new
             {
@@ -224,7 +226,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             var jsonModel = JsonConvert.SerializeObject(createModel);
 
             // Act
-            var result = await client.PostAsync("/api/users", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+            var result = await _client.PostAsync("/api/users", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
 
             // Assert
             Assert.NotNull(result);
@@ -235,11 +237,11 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task Create_Returns_BadRequest_With_Empty_Body()
         {
             // Arrange
-            var client = _factory.CreateClient();
+            
             var jsonModel = JsonConvert.SerializeObject(new { });
 
             // Act
-            var result = await client.PostAsync("/api/users", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+            var result = await _client.PostAsync("/api/users", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
 
             // Assert
             Assert.NotNull(result);
@@ -250,7 +252,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task Update_Returns_NotFound_With_Invalid_Id()
         {
             // Arrange
-            var client = _factory.CreateClient();
+            
             var invalidUserId = 999999;
             var updateModel = new UserUpdateModel(
                 email: null,
@@ -267,7 +269,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             var jsonModel = JsonConvert.SerializeObject(updateModel);
 
             // Act
-            var result = await client.PutAsync($"/api/users/{invalidUserId}", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+            var result = await _client.PutAsync($"/api/users/{invalidUserId}", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
 
             // Assert
             Assert.NotNull(result);
@@ -278,7 +280,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task Update_Returns_BadRequest_With_Invalid_Email_Format()
         {
             // Arrange
-            var client = _factory.CreateClient();
+            
 
             var userId = DefaultDataSet.DefaultUserId;
             var updateModel = new UserUpdateModel(
@@ -296,7 +298,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             var jsonModel = JsonConvert.SerializeObject(updateModel);
 
             // Act
-            var result = await client.PutAsync($"/api/users/{userId}", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+            var result = await _client.PutAsync($"/api/users/{userId}", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
 
             // Assert
             Assert.NotNull(result);
@@ -307,11 +309,11 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task Delete_Returns_NotFound_With_Invalid_Id()
         {
             // Arrange
-            var client = _factory.CreateClient();
+            
             var invalidUserId = 999999;
 
             // Act
-            var result = await client.DeleteAsync($"/api/users/{invalidUserId}");
+            var result = await _client.DeleteAsync($"/api/users/{invalidUserId}");
 
             // Assert
             Assert.NotNull(result);
@@ -323,7 +325,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         {
             // Arrange - Try to create user with existing email
 
-            var client = _factory.CreateClient();
+            
 
             var createModel = new UserCreateModel(
                 email: DefaultDataSet.DefaultUserEmail,
@@ -340,7 +342,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             var jsonModel = JsonConvert.SerializeObject(createModel);
 
             // Act
-            var result = await client.PostAsync("/api/users", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+            var result = await _client.PostAsync("/api/users", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
 
             // Assert
             Assert.NotNull(result);
@@ -351,7 +353,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task Update_Returns_BadRequest_With_PhoneNumber_Exceeding_MaxLength()
         {
             // Arrange
-            var client = _factory.CreateClient();
+            
 
             var userId = DefaultDataSet.DefaultUserId;
             var updateModel = new UserUpdateModel(
@@ -369,7 +371,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             var jsonModel = JsonConvert.SerializeObject(updateModel);
 
             // Act
-            var result = await client.PutAsync($"/api/users/{userId}", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+            var result = await _client.PutAsync($"/api/users/{userId}", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
 
             // Assert
             Assert.NotNull(result);
@@ -380,7 +382,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         public async Task Create_Returns_BadRequest_With_Name_Exceeding_MaxLength()
         {
             // Arrange
-            var client = _factory.CreateClient();
+            
 
             var longName = new string('A', 256); // Exceeds 255 character limit
             var createModel = new UserCreateModel(
@@ -398,7 +400,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             var jsonModel = JsonConvert.SerializeObject(createModel);
 
             // Act
-            var result = await client.PostAsync("/api/users", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+            var result = await _client.PostAsync("/api/users", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
 
             // Assert
             Assert.NotNull(result);

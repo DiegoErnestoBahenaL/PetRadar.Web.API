@@ -47,7 +47,22 @@ pipeline {
             }
         }
 
-        stage('Build im·genes QA') {
+        stage('Run Tests QA') {
+            when { expression { env.BRANCH_NAME == 'QA' } }
+            steps {
+                sh '''
+                    set -e
+                    cd ${PROJECT_ROOT}/PetRadar.Web.API
+
+                    echo "Running integration tests..."
+                    dotnet test PetRadar.Web.API.IntegrationTests/PetRadar.Web.API.IntegrationTests.csproj \
+                        --configuration Release \
+                        --logger "trx;LogFileName=test-results.trx"
+                '''
+            }
+        }
+
+        stage('Build im√°genes QA') {
             when { expression { env.BRANCH_NAME == 'QA' } }
             steps {
                 sh '''
