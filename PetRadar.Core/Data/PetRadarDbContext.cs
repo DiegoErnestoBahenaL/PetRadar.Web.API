@@ -16,10 +16,13 @@ namespace PetRadar.Core.Data
 
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<UserPetEntity> UserPets { get; set; }
+        public DbSet<VeterinaryAppointmentEntity> VeterinaryAppointments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.HasPostgresExtension("postgis");
 
             modelBuilder.Entity<UserEntity>()
                 .Property(x => x.Role)
@@ -39,6 +42,18 @@ namespace PetRadar.Core.Data
             modelBuilder.Entity<UserPetEntity>()
                 .Property(x => x.Size)
                 .HasConversion<string>();
+
+            modelBuilder.Entity<VeterinaryAppointmentEntity>()
+                .Property(x => x.AppointmentType)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<VeterinaryAppointmentEntity>()
+                .Property(x => x.AppointmentStatus)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<VeterinaryAppointmentEntity>()
+                .Property(x => x.Location)
+                .HasColumnType("geography (point)");
 
             modelBuilder.Entity<UserEntity>()
                 .HasData(new UserEntity("sa@test.com",hashPassword,salt, "Super", "Admmin", "000000000", null,null,null, RoleEnum.SuperAdmin, 1) 
