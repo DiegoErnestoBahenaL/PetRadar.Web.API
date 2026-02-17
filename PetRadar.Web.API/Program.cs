@@ -28,7 +28,9 @@ builder.Services.AddScoped<IUserDomain, UserDomain>();
 builder.Services.AddScoped<IUserPetDomain, UserPetDomain>();
 
 builder.Services.AddDbContext<PetRadarDbContext>(options =>
-    options.UseNpgsql(connectionString, x => x.MigrationsAssembly(Constants.MigrationsAssembly)));
+    options.UseNpgsql(connectionString, x => x.MigrationsAssembly(Constants.MigrationsAssembly)
+    .UseNetTopologySuite()
+    ));
 
 // Add services to the container.
 builder.Services.AddHealthChecks();
