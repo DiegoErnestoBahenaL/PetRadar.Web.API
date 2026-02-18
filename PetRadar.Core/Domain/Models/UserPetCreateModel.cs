@@ -24,10 +24,10 @@ namespace PetRadar.Core.Domain.Models
         [JsonConverter(typeof(StringEnumConverter))]
         public PetSpeciesEnum Species { get; set; }
 
-        [StringLength(100, MinimumLength = 1, ErrorMessage = "The field Breed must be a string with a minimum length of {2} and a maximum length of {1}")]
+        [StringLength(100, ErrorMessage = "The field Breed must be a string with maximum length of {1}")]
         public string? Breed { get; set; }
 
-        [StringLength(100, MinimumLength = 1, ErrorMessage = "The field Color must be a string with a minimum length of {2} and a maximum length of {1}")]
+        [StringLength(100, ErrorMessage = "The field Color must be a string with a maximum length of {1}")]
         public string? Color { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -42,15 +42,15 @@ namespace PetRadar.Core.Domain.Models
 
         public decimal? Weight { get; set; }
 
-        [StringLength(500, MinimumLength = 1, ErrorMessage = "The field Description must be a string with a minimum length of {2} and a maximum length of {1}")]
+        [StringLength(500,  ErrorMessage = "The field Description must be a string with maximum length of {1}")]
         public string? Description { get; set; }
 
         public bool? IsNeutered { get; set; }
 
-        [StringLength(255, MinimumLength = 1, ErrorMessage = "The field Allergies must be a string with a minimum length of {2} and a maximum length of {1}")]
+        [StringLength(255, ErrorMessage = "The field Allergies must be a string with a maximum length of {1}")]
         public string? Allergies { get; set; }
 
-        [StringLength(500, MinimumLength = 1, ErrorMessage = "The field MedicalNotes must be a string with a minimum length of {2} and a maximum length of {1}")]
+        [StringLength(500, ErrorMessage = "The field MedicalNotes must be a string with a maximum length of {1}")]
         public string? MedicalNotes { get; set; }
 
         public UserPetCreateModel(
