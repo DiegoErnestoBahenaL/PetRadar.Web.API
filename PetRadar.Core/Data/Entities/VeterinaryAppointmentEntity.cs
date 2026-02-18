@@ -59,5 +59,29 @@ namespace PetRadar.Core.Data.Entities
         public string? AddressText { get; set; }
 
         public bool ReminderSent { get; set; } = false; 
+
+        public VeterinaryAppointmentEntity() { }
+
+        public VeterinaryAppointmentEntity(long petId, string veterinaryName, 
+            AppointmentTypeEnum appointmentType, AppointmentStatusEnum appointmentStatus, DateTimeOffset appointmentDate, 
+            int? durationInMinutes, string reasonForVisit, string? notes, string? diagnosis, string? treatment, 
+            string? prescriptions, decimal? cost, Point? location, string? addressText)
+        {
+            PetId = petId;
+            VeterinaryName = veterinaryName;
+            AppointmentType = appointmentType;
+            AppointmentStatus = appointmentStatus;
+            AppointmentDate = appointmentDate;
+            DurationInMinutes = durationInMinutes;
+            ReasonForVisit = reasonForVisit;
+            Notes = notes;
+            Diagnosis = diagnosis;
+            Treatment = treatment;
+            Prescriptions = prescriptions;
+            Cost = cost;
+            Location = location;
+            AddressText = addressText;
+           
+        }
     }
 }

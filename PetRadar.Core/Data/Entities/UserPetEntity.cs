@@ -58,10 +58,7 @@ namespace PetRadar.Core.Data.Entities
         [StringLength(maximumLength: 500)]
         public string? MedicalNotes { get; set; }
 
-        public UserPetEntity() 
-        {
-            ParentUser = new UserEntity();
-        }
+        public UserPetEntity() {}
 
         public UserPetEntity
         (

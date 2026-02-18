@@ -11,6 +11,7 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
     public interface IDefaultDataSet
     {
         public UserEntity DefaultUserEntity  { get; }
+        public UserPetEntity DefaultPetEntity { get; }
         void SeedData(PetRadarDbContext dbContext);
     }
 }
