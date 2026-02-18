@@ -23,9 +23,11 @@ builder.Services.AddSingleton<IJwtHelper, JwtHelper>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserPetRepository, UserPetRepository>();
+builder.Services.AddScoped<IVeterinaryAppointmentRepository, VeterinaryAppointmentRepository>();
 
 builder.Services.AddScoped<IUserDomain, UserDomain>();
 builder.Services.AddScoped<IUserPetDomain, UserPetDomain>();
+builder.Services.AddScoped<IVeterinaryAppointmentDomain, VeterinaryAppointmentDomain>();
 
 builder.Services.AddDbContext<PetRadarDbContext>(options =>
     options.UseNpgsql(connectionString, x => x.MigrationsAssembly(Constants.MigrationsAssembly)

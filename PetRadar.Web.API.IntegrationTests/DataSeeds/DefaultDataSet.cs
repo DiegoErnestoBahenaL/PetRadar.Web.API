@@ -21,14 +21,21 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
         public static readonly string DefaultUserPhoneNumber = "1234567890";
         public static readonly RoleEnum DefaultUserRole = RoleEnum.Admin;
 
+        public static readonly int DefaultPetId = 2000;
+        public static readonly string DefaultPetName = "TestDog";
+        public static readonly PetSpeciesEnum DefaultPetSpecies = PetSpeciesEnum.Dog;
+
 
         public UserEntity DefaultUserEntity { get; private set; }
 
         public UserEntity DefaultUser { get => DefaultUserEntity; }
 
+        public UserPetEntity DefaultPetEntity { get; private set; }
+
         public DefaultDataSet()
         {
             DefaultUserEntity = new UserEntity();
+            DefaultPetEntity = new UserPetEntity();
         }
 
         public void SeedData(PetRadarDbContext dbContext)
@@ -50,6 +57,22 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
             
 
             dbContext.Users.Add(DefaultUserEntity);
+            dbContext.SaveChanges();
+
+            DefaultPetEntity = new UserPetEntity()
+            {
+                Id = DefaultPetId,
+                UserId = DefaultUserId,
+                Name = DefaultPetName,
+                Species = DefaultPetSpecies,
+                IsActive = true,
+                CreatedBy = DefaultUserId,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow,
+                UpdatedBy = DefaultUserId
+            };
+
+            dbContext.UserPets.Add(DefaultPetEntity);
             dbContext.SaveChanges();
         }
     }
