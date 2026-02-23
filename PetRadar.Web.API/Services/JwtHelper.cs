@@ -82,7 +82,7 @@ namespace PetRadar.Web.API.Services
             new Claim(JwtRegisteredClaimNames.FamilyName, userdb.LastName ?? string.Empty),
 
             // TODO: hardcoded role
-            new Claim("Role", userdb.Role.ToString()),
+            new Claim("role", userdb.Role.ToString()),
             new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
 
             // I'm not gonna blacklist/whitelist tokens so... disable is for now
