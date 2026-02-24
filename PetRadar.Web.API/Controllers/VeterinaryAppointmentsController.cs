@@ -98,7 +98,7 @@ namespace PetRadar.Web.API.Controllers
             if (pet == default)
                 return NotFound();
 
-            var appointmentDb = await _domain.CreateAsync(appointment, 1, token);
+            var appointmentDb = await _domain.CreateAsync(appointment, UserJwt.Id, token);
 
             return CreatedAtAction(nameof(Get), new { id = appointmentDb.Id }, new VeterinaryAppointmentViewModel(appointmentDb));
         }
@@ -115,8 +115,7 @@ namespace PetRadar.Web.API.Controllers
             if (appointmentDb == default)
                 return NotFound();
 
-            //Use JWT info
-            await _domain.UpdateAsync(appointmentDb, appointment, 1, token);
+            await _domain.UpdateAsync(appointmentDb, appointment, UserJwt.Id, token);
             return NoContent();
         }
 
@@ -130,8 +129,7 @@ namespace PetRadar.Web.API.Controllers
             if (appointmentDb == default)
                 return NotFound();
 
-            //Use JWT info
-            await _domain.DeleteAsync(appointmentDb, 1, token);
+            await _domain.DeleteAsync(appointmentDb, UserJwt.Id, token);
             return NoContent();
         }
     }

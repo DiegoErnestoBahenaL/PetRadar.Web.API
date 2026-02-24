@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PetRadar.Core.Data.Entities
 {
-    public class UserPetEntity : Entity, IEntity
+    public class UserPetEntity : PetEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
@@ -20,65 +20,26 @@ namespace PetRadar.Core.Data.Entities
         [ForeignKey(nameof(UserId))]
         public UserEntity ParentUser { get; set; }
 
-        [Required, StringLength(maximumLength: 100)]
-        public string Name { get; set; } = string.Empty;
-
-        [Required]
-        public PetSpeciesEnum Species { get; set; }
-        
-        [StringLength(maximumLength: 100)]
-        public string? Breed { get; set; }
-
-        [StringLength(maximumLength: 100)]
-        public string? Color { get; set; }
-
-        public PetSexEnum? Sex { get; set; }
-
-        public PetSizeEnum? Size { get; set; }
-
         public DateTimeOffset? BirthDate { get; set; }
-        
-        public decimal? ApproximateAge { get; set; }
-        public decimal?  Weight { get; set; }
-
-        [StringLength(maximumLength: 500)]
-        public string? Description { get; set; }
-
-        [StringLength(maximumLength: 255)]
-        public string? PhotoURL { get; set; }
-
-        [StringLength(maximumLength: 255)]
-        public string? AdditionalPhotosURL { get; set; }
-
-        public bool? IsNeutered { get; set; }
-
+      
         [StringLength(maximumLength: 255)]
         public string? Allergies { get; set; }
 
         [StringLength(maximumLength: 500)]
         public string? MedicalNotes { get; set; }
 
-        public UserPetEntity() {}
+        public UserPetEntity() : base() {}
 
         public UserPetEntity
         (
-            long userId, string name, PetSpeciesEnum species, string? breed, string? color, 
-            PetSexEnum? sex, PetSizeEnum? size, DateTimeOffset? birthDate, decimal? approximateAge, 
+            long userId, string name, PetSpeciesEnum species, string? breed, string? color,
+            PetSexEnum? sex, PetSizeEnum? size, DateTimeOffset? birthDate, decimal? approximateAge,
             decimal? weight, string? description, bool? isNeutered, string? allergies, string? medicalNotes
         )
+        : base(name, species, breed, color, sex, size, approximateAge, weight, description, photoURL: null, additionalPhotosURL: null, isNeutered)
         {
             UserId = userId;
-            Name = name;
-            Species = species;
-            Breed = breed;
-            Color = color;
-            Sex = sex;
-            Size = size;
             BirthDate = birthDate;
-            ApproximateAge = approximateAge;
-            Weight = weight;
-            Description = description;
-            IsNeutered = isNeutered;
             Allergies = allergies;
             MedicalNotes = medicalNotes;
         }
