@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Domain;
 using PetRadar.Core.Domain.Models;
 using PetRadar.Web.API.ViewModels;
@@ -7,6 +9,7 @@ using System.Net.Mime;
 namespace PetRadar.Web.API.Controllers
 {
     [ApiController]
+    [Authorize(Roles = nameof(RoleEnum.SuperAdmin) + "," + nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.User) + "," + nameof(RoleEnum.Organization))]
     [Route("/api/[controller]")]
     public class VeterinaryAppointmentsController : PetRadarController
     {

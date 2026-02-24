@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using PetRadar.Core.Data;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain;
 using PetRadar.Web.API;
 using PetRadar.Web.API.Services;
+using System.Text;
 using System.Text.Json.Serialization;
 
 
@@ -19,7 +22,6 @@ var configuration = new ConfigurationBuilder()
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddSingleton<IJwtHelper, JwtHelper>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserPetRepository, UserPetRepository>();
@@ -33,6 +35,27 @@ builder.Services.AddDbContext<PetRadarDbContext>(options =>
     options.UseNpgsql(connectionString, x => x.MigrationsAssembly(Constants.MigrationsAssembly)
     .UseNetTopologySuite()
     ));
+
+
+builder.Services.AddAuthentication(auth => {
+    auth.DefaultAuthenticateScheme =  JwtBearerDefaults.AuthenticationScheme;
+    auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = "petradar.com",
+        ValidAudience = "petradar.com",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("RedactedRedactedRedactedRedacted"))
+    };
+});
+builder.Services.AddSingleton<IJwtHelper, JwtHelper>();
+
+builder.Services.AddHttpContextAccessor();
 
 // Add services to the container.
 builder.Services.AddHealthChecks();
@@ -70,20 +93,20 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
 app.UseCors("AllowEverything");
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
 
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.MapHealthChecks("/api/health");
-
-
 
 app.Run();
 
