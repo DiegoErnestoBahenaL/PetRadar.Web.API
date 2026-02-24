@@ -66,7 +66,7 @@ namespace PetRadar.Web.API.Controllers
             UserEntity userdb;
             try 
             {
-                userdb = await _domain.CreateAsync(user, 1, token);
+                userdb = await _domain.CreateAsync(user, UserJwt.Id, token);
 
                 return CreatedAtAction(nameof(Get), new { id = userdb.Id }, userdb);
 
@@ -94,7 +94,7 @@ namespace PetRadar.Web.API.Controllers
             if (userdb == default)
                 return NotFound();
             //Use JWT info
-            await _domain.UpdateAsync(userdb, user, 1, token);
+            await _domain.UpdateAsync(userdb, user, UserJwt.Id, token);
             return NoContent();
         }
 
@@ -108,7 +108,7 @@ namespace PetRadar.Web.API.Controllers
             if (userdb == default)
                 return NotFound();
             //Use JWT info
-            await _domain.DeleteAsync(userdb, 1, token);
+            await _domain.DeleteAsync(userdb, UserJwt.Id, token);
             return NoContent();
         }
 

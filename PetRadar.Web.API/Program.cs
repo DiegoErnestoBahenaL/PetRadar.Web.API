@@ -26,10 +26,12 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserPetRepository, UserPetRepository>();
 builder.Services.AddScoped<IVeterinaryAppointmentRepository, VeterinaryAppointmentRepository>();
+builder.Services.AddScoped<IAdoptionAnimalRepository, AdoptionAnimalRepository>();
 
 builder.Services.AddScoped<IUserDomain, UserDomain>();
 builder.Services.AddScoped<IUserPetDomain, UserPetDomain>();
 builder.Services.AddScoped<IVeterinaryAppointmentDomain, VeterinaryAppointmentDomain>();
+builder.Services.AddScoped<IAdoptionAnimalDomain, AdoptionAnimalDomain>();
 
 builder.Services.AddDbContext<PetRadarDbContext>(options =>
     options.UseNpgsql(connectionString, x => x.MigrationsAssembly(Constants.MigrationsAssembly)

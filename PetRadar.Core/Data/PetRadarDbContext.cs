@@ -17,6 +17,7 @@ namespace PetRadar.Core.Data
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<UserPetEntity> UserPets { get; set; }
         public DbSet<VeterinaryAppointmentEntity> VeterinaryAppointments { get; set; }
+        public DbSet<AdoptionAnimalEntity> AdoptionAnimals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -54,6 +55,22 @@ namespace PetRadar.Core.Data
             modelBuilder.Entity<VeterinaryAppointmentEntity>()
                 .Property(x => x.Location)
                 .HasColumnType("geography (point)");
+
+            modelBuilder.Entity<AdoptionAnimalEntity>()
+                .Property(x => x.Sex)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<AdoptionAnimalEntity>()
+                .Property(x => x.Species)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<AdoptionAnimalEntity>()
+                .Property(x => x.Size)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<AdoptionAnimalEntity>()
+                .Property(x => x.Status)
+                .HasConversion<string>();
 
             modelBuilder.Entity<UserEntity>()
                 .HasData(new UserEntity("sa@test.com",hashPassword,salt, "Super", "Admmin", "000000000", null,null,null, RoleEnum.SuperAdmin, 1) 
