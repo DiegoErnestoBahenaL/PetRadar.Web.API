@@ -3,6 +3,7 @@
     public enum PetSpeciesEnum
     {
         Dog = 1,
-        Cat
+        Cat,
+        NotSet
     }
 }

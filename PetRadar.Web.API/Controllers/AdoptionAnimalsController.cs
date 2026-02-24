@@ -13,13 +13,13 @@ namespace PetRadar.Web.API.Controllers
     [ApiController]
     [Authorize(Roles = nameof(RoleEnum.SuperAdmin) + "," + nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.User) + "," + nameof(RoleEnum.Organization))]
     [Route("/api/[controller]")]
-    public class UserPetsController : PetRadarController
+    public class AdoptionAnimalsController : PetRadarController
     {
-        private readonly ILogger<UserPetsController> _logger;
-        private readonly IUserPetDomain _domain;
+        private readonly ILogger<AdoptionAnimalsController> _logger;
+        private readonly IAdoptionAnimalDomain _domain;
         private readonly IUserDomain _userDomain;
 
-        public UserPetsController(ILogger<UserPetsController> logger, IUserPetDomain domain, IUserDomain userDomain)
+        public AdoptionAnimalsController(ILogger<AdoptionAnimalsController> logger, IAdoptionAnimalDomain domain, IUserDomain userDomain)
         {
             _logger = logger;
             _domain = domain;
@@ -30,54 +30,54 @@ namespace PetRadar.Web.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<IList<UserPetViewModel>>> Get(CancellationToken token)
+        public async Task<ActionResult<IList<AdoptionAnimalViewModel>>> Get(CancellationToken token)
         {
-            var pets = await _domain.GetAllAsync(token);
+            var animals = await _domain.GetAllAsync(token);
 
-            return Ok(UserPetViewModel.FromList(pets));
+            return Ok(AdoptionAnimalViewModel.FromList(animals));
         }
 
-        [HttpGet("user/{userId}")]
+        [HttpGet("shelter/{shelterId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<IList<UserPetViewModel>>> GetByUserId([FromRoute] long userId, CancellationToken token)
+        public async Task<ActionResult<IList<AdoptionAnimalViewModel>>> GetByShelterId([FromRoute] long shelterId, CancellationToken token)
         {
-            var pets = await _domain.GetAllByUserIdAsync(userId, token);
+            var animals = await _domain.GetAllByShelterIdAsync(shelterId, token);
 
-            return Ok(UserPetViewModel.FromList(pets));
+            return Ok(AdoptionAnimalViewModel.FromList(animals));
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<UserPetViewModel>> Get([FromRoute] long id, CancellationToken token)
+        public async Task<ActionResult<AdoptionAnimalViewModel>> Get([FromRoute] long id, CancellationToken token)
         {
-            var pet = await _domain.FindByIdAsync(id, token);
+            var animal = await _domain.FindByIdAsync(id, token);
 
-            if (pet == default)
+            if (animal == default)
                 return NotFound();
 
-            return Ok(new UserPetViewModel(pet));
+            return Ok(new AdoptionAnimalViewModel(animal));
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces(MediaTypeNames.Application.Json)]
-        public async Task<IActionResult> Post([FromBody] UserPetCreateModel pet, CancellationToken token)
+        public async Task<IActionResult> Post([FromBody] AdoptionAnimalCreateModel animal, CancellationToken token)
         {
-            var user = await _userDomain.FindByIdAsync(pet.UserId, token);
+            var user = await _userDomain.FindByIdAsync(animal.ShelterId, token);
 
             if (user == default)
                 return NotFound();
 
+            var animalDb = await _domain.CreateAsync(animal, UserJwt.Id, token);
 
-            var petDb = await _domain.CreateAsync(pet, UserJwt.Id, token);
-
-            return CreatedAtAction(nameof(Get), new { id = petDb.Id }, new UserPetViewModel(petDb));
+            return CreatedAtAction(nameof(Get), new { id = animalDb.Id }, new AdoptionAnimalViewModel(animalDb));
         }
 
         [HttpPut("{id}")]
@@ -85,14 +85,22 @@ namespace PetRadar.Web.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Consumes(MediaTypeNames.Application.Json)]
-        public async Task<IActionResult> Put([FromRoute] long id, [FromBody] UserPetUpdateModel pet, CancellationToken token)
+        public async Task<IActionResult> Put([FromRoute] long id, [FromBody] AdoptionAnimalUpdateModel animal, CancellationToken token)
         {
-            var petdb = await _domain.FindByIdAsync(id, token);
+            var animalDb = await _domain.FindByIdAsync(id, token);
 
-            if (petdb == default)
+            if (animalDb == default)
                 return NotFound();
 
-            await _domain.UpdateAsync(petdb, pet, UserJwt.Id, token);
+            if (animal.AdopterId != null)
+            {
+               var adopterUser = await _userDomain.FindByIdAsync(animal.AdopterId.Value, token);
+
+               if (adopterUser == default)
+                    return NotFound("Usuario adoptante no encontrado");
+            }
+
+            await _domain.UpdateAsync(animalDb, animal, UserJwt.Id, token);
             return NoContent();
         }
 
@@ -101,12 +109,12 @@ namespace PetRadar.Web.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromRoute] long id, CancellationToken token)
         {
-            var petdb = await _domain.FindByIdAsync(id, token);
+            var animalDb = await _domain.FindByIdAsync(id, token);
 
-            if (petdb == default)
+            if (animalDb == default)
                 return NotFound();
 
-            await _domain.DeleteAsync(petdb, UserJwt.Id, token);
+            await _domain.DeleteAsync(animalDb, UserJwt.Id, token);
             return NoContent();
         }
     }
