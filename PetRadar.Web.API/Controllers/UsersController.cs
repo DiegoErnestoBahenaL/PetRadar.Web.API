@@ -1,3 +1,4 @@
+using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -54,7 +55,7 @@ namespace PetRadar.Web.API.Controllers
             return Ok(new UserViewModel(user));
         }
 
-
+        [AllowAnonymous]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -62,14 +63,25 @@ namespace PetRadar.Web.API.Controllers
         [Produces(MediaTypeNames.Application.Json)]
         public async Task<IActionResult> Post([FromBody] UserCreateModel user, CancellationToken token)
         {
-            //Use the JWT info
             UserEntity userdb;
             try 
             {
+                // If UserJwt is null, it means the user is creating their own account,
+                // so we can set createdBy to 0 or some default value.
+
+
                 userdb = await _domain.CreateAsync(user, UserJwt.Id, token);
 
-                return CreatedAtAction(nameof(Get), new { id = userdb.Id }, userdb);
+                return CreatedAtAction(nameof(Get), new { id = userdb.Id }, new UserViewModel(userdb));
 
+            }
+            //If UserJwt.Id throws InvalidOperationException, it means the user is creating their own account,
+            // so we can set createdByUserID to 1 or some default value.
+            catch (InvalidOperationException)
+            {
+                userdb = await _domain.CreateAsync(user, createdByUserId: 1, token);
+
+                return CreatedAtAction(nameof(Get), new { id = userdb.Id }, new UserViewModel(userdb));
             }
             catch (PetRadarException ex)
             {
@@ -80,6 +92,7 @@ namespace PetRadar.Web.API.Controllers
 
                 return BadRequest(ex.Message);
             }
+
         }
 
         [HttpPut("{id}")]
