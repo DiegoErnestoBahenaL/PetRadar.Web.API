@@ -1,3 +1,4 @@
+using NetTopologySuite.Geometries;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
@@ -44,14 +45,15 @@ namespace PetRadar.Core.Domain
 
         public async Task<VeterinaryAppointmentEntity> CreateAsync(VeterinaryAppointmentCreateModel appointment, long createdByUserId, CancellationToken token)
         {
-
-
+            Point? location = null;
+            if (appointment.Latitude.HasValue && appointment.Longitude.HasValue)
+                location = new Point(appointment.Longitude.Value, appointment.Latitude.Value) { SRID = 4326 };
 
             var appointmentDb = new VeterinaryAppointmentEntity (
-                appointment.PetId, appointment.VeterinaryName, appointment.AppointmentType,
-                appointment.AppointmentStatus, appointment.AppointmentDate, appointment.DurationInMinutes,
+                appointment.PetId.Value, appointment.VeterinaryName, appointment.AppointmentType.Value,
+                appointment.AppointmentStatus.Value, appointment.AppointmentDate.Value, appointment.DurationInMinutes,
                 appointment.ReasonForVisit, appointment.Notes, appointment.Diagnosis, appointment.Treatment, 
-                appointment.Prescriptions, appointment.Cost, appointment.Location, appointment.AddressText
+                appointment.Prescriptions, appointment.Cost, location, appointment.AddressText
             );
 
             appointmentDb.CreatedBy = createdByUserId;
@@ -100,6 +102,9 @@ namespace PetRadar.Core.Domain
 
             if (appointment.Cost.HasValue)
                 appointmentDb.Cost = appointment.Cost.Value;
+
+            if (appointment.Latitude.HasValue && appointment.Longitude.HasValue)
+                appointmentDb.Location = new Point(appointment.Longitude.Value, appointment.Latitude.Value) { SRID = 4326 };
 
             if (!string.IsNullOrEmpty(appointment.AddressText))
                 appointmentDb.AddressText = appointment.AddressText;

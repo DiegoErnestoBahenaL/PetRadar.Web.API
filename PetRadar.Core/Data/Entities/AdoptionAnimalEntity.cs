@@ -14,6 +14,9 @@ namespace PetRadar.Core.Data.Entities
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
+        [Required, StringLength(maximumLength: 100)]
+        public string Name { get; set; } = string.Empty;
+
         [Required]
         public long ShelterId { get; set; }
 
@@ -51,8 +54,9 @@ namespace PetRadar.Core.Data.Entities
             bool? goodWithCats, bool? isVaccinated, bool? needsSpecialCare, string? specialCareDetails
            
         )
-        : base(name, species, breed, color, sex, size, approximateAge, weight, description, photoURL: null, additionalPhotosURL: null, isNeutered)
+        : base(species, breed, color, sex, size, approximateAge, weight, description, photoURL: null, additionalPhotosURL: null, isNeutered)
         {
+            Name = name;
             ShelterId = shelterId;
             Personality = personality;
             GoodWithKids = goodWithKids;

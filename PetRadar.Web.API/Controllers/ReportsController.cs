@@ -13,13 +13,13 @@ namespace PetRadar.Web.API.Controllers
     [ApiController]
     [Authorize(Roles = nameof(RoleEnum.SuperAdmin) + "," + nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.User) + "," + nameof(RoleEnum.Organization))]
     [Route("/api/[controller]")]
-    public class AdoptionAnimalsController : PetRadarController
+    public class ReportsController : PetRadarController
     {
-        private readonly ILogger<AdoptionAnimalsController> _logger;
-        private readonly IAdoptionAnimalDomain _domain;
+        private readonly ILogger<ReportsController> _logger;
+        private readonly IReportDomain _domain;
         private readonly IUserDomain _userDomain;
 
-        public AdoptionAnimalsController(ILogger<AdoptionAnimalsController> logger, IAdoptionAnimalDomain domain, IUserDomain userDomain)
+        public ReportsController(ILogger<ReportsController> logger, IReportDomain domain, IUserDomain userDomain)
         {
             _logger = logger;
             _domain = domain;
@@ -30,36 +30,36 @@ namespace PetRadar.Web.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<IList<AdoptionAnimalViewModel>>> Get(CancellationToken token)
+        public async Task<ActionResult<IList<ReportViewModel>>> Get(CancellationToken token)
         {
-            var animals = await _domain.GetAllAsync(token);
+            var reports = await _domain.GetAllAsync(token);
 
-            return Ok(AdoptionAnimalViewModel.FromList(animals));
+            return Ok(ReportViewModel.FromList(reports));
         }
 
-        [HttpGet("shelter/{shelterId}")]
+        [HttpGet("user/{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<IList<AdoptionAnimalViewModel>>> GetByShelterId([FromRoute] long shelterId, CancellationToken token)
+        public async Task<ActionResult<IList<ReportViewModel>>> GetByUserId([FromRoute] long userId, CancellationToken token)
         {
-            var animals = await _domain.GetAllByShelterIdAsync(shelterId, token);
+            var reports = await _domain.GetAllByUserIdAsync(userId, token);
 
-            return Ok(AdoptionAnimalViewModel.FromList(animals));
+            return Ok(ReportViewModel.FromList(reports));
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult<AdoptionAnimalViewModel>> Get([FromRoute] long id, CancellationToken token)
+        public async Task<ActionResult<ReportViewModel>> Get([FromRoute] long id, CancellationToken token)
         {
-            var animal = await _domain.FindByIdAsync(id, token);
+            var report = await _domain.FindByIdAsync(id, token);
 
-            if (animal == default)
+            if (report == default)
                 return NotFound();
 
-            return Ok(new AdoptionAnimalViewModel(animal));
+            return Ok(new ReportViewModel(report));
         }
 
         [HttpPost]
@@ -68,16 +68,16 @@ namespace PetRadar.Web.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Consumes(MediaTypeNames.Application.Json)]
         [Produces(MediaTypeNames.Application.Json)]
-        public async Task<IActionResult> Post([FromBody] AdoptionAnimalCreateModel animal, CancellationToken token)
+        public async Task<IActionResult> Post([FromBody] ReportCreateModel report, CancellationToken token)
         {
-            var user = await _userDomain.FindByIdAsync(animal.ShelterId.Value, token);
+            var user = await _userDomain.FindByIdAsync(report.UserId.Value, token);
 
             if (user == default)
                 return NotFound();
 
-            var animalDb = await _domain.CreateAsync(animal, UserJwt.Id, token);
+            var reportDb = await _domain.CreateAsync(report, UserJwt.Id, token);
 
-            return CreatedAtAction(nameof(Get), new { id = animalDb.Id }, new AdoptionAnimalViewModel(animalDb));
+            return CreatedAtAction(nameof(Get), new { id = reportDb.Id }, new ReportViewModel(reportDb));
         }
 
         [HttpPut("{id}")]
@@ -85,22 +85,14 @@ namespace PetRadar.Web.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Consumes(MediaTypeNames.Application.Json)]
-        public async Task<IActionResult> Put([FromRoute] long id, [FromBody] AdoptionAnimalUpdateModel animal, CancellationToken token)
+        public async Task<IActionResult> Put([FromRoute] long id, [FromBody] ReportUpdateModel report, CancellationToken token)
         {
-            var animalDb = await _domain.FindByIdAsync(id, token);
+            var reportDb = await _domain.FindByIdAsync(id, token);
 
-            if (animalDb == default)
+            if (reportDb == default)
                 return NotFound();
 
-            if (animal.AdopterId != null)
-            {
-               var adopterUser = await _userDomain.FindByIdAsync(animal.AdopterId.Value, token);
-
-               if (adopterUser == default)
-                    return NotFound("Usuario adoptante no encontrado");
-            }
-
-            await _domain.UpdateAsync(animalDb, animal, UserJwt.Id, token);
+            await _domain.UpdateAsync(reportDb, report, UserJwt.Id, token);
             return NoContent();
         }
 
@@ -109,12 +101,12 @@ namespace PetRadar.Web.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromRoute] long id, CancellationToken token)
         {
-            var animalDb = await _domain.FindByIdAsync(id, token);
+            var reportDb = await _domain.FindByIdAsync(id, token);
 
-            if (animalDb == default)
+            if (reportDb == default)
                 return NotFound();
 
-            await _domain.DeleteAsync(animalDb, UserJwt.Id, token);
+            await _domain.DeleteAsync(reportDb, UserJwt.Id, token);
             return NoContent();
         }
     }
