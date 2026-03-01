@@ -20,6 +20,10 @@ namespace PetRadar.Web.API.Controllers
         {
             if (_userJwt == default)
             {
+
+                if (HttpContext.User == null || HttpContext.User.Claims == null || !HttpContext.User.Claims.Any())
+                    throw new InvalidOperationException("User is not authenticated");
+
                 var claims = HttpContext.User.Claims;
                 var sub = GetClaim(ClaimTypes.NameIdentifier, claims);
                 var email = GetClaim(ClaimTypes.Email, claims);
