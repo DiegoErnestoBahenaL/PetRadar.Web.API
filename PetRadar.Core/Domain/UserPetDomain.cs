@@ -40,7 +40,7 @@ namespace PetRadar.Core.Domain
         public async Task<UserPetEntity> CreateAsync(UserPetCreateModel pet, long createdByUserId, CancellationToken token)
         {
             var petdb = new UserPetEntity(
-                pet.UserId, pet.Name, pet.Species, pet.Breed, pet.Color,
+                pet.UserId.Value, pet.Name, pet.Species.Value, pet.Breed, pet.Color,
                 pet.Sex, pet.Size, pet.BirthDate, pet.ApproximateAge,
                 pet.Weight, pet.Description, pet.IsNeutered, pet.Allergies, pet.MedicalNotes
             );

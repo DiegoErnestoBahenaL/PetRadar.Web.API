@@ -17,6 +17,8 @@ namespace PetRadar.Web.API.ViewModels
         public string? Treatment { get; set; }
         public string? Prescriptions { get; set; }
         public decimal? Cost { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
         public string? AddressText { get; set; }
         public bool ReminderSent { get; set; }
 
@@ -37,6 +39,8 @@ namespace PetRadar.Web.API.ViewModels
             Treatment = entity.Treatment;
             Prescriptions = entity.Prescriptions;
             Cost = entity.Cost;
+            Latitude = entity.Location?.Y;
+            Longitude = entity.Location?.X;
             AddressText = entity.AddressText;
             ReminderSent = entity.ReminderSent;
         }

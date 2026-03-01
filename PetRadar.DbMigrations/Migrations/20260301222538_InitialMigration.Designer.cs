@@ -13,7 +13,7 @@ using PetRadar.Core.Data;
 namespace PetRadar.DbMigrations.Migrations
 {
     [DbContext(typeof(PetRadarDbContext))]
-    [Migration("20260224220120_InitialMigration")]
+    [Migration("20260301222538_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -148,6 +148,144 @@ namespace PetRadar.DbMigrations.Migrations
                     b.ToTable("AdoptionAnimals");
                 });
 
+            modelBuilder.Entity("PetRadar.Core.Data.Entities.ReportEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AdditionalPhotosURL")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("AddressText")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<decimal?>("ApproximateAge")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Breed")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Color")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ContactEmail")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ContactName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ContactPhone")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("DeletedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool?>("HasCollar")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("HasTag")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("IncidentDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsNeutered")
+                        .HasColumnType("boolean");
+
+                    b.Property<Point>("Location")
+                        .IsRequired()
+                        .HasColumnType("geography (point)");
+
+                    b.Property<bool>("OffersReward")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("PhotoURL")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTimeOffset>("ReportDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ReportStatus")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ReportType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("RewardAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("SearchRadiusMeters")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Sex")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Size")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Species")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("UseAlternateContact")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("UserPetId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Views")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("Weight")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserPetId");
+
+                    b.ToTable("Reports");
+                });
+
             modelBuilder.Entity("PetRadar.Core.Data.Entities.UserEntity", b =>
                 {
                     b.Property<long>("Id")
@@ -236,18 +374,18 @@ namespace PetRadar.DbMigrations.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 2, 24, 22, 1, 19, 464, DateTimeKind.Unspecified).AddTicks(467), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 3, 1, 22, 25, 38, 333, DateTimeKind.Unspecified).AddTicks(8383), new TimeSpan(0, 0, 0, 0, 0)),
                             CreatedBy = 1L,
                             Email = "sa@test.com",
                             EmailVerified = true,
                             IsActive = true,
                             LastName = "Admmin",
                             Name = "Super",
-                            Password = new byte[] { 190, 177, 99, 44, 149, 154, 30, 167, 62, 157, 69, 173, 137, 118, 80, 222, 14, 237, 156, 72, 41, 82, 60, 122, 185, 249, 36, 230, 136, 124, 181, 78, 27, 103, 60, 198, 156, 144, 147, 140, 209, 170, 65, 221, 225, 179, 222, 48, 24, 231, 109, 59, 21, 236, 43, 124, 193, 4, 66, 1, 195, 148, 94, 230, 234, 26, 123, 153, 140, 157, 69, 214, 133, 17, 67, 207, 12, 149, 165, 205, 197, 248, 51, 115, 184, 204, 210, 32, 172, 222, 41, 24, 136, 125, 113, 246, 160, 144, 21, 172, 193, 43, 249, 146, 158, 246, 164, 157, 16, 251, 190, 120, 207, 12, 174, 11, 205, 140, 30, 14, 129, 232, 234, 77, 164, 220, 234, 6, 141, 228, 116, 147, 193, 90, 26, 117, 109, 120, 8, 64, 148, 159, 144, 58, 50, 179, 36, 83, 20, 151, 123, 153, 29, 216, 3, 34, 65, 112, 115, 121, 140, 89, 244, 222, 13, 54, 50, 227, 210, 156, 183, 114, 124, 2, 53, 88, 64, 48, 65, 74, 117, 234, 53, 21, 86, 163, 73, 76, 101, 158, 42, 158, 8, 130, 52, 81, 149, 127, 90, 217, 158, 190, 37, 51, 245, 133, 41, 114, 125, 235, 167, 172, 132, 120, 41, 243, 165, 4, 78, 8, 217, 155, 130, 20, 210, 152, 224, 118, 87, 65, 191, 121, 47, 36, 69, 142, 202, 162, 8, 163, 187, 91, 144, 61, 53, 17, 138, 159, 96, 74, 220, 101, 148, 150, 234, 180 },
+                            Password = new byte[] { 6, 132, 253, 77, 33, 227, 169, 130, 189, 102, 158, 242, 57, 161, 204, 173, 188, 194, 243, 136, 213, 188, 84, 68, 179, 211, 238, 185, 45, 154, 55, 120, 234, 183, 150, 170, 33, 98, 250, 222, 61, 229, 240, 195, 89, 103, 114, 231, 203, 225, 53, 157, 200, 109, 245, 69, 112, 162, 114, 12, 150, 189, 102, 152, 199, 110, 135, 188, 116, 27, 40, 169, 2, 217, 238, 35, 48, 128, 0, 73, 149, 193, 132, 141, 227, 195, 169, 114, 104, 222, 236, 41, 208, 210, 112, 97, 103, 236, 100, 199, 107, 74, 106, 36, 66, 88, 65, 34, 146, 0, 191, 45, 136, 105, 143, 96, 56, 69, 173, 121, 254, 200, 44, 79, 248, 207, 128, 95, 89, 83, 171, 130, 200, 154, 25, 173, 227, 42, 159, 93, 170, 245, 14, 201, 63, 47, 211, 64, 69, 11, 192, 100, 243, 239, 218, 191, 109, 104, 31, 124, 212, 238, 106, 18, 21, 32, 85, 252, 58, 58, 77, 84, 95, 56, 116, 61, 248, 111, 91, 157, 209, 76, 206, 133, 57, 181, 226, 68, 209, 241, 147, 91, 89, 168, 183, 142, 124, 191, 123, 54, 175, 103, 47, 67, 38, 69, 49, 253, 199, 231, 133, 233, 253, 48, 69, 62, 110, 178, 98, 25, 234, 145, 239, 55, 79, 72, 38, 177, 94, 0, 228, 126, 70, 102, 162, 149, 78, 252, 209, 235, 169, 211, 16, 214, 212, 37, 244, 161, 215, 193, 18, 133, 48, 84, 148, 240 },
                             PhoneNumber = "000000000",
                             Role = "SuperAdmin",
-                            Salt = new byte[] { 232, 8, 80, 43, 199, 126, 2, 172, 208, 120, 144, 96, 53, 52, 57, 169, 248, 105, 24, 5, 217, 1, 138, 65, 93, 123, 114, 255, 7, 162, 63, 37, 189, 205, 183, 147, 241, 106, 199, 66, 185, 13, 85, 114, 152, 38, 76, 73, 51, 142, 157, 117, 15, 117, 207, 135, 240, 71, 233, 185, 201, 120, 67, 250, 247, 64, 163, 82, 49, 101, 105, 174, 244, 81, 2, 132, 9, 9, 1, 110, 159, 226, 28, 14, 208, 52, 20, 155, 11, 70, 220, 174, 143, 97, 80, 22, 181, 0, 219, 0, 16, 151, 170, 65, 218, 100, 217, 224, 111, 204, 36, 156, 198, 177, 115, 73, 174, 56, 97, 28, 66, 28, 172, 116, 172, 173, 61, 78 },
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 2, 24, 22, 1, 19, 464, DateTimeKind.Unspecified).AddTicks(467), new TimeSpan(0, 0, 0, 0, 0)),
+                            Salt = new byte[] { 55, 137, 144, 223, 82, 114, 251, 128, 249, 253, 197, 74, 157, 146, 158, 186, 248, 164, 34, 84, 106, 79, 176, 6, 194, 20, 234, 183, 212, 187, 198, 173, 243, 153, 185, 110, 210, 156, 240, 12, 109, 27, 79, 97, 177, 114, 130, 255, 110, 157, 167, 137, 5, 214, 37, 73, 168, 241, 246, 173, 195, 31, 86, 193, 114, 138, 126, 222, 168, 33, 190, 185, 158, 9, 164, 212, 162, 168, 58, 35, 50, 94, 83, 41, 187, 28, 24, 133, 246, 253, 15, 187, 25, 223, 246, 119, 188, 18, 120, 140, 27, 79, 199, 151, 114, 71, 15, 208, 104, 55, 42, 30, 155, 115, 114, 182, 57, 58, 160, 125, 21, 5, 68, 6, 24, 158, 49, 68 },
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 3, 1, 22, 25, 38, 333, DateTimeKind.Unspecified).AddTicks(8383), new TimeSpan(0, 0, 0, 0, 0)),
                             UpdatedBy = 0L
                         });
                 });
@@ -453,6 +591,23 @@ namespace PetRadar.DbMigrations.Migrations
                     b.Navigation("AdopterUser");
 
                     b.Navigation("ShelterUser");
+                });
+
+            modelBuilder.Entity("PetRadar.Core.Data.Entities.ReportEntity", b =>
+                {
+                    b.HasOne("PetRadar.Core.Data.Entities.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PetRadar.Core.Data.Entities.UserPetEntity", "UserPet")
+                        .WithMany()
+                        .HasForeignKey("UserPetId");
+
+                    b.Navigation("User");
+
+                    b.Navigation("UserPet");
                 });
 
             modelBuilder.Entity("PetRadar.Core.Data.Entities.UserPetEntity", b =>

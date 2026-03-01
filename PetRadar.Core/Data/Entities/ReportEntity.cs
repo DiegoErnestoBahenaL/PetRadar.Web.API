@@ -23,7 +23,7 @@ namespace PetRadar.Core.Data.Entities
 
         public long? UserPetId { get; set; }
 
-        [ForeignKey(nameof(UserId))]
+        [ForeignKey(nameof(UserPetId))]
         public UserPetEntity UserPet { get; set; }
         public ReportTypeEnum ReportType { get; set; }
         public ReportStatusEnum ReportStatus { get; set; } = ReportStatusEnum.Active;

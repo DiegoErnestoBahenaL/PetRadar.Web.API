@@ -15,14 +15,14 @@ namespace PetRadar.Core.Domain.Models
         public UserPetCreateModel() { }
 
         [Required]
-        public long UserId { get; set; }
+        public long? UserId { get; set; }
 
         [StringLength(100, MinimumLength = 1, ErrorMessage = "The field Name must be a string with a minimum length of {2} and a maximum length of {1}"), Required]
         public string Name { get; set; } = string.Empty;
 
         [Required]
         [JsonConverter(typeof(StringEnumConverter))]
-        public PetSpeciesEnum Species { get; set; }
+        public PetSpeciesEnum? Species { get; set; }
 
         [StringLength(100, ErrorMessage = "The field Breed must be a string with maximum length of {1}")]
         public string? Breed { get; set; }

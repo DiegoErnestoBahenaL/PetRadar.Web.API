@@ -1,4 +1,3 @@
-using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using PetRadar.Core.Data.Entities.Enums;
@@ -16,21 +15,21 @@ namespace PetRadar.Core.Domain.Models
         public VeterinaryAppointmentCreateModel() { }
 
         [Required]
-        public long PetId { get; set; }
+        public long? PetId { get; set; }
 
         [StringLength(100, MinimumLength = 1, ErrorMessage = "The field VeterinaryName must be a string with a minimum length of {2} and a maximum length of {1}")]
         public string VeterinaryName { get; set; } = string.Empty;
 
         [Required]
         [JsonConverter(typeof(StringEnumConverter))]
-        public AppointmentTypeEnum AppointmentType { get; set; }
+        public AppointmentTypeEnum? AppointmentType { get; set; }
 
         [Required]
         [JsonConverter(typeof(StringEnumConverter))]
-        public AppointmentStatusEnum AppointmentStatus { get; set; }
+        public AppointmentStatusEnum? AppointmentStatus { get; set; }
 
         [Required]
-        public DateTimeOffset AppointmentDate { get; set; }
+        public DateTimeOffset? AppointmentDate { get; set; }
 
         public int? DurationInMinutes { get; set; }
 
@@ -49,9 +48,11 @@ namespace PetRadar.Core.Domain.Models
         [StringLength(500, MinimumLength = 1, ErrorMessage = "The field Prescriptions must be a string with a minimum length of {2} and a maximum length of {1}")]
         public string? Prescriptions { get; set; }
 
-        public Point? Location { get; set; }
-
         public decimal? Cost { get; set; }
+
+        public double? Latitude { get; set; }
+
+        public double? Longitude { get; set; }
 
         [StringLength(200, MinimumLength = 1, ErrorMessage = "The field AddressText must be a string with a minimum length of {2} and a maximum length of {1}")]
         public string? AddressText { get; set; }
@@ -60,7 +61,8 @@ namespace PetRadar.Core.Domain.Models
             long petId, string veterinaryName, AppointmentTypeEnum appointmentType,
             AppointmentStatusEnum appointmentStatus, DateTimeOffset appointmentDate, int? durationInMinutes,
             string reasonForVisit, string? notes, string? diagnosis, string? treatment,
-            string? prescriptions, decimal? cost, string? addressText)
+            string? prescriptions, decimal? cost, string? addressText,
+            double? latitude = null, double? longitude = null)
         {
             PetId = petId;
             VeterinaryName = veterinaryName;
@@ -75,6 +77,8 @@ namespace PetRadar.Core.Domain.Models
             Prescriptions = prescriptions;
             Cost = cost;
             AddressText = addressText;
+            Latitude = latitude;
+            Longitude = longitude;
         }
     }
 }

@@ -1,4 +1,3 @@
-using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using PetRadar.Core.Data.Entities.Enums;
@@ -43,9 +42,11 @@ namespace PetRadar.Core.Domain.Models
         [StringLength(500, MinimumLength = 1, ErrorMessage = "The field Prescriptions must be a string with a minimum length of {2} and a maximum length of {1}")]
         public string? Prescriptions { get; set; }
 
-        public Point? Location { get; set; }
-
         public decimal? Cost { get; set; }
+
+        public double? Latitude { get; set; }
+
+        public double? Longitude { get; set; }
 
         [StringLength(200, MinimumLength = 1, ErrorMessage = "The field AddressText must be a string with a minimum length of {2} and a maximum length of {1}")]
         public string? AddressText { get; set; }
@@ -54,7 +55,8 @@ namespace PetRadar.Core.Domain.Models
             string? veterinaryName, AppointmentTypeEnum? appointmentType,
             AppointmentStatusEnum? appointmentStatus, DateTimeOffset? appointmentDate, int? durationInMinutes,
             string? reasonForVisit, string? notes, string? diagnosis, string? treatment,
-            string? prescriptions, decimal? cost, string? addressText)
+            string? prescriptions, decimal? cost, string? addressText,
+            double? latitude = null, double? longitude = null)
         {
             VeterinaryName = veterinaryName;
             AppointmentType = appointmentType;
@@ -68,6 +70,8 @@ namespace PetRadar.Core.Domain.Models
             Prescriptions = prescriptions;
             Cost = cost;
             AddressText = addressText;
+            Latitude = latitude;
+            Longitude = longitude;
         }
     }
 }
