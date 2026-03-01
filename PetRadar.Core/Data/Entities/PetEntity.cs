@@ -10,8 +10,6 @@ namespace PetRadar.Core.Data.Entities
 {
     public abstract class PetEntity : Entity, IEntity
     {
-        [Required, StringLength(maximumLength: 100)]
-        public string Name { get; set; } = string.Empty;
 
         [Required]
         public PetSpeciesEnum Species { get; set; } = PetSpeciesEnum.NotSet;
@@ -43,12 +41,11 @@ namespace PetRadar.Core.Data.Entities
         protected PetEntity() { }
 
         protected PetEntity(
-            string name, PetSpeciesEnum species, string? breed, string? color, PetSexEnum? sex, 
+            PetSpeciesEnum species, string? breed, string? color, PetSexEnum? sex, 
             PetSizeEnum? size, decimal? approximateAge, decimal? weight, string? description, 
             string? photoURL, string? additionalPhotosURL, bool? isNeutered
         )
         {
-            Name = name;
             Species = species;
             Breed = breed;
             Color = color;
