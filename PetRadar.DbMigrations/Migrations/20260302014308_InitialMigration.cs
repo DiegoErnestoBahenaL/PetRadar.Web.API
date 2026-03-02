@@ -241,10 +241,48 @@ namespace PetRadar.DbMigrations.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Matches",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    LostReportId = table.Column<long>(type: "bigint", nullable: false),
+                    StrayReportId = table.Column<long>(type: "bigint", nullable: false),
+                    Score = table.Column<double>(type: "double precision", nullable: false),
+                    DistanceInKM = table.Column<double>(type: "double precision", nullable: true),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    Notes = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    ConfirmationDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    UpdatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    DeletedBy = table.Column<long>(type: "bigint", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Matches", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Matches_Reports_LostReportId",
+                        column: x => x.LostReportId,
+                        principalTable: "Reports",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Matches_Reports_StrayReportId",
+                        column: x => x.StrayReportId,
+                        principalTable: "Reports",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "CreatedBy", "DeletedAt", "DeletedBy", "Email", "EmailVerified", "IsActive", "LastName", "Name", "OrganizationAddress", "OrganizationName", "OrganizationPhone", "Password", "PhoneNumber", "ProfilePhotoURL", "Role", "Salt", "UpdatedAt", "UpdatedBy" },
-                values: new object[] { 1L, new DateTimeOffset(new DateTime(2026, 3, 1, 22, 25, 38, 333, DateTimeKind.Unspecified).AddTicks(8383), new TimeSpan(0, 0, 0, 0, 0)), 1L, null, null, "sa@test.com", true, true, "Admmin", "Super", null, null, null, new byte[] { 6, 132, 253, 77, 33, 227, 169, 130, 189, 102, 158, 242, 57, 161, 204, 173, 188, 194, 243, 136, 213, 188, 84, 68, 179, 211, 238, 185, 45, 154, 55, 120, 234, 183, 150, 170, 33, 98, 250, 222, 61, 229, 240, 195, 89, 103, 114, 231, 203, 225, 53, 157, 200, 109, 245, 69, 112, 162, 114, 12, 150, 189, 102, 152, 199, 110, 135, 188, 116, 27, 40, 169, 2, 217, 238, 35, 48, 128, 0, 73, 149, 193, 132, 141, 227, 195, 169, 114, 104, 222, 236, 41, 208, 210, 112, 97, 103, 236, 100, 199, 107, 74, 106, 36, 66, 88, 65, 34, 146, 0, 191, 45, 136, 105, 143, 96, 56, 69, 173, 121, 254, 200, 44, 79, 248, 207, 128, 95, 89, 83, 171, 130, 200, 154, 25, 173, 227, 42, 159, 93, 170, 245, 14, 201, 63, 47, 211, 64, 69, 11, 192, 100, 243, 239, 218, 191, 109, 104, 31, 124, 212, 238, 106, 18, 21, 32, 85, 252, 58, 58, 77, 84, 95, 56, 116, 61, 248, 111, 91, 157, 209, 76, 206, 133, 57, 181, 226, 68, 209, 241, 147, 91, 89, 168, 183, 142, 124, 191, 123, 54, 175, 103, 47, 67, 38, 69, 49, 253, 199, 231, 133, 233, 253, 48, 69, 62, 110, 178, 98, 25, 234, 145, 239, 55, 79, 72, 38, 177, 94, 0, 228, 126, 70, 102, 162, 149, 78, 252, 209, 235, 169, 211, 16, 214, 212, 37, 244, 161, 215, 193, 18, 133, 48, 84, 148, 240 }, "000000000", null, "SuperAdmin", new byte[] { 55, 137, 144, 223, 82, 114, 251, 128, 249, 253, 197, 74, 157, 146, 158, 186, 248, 164, 34, 84, 106, 79, 176, 6, 194, 20, 234, 183, 212, 187, 198, 173, 243, 153, 185, 110, 210, 156, 240, 12, 109, 27, 79, 97, 177, 114, 130, 255, 110, 157, 167, 137, 5, 214, 37, 73, 168, 241, 246, 173, 195, 31, 86, 193, 114, 138, 126, 222, 168, 33, 190, 185, 158, 9, 164, 212, 162, 168, 58, 35, 50, 94, 83, 41, 187, 28, 24, 133, 246, 253, 15, 187, 25, 223, 246, 119, 188, 18, 120, 140, 27, 79, 199, 151, 114, 71, 15, 208, 104, 55, 42, 30, 155, 115, 114, 182, 57, 58, 160, 125, 21, 5, 68, 6, 24, 158, 49, 68 }, new DateTimeOffset(new DateTime(2026, 3, 1, 22, 25, 38, 333, DateTimeKind.Unspecified).AddTicks(8383), new TimeSpan(0, 0, 0, 0, 0)), 0L });
+                values: new object[] { 1L, new DateTimeOffset(new DateTime(2026, 3, 2, 1, 43, 7, 676, DateTimeKind.Unspecified).AddTicks(7002), new TimeSpan(0, 0, 0, 0, 0)), 1L, null, null, "sa@test.com", true, true, "Admmin", "Super", null, null, null, new byte[] { 112, 48, 240, 37, 215, 171, 162, 143, 64, 120, 20, 195, 224, 245, 200, 109, 74, 237, 82, 46, 201, 111, 53, 149, 120, 24, 63, 160, 111, 18, 214, 127, 226, 236, 26, 210, 203, 107, 215, 19, 15, 75, 209, 233, 206, 167, 47, 41, 110, 239, 4, 10, 54, 145, 47, 129, 28, 72, 205, 249, 32, 133, 90, 228, 232, 221, 144, 83, 162, 48, 8, 222, 110, 209, 248, 44, 15, 12, 62, 14, 173, 228, 187, 79, 169, 71, 164, 186, 132, 116, 95, 181, 179, 121, 121, 198, 58, 40, 213, 193, 121, 17, 93, 136, 150, 134, 220, 106, 108, 184, 155, 162, 105, 74, 100, 13, 99, 147, 222, 155, 204, 197, 58, 54, 205, 95, 13, 198, 104, 84, 78, 20, 132, 33, 30, 238, 29, 3, 106, 201, 69, 78, 130, 107, 199, 177, 207, 255, 105, 5, 194, 22, 217, 231, 101, 101, 15, 170, 52, 152, 137, 149, 18, 31, 23, 45, 227, 8, 95, 154, 185, 94, 67, 144, 189, 118, 142, 122, 111, 34, 133, 129, 45, 235, 11, 148, 123, 116, 252, 204, 232, 157, 55, 158, 0, 206, 51, 68, 24, 200, 154, 211, 108, 104, 135, 206, 190, 196, 129, 184, 81, 82, 143, 102, 100, 147, 28, 231, 219, 62, 71, 45, 221, 77, 29, 119, 82, 43, 227, 175, 113, 184, 250, 65, 233, 176, 157, 12, 90, 156, 126, 100, 49, 25, 64, 245, 206, 27, 199, 238, 179, 190, 75, 228, 117, 3 }, "000000000", null, "SuperAdmin", new byte[] { 9, 229, 6, 6, 242, 183, 163, 134, 240, 4, 200, 255, 180, 223, 112, 164, 173, 205, 148, 221, 98, 176, 139, 105, 201, 146, 212, 139, 134, 233, 137, 44, 175, 165, 60, 74, 52, 86, 171, 136, 51, 163, 32, 70, 38, 104, 183, 1, 70, 231, 88, 6, 114, 146, 232, 154, 133, 182, 52, 213, 132, 157, 245, 93, 85, 187, 142, 136, 111, 237, 14, 32, 115, 8, 156, 216, 88, 220, 115, 147, 29, 75, 126, 2, 211, 94, 63, 89, 119, 243, 49, 232, 109, 116, 195, 150, 102, 124, 6, 89, 211, 119, 47, 21, 126, 134, 97, 100, 50, 240, 159, 114, 220, 222, 3, 244, 222, 28, 201, 163, 73, 1, 253, 171, 110, 189, 55, 14 }, new DateTimeOffset(new DateTime(2026, 3, 2, 1, 43, 7, 676, DateTimeKind.Unspecified).AddTicks(7002), new TimeSpan(0, 0, 0, 0, 0)), 0L });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AdoptionAnimals_AdopterId",
@@ -255,6 +293,16 @@ namespace PetRadar.DbMigrations.Migrations
                 name: "IX_AdoptionAnimals_ShelterId",
                 table: "AdoptionAnimals",
                 column: "ShelterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Matches_LostReportId",
+                table: "Matches",
+                column: "LostReportId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Matches_StrayReportId",
+                table: "Matches",
+                column: "StrayReportId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reports_UserId",
@@ -284,10 +332,13 @@ namespace PetRadar.DbMigrations.Migrations
                 name: "AdoptionAnimals");
 
             migrationBuilder.DropTable(
-                name: "Reports");
+                name: "Matches");
 
             migrationBuilder.DropTable(
                 name: "VeterinaryAppointments");
+
+            migrationBuilder.DropTable(
+                name: "Reports");
 
             migrationBuilder.DropTable(
                 name: "UserPets");
