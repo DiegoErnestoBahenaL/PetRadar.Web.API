@@ -22,7 +22,4 @@
     <ProjectReference Include="..\PetRadar.Core\PetRadar.Core.csproj" />
 	<ProjectReference Include="..\PetRadar.DbMigrations\PetRadar.DbMigrations.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="PetRadar.Web.API.IntegrationTests\Tests\" />
-  </ItemGroup>
 </Project>
