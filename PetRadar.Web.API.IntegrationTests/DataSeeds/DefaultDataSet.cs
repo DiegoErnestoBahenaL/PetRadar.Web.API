@@ -1,4 +1,5 @@
-﻿using PetRadar.Core.Data;
+﻿using NetTopologySuite.Geometries;
+using PetRadar.Core.Data;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Domain;
@@ -25,6 +26,9 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
         public static readonly string DefaultPetName = "TestDog";
         public static readonly PetSpeciesEnum DefaultPetSpecies = PetSpeciesEnum.Dog;
 
+        public static readonly int DefaultLostReportId = 3000;
+        public static readonly int DefaultStrayReportId = 3001;
+
 
         public UserEntity DefaultUserEntity { get; private set; }
 
@@ -32,10 +36,16 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
 
         public UserPetEntity DefaultPetEntity { get; private set; }
 
+        public ReportEntity DefaultLostReportEntity { get; private set; }
+
+        public ReportEntity DefaultStrayReportEntity { get; private set; }
+
         public DefaultDataSet()
         {
             DefaultUserEntity = new UserEntity();
             DefaultPetEntity = new UserPetEntity();
+            DefaultLostReportEntity = new ReportEntity();
+            DefaultStrayReportEntity = new ReportEntity();
         }
 
         public void SeedData(PetRadarDbContext dbContext)
@@ -73,6 +83,63 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
             };
 
             dbContext.UserPets.Add(DefaultPetEntity);
+            dbContext.SaveChanges();
+
+            DefaultLostReportEntity = new ReportEntity()
+            {
+                Id = DefaultLostReportId,
+                UserId = DefaultUserId,
+                Species = PetSpeciesEnum.Dog,
+                Breed = "Labrador",
+                Color = "Golden",
+                Sex = PetSexEnum.Male,
+                Size = PetSizeEnum.Large,
+                ApproximateAge = 3,
+                Weight = 25.0m,
+                Description = "Lost dog near the park",
+                IsNeutered = true,
+                ReportType = ReportTypeEnum.Lost,
+                ReportStatus = ReportStatusEnum.Active,
+                HasCollar = true,
+                HasTag = false,
+                Location = new Point(-99.1332, 19.4326) { SRID = 4326 },
+                AddressText = "Test Address",
+                SearchRadiusMeters = 5000,
+                IsActive = true,
+                CreatedBy = DefaultUserId,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow,
+                UpdatedBy = DefaultUserId
+            };
+
+            DefaultStrayReportEntity = new ReportEntity()
+            {
+                Id = DefaultStrayReportId,
+                UserId = DefaultUserId,
+                Species = PetSpeciesEnum.Dog,
+                Breed = "Labrador",
+                Color = "Golden",
+                Sex = PetSexEnum.Male,
+                Size = PetSizeEnum.Large,
+                ApproximateAge = 3,
+                Weight = 25.0m,
+                Description = "Stray dog found near the park",
+                IsNeutered = true,
+                ReportType = ReportTypeEnum.Stray,
+                ReportStatus = ReportStatusEnum.Active,
+                HasCollar = false,
+                HasTag = false,
+                Location = new Point(-99.1332, 19.4326) { SRID = 4326 },
+                AddressText = "Test Address",
+                SearchRadiusMeters = 5000,
+                IsActive = true,
+                CreatedBy = DefaultUserId,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow,
+                UpdatedBy = DefaultUserId
+            };
+
+            dbContext.Reports.AddRange(DefaultLostReportEntity, DefaultStrayReportEntity);
             dbContext.SaveChanges();
         }
     }
