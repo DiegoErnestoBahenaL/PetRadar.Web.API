@@ -206,6 +206,73 @@ namespace PetRadar.DbMigrations.Migrations
                     b.ToTable("Matches");
                 });
 
+            modelBuilder.Entity("PetRadar.Core.Data.Entities.MessageEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long?>("DeletedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<long?>("MatchId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("ReadDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("RecipientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ReportId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("SenderId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("SentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("UpdatedBy")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchId");
+
+                    b.HasIndex("RecipientId");
+
+                    b.HasIndex("ReportId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Messages");
+                });
+
             modelBuilder.Entity("PetRadar.Core.Data.Entities.ReportEntity", b =>
                 {
                     b.Property<long>("Id")
@@ -432,18 +499,18 @@ namespace PetRadar.DbMigrations.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 3, 2, 1, 43, 7, 676, DateTimeKind.Unspecified).AddTicks(7002), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 3, 2, 3, 26, 33, 998, DateTimeKind.Unspecified).AddTicks(2533), new TimeSpan(0, 0, 0, 0, 0)),
                             CreatedBy = 1L,
                             Email = "sa@test.com",
                             EmailVerified = true,
                             IsActive = true,
                             LastName = "Admmin",
                             Name = "Super",
-                            Password = new byte[] { 112, 48, 240, 37, 215, 171, 162, 143, 64, 120, 20, 195, 224, 245, 200, 109, 74, 237, 82, 46, 201, 111, 53, 149, 120, 24, 63, 160, 111, 18, 214, 127, 226, 236, 26, 210, 203, 107, 215, 19, 15, 75, 209, 233, 206, 167, 47, 41, 110, 239, 4, 10, 54, 145, 47, 129, 28, 72, 205, 249, 32, 133, 90, 228, 232, 221, 144, 83, 162, 48, 8, 222, 110, 209, 248, 44, 15, 12, 62, 14, 173, 228, 187, 79, 169, 71, 164, 186, 132, 116, 95, 181, 179, 121, 121, 198, 58, 40, 213, 193, 121, 17, 93, 136, 150, 134, 220, 106, 108, 184, 155, 162, 105, 74, 100, 13, 99, 147, 222, 155, 204, 197, 58, 54, 205, 95, 13, 198, 104, 84, 78, 20, 132, 33, 30, 238, 29, 3, 106, 201, 69, 78, 130, 107, 199, 177, 207, 255, 105, 5, 194, 22, 217, 231, 101, 101, 15, 170, 52, 152, 137, 149, 18, 31, 23, 45, 227, 8, 95, 154, 185, 94, 67, 144, 189, 118, 142, 122, 111, 34, 133, 129, 45, 235, 11, 148, 123, 116, 252, 204, 232, 157, 55, 158, 0, 206, 51, 68, 24, 200, 154, 211, 108, 104, 135, 206, 190, 196, 129, 184, 81, 82, 143, 102, 100, 147, 28, 231, 219, 62, 71, 45, 221, 77, 29, 119, 82, 43, 227, 175, 113, 184, 250, 65, 233, 176, 157, 12, 90, 156, 126, 100, 49, 25, 64, 245, 206, 27, 199, 238, 179, 190, 75, 228, 117, 3 },
+                            Password = new byte[] { 41, 210, 96, 231, 167, 143, 142, 16, 146, 148, 89, 18, 139, 100, 203, 74, 166, 211, 56, 94, 39, 23, 22, 137, 47, 118, 132, 119, 121, 123, 120, 232, 205, 173, 74, 64, 154, 115, 40, 245, 41, 178, 55, 41, 153, 241, 251, 209, 93, 246, 118, 243, 190, 172, 213, 244, 111, 239, 32, 72, 25, 254, 136, 14, 79, 64, 187, 21, 62, 15, 145, 177, 20, 9, 244, 228, 251, 63, 124, 152, 189, 186, 202, 219, 102, 18, 112, 251, 163, 132, 92, 85, 236, 10, 88, 145, 142, 92, 186, 13, 22, 227, 116, 65, 215, 2, 24, 63, 93, 194, 185, 77, 112, 105, 93, 119, 39, 230, 91, 217, 126, 200, 31, 32, 140, 248, 111, 76, 93, 126, 246, 142, 200, 166, 77, 134, 108, 195, 46, 29, 123, 234, 134, 46, 16, 124, 244, 218, 60, 162, 160, 89, 48, 191, 111, 163, 69, 128, 228, 79, 153, 167, 160, 142, 137, 113, 80, 34, 129, 192, 175, 106, 150, 142, 58, 185, 118, 45, 127, 255, 184, 181, 190, 15, 65, 127, 196, 98, 18, 205, 42, 76, 165, 110, 226, 87, 214, 76, 147, 0, 45, 47, 97, 103, 198, 122, 155, 99, 16, 206, 212, 70, 32, 181, 23, 94, 165, 150, 161, 122, 81, 52, 60, 119, 74, 12, 171, 247, 250, 157, 179, 33, 148, 166, 88, 100, 200, 175, 45, 133, 126, 93, 29, 112, 202, 59, 184, 44, 140, 104, 55, 216, 186, 169, 101, 126 },
                             PhoneNumber = "000000000",
                             Role = "SuperAdmin",
-                            Salt = new byte[] { 9, 229, 6, 6, 242, 183, 163, 134, 240, 4, 200, 255, 180, 223, 112, 164, 173, 205, 148, 221, 98, 176, 139, 105, 201, 146, 212, 139, 134, 233, 137, 44, 175, 165, 60, 74, 52, 86, 171, 136, 51, 163, 32, 70, 38, 104, 183, 1, 70, 231, 88, 6, 114, 146, 232, 154, 133, 182, 52, 213, 132, 157, 245, 93, 85, 187, 142, 136, 111, 237, 14, 32, 115, 8, 156, 216, 88, 220, 115, 147, 29, 75, 126, 2, 211, 94, 63, 89, 119, 243, 49, 232, 109, 116, 195, 150, 102, 124, 6, 89, 211, 119, 47, 21, 126, 134, 97, 100, 50, 240, 159, 114, 220, 222, 3, 244, 222, 28, 201, 163, 73, 1, 253, 171, 110, 189, 55, 14 },
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 3, 2, 1, 43, 7, 676, DateTimeKind.Unspecified).AddTicks(7002), new TimeSpan(0, 0, 0, 0, 0)),
+                            Salt = new byte[] { 146, 97, 46, 23, 146, 216, 188, 48, 38, 234, 74, 213, 82, 135, 97, 107, 191, 168, 17, 12, 42, 196, 61, 240, 141, 163, 86, 209, 57, 93, 112, 20, 129, 124, 253, 176, 135, 251, 150, 204, 131, 144, 60, 166, 94, 72, 84, 160, 149, 100, 158, 95, 169, 46, 31, 231, 210, 150, 179, 54, 135, 168, 171, 2, 200, 84, 88, 62, 164, 3, 139, 55, 255, 172, 73, 36, 114, 35, 51, 136, 223, 25, 0, 134, 26, 211, 12, 107, 42, 12, 199, 233, 223, 124, 239, 45, 177, 241, 92, 161, 232, 210, 107, 202, 132, 148, 206, 199, 189, 250, 51, 161, 20, 241, 183, 46, 79, 255, 29, 19, 26, 26, 23, 105, 237, 178, 235, 43 },
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 3, 2, 3, 26, 33, 998, DateTimeKind.Unspecified).AddTicks(2533), new TimeSpan(0, 0, 0, 0, 0)),
                             UpdatedBy = 0L
                         });
                 });
@@ -668,6 +735,37 @@ namespace PetRadar.DbMigrations.Migrations
                     b.Navigation("LostReport");
 
                     b.Navigation("StrayReport");
+                });
+
+            modelBuilder.Entity("PetRadar.Core.Data.Entities.MessageEntity", b =>
+                {
+                    b.HasOne("PetRadar.Core.Data.Entities.MatchEntity", "Match")
+                        .WithMany()
+                        .HasForeignKey("MatchId");
+
+                    b.HasOne("PetRadar.Core.Data.Entities.UserEntity", "Recipient")
+                        .WithMany()
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PetRadar.Core.Data.Entities.ReportEntity", "Report")
+                        .WithMany()
+                        .HasForeignKey("ReportId");
+
+                    b.HasOne("PetRadar.Core.Data.Entities.UserEntity", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Match");
+
+                    b.Navigation("Recipient");
+
+                    b.Navigation("Report");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("PetRadar.Core.Data.Entities.ReportEntity", b =>
