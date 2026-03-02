@@ -21,6 +21,7 @@ namespace PetRadar.Core.Data
         public DbSet<ReportEntity> Reports { get; set; }
         public DbSet<MatchEntity> Matches { get; set; }
         public DbSet<MessageEntity> Messages { get; set; }
+        public DbSet<NotificationEntity> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -101,6 +102,10 @@ namespace PetRadar.Core.Data
 
             modelBuilder.Entity<MatchEntity>()
                 .Property(x => x.Status)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<NotificationEntity>()
+                .Property(x => x.Type)
                 .HasConversion<string>();
 
             modelBuilder.Entity<UserEntity>()
