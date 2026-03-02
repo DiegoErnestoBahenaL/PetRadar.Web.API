@@ -69,7 +69,7 @@ namespace PetRadar.Web.API.Controllers
         [Produces(MediaTypeNames.Application.Json)]
         public async Task<IActionResult> Post([FromBody] UserPetCreateModel pet, CancellationToken token)
         {
-            var user = await _userDomain.FindByIdAsync(pet.UserId, token);
+            var user = await _userDomain.FindByIdAsync(pet.UserId.Value, token);
 
             if (user == default)
                 return NotFound();

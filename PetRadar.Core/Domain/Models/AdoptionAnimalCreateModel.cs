@@ -15,14 +15,14 @@ namespace PetRadar.Core.Domain.Models
         public AdoptionAnimalCreateModel() { }
 
         [Required]
-        public long ShelterId { get; set; }
+        public long? ShelterId { get; set; }
 
         [StringLength(maximumLength: 100, MinimumLength = 1, ErrorMessage = "The field Name must be a string with a minimum length of {2} and a maximum length of {1}"), Required]
         public string Name { get; set; } = string.Empty;
 
         [Required]
         [JsonConverter(typeof(StringEnumConverter))]
-        public PetSpeciesEnum Species { get; set; }
+        public PetSpeciesEnum? Species { get; set; }
 
         [StringLength(maximumLength: 100, ErrorMessage = "The field Breed must be a string with maximum length of {1}")]
         public string? Breed { get; set; }

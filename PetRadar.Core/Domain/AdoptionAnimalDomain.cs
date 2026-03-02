@@ -46,7 +46,7 @@ namespace PetRadar.Core.Domain
         public async Task<AdoptionAnimalEntity> CreateAsync(AdoptionAnimalCreateModel animal, long createdByUserId, CancellationToken token)
         {
             var animalDb = new AdoptionAnimalEntity(
-                animal.ShelterId, animal.Name, animal.Species, animal.Breed, animal.Color,
+                animal.ShelterId.Value, animal.Name, animal.Species.Value, animal.Breed, animal.Color,
                 animal.Sex, animal.Size, animal.ApproximateAge,
                 animal.Weight, animal.Description, animal.IsNeutered,
                 animal.Personality, animal.GoodWithKids, animal.GoodWithDogs,

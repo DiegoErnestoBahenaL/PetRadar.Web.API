@@ -14,6 +14,9 @@ namespace PetRadar.Core.Data.Entities
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
 
+        [Required, StringLength(maximumLength: 100)]
+        public string Name { get; set; } = string.Empty;
+
         [Required]
         public long UserId { get; set; }
 
@@ -36,8 +39,9 @@ namespace PetRadar.Core.Data.Entities
             PetSexEnum? sex, PetSizeEnum? size, DateTimeOffset? birthDate, decimal? approximateAge,
             decimal? weight, string? description, bool? isNeutered, string? allergies, string? medicalNotes
         )
-        : base(name, species, breed, color, sex, size, approximateAge, weight, description, photoURL: null, additionalPhotosURL: null, isNeutered)
+        : base(species, breed, color, sex, size, approximateAge, weight, description, photoURL: null, additionalPhotosURL: null, isNeutered)
         {
+            Name = name;
             UserId = userId;
             BirthDate = birthDate;
             Allergies = allergies;

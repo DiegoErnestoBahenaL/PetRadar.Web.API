@@ -1,0 +1,167 @@
+using NetTopologySuite.Geometries;
+using PetRadar.Core.Data.Entities;
+using PetRadar.Core.Data.Repositories;
+using PetRadar.Core.Domain.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace PetRadar.Core.Domain
+{
+    public class ReportDomain : IReportDomain
+    {
+        private readonly IReportRepository _repo;
+
+        public ReportDomain(IReportRepository repo)
+        {
+            _repo = repo;
+        }
+
+        public Task<List<ReportEntity>> GetAllAsync(CancellationToken token)
+        {
+            return _repo.GetAllAsync(token);
+        }
+
+        public Task<List<ReportEntity>> GetAllByUserIdAsync(long userId, CancellationToken token)
+        {
+            return _repo.GetAllByUserIdAsync(userId, token);
+        }
+
+        public async Task<ReportEntity?> FindByIdAsync(long id, CancellationToken token = default)
+        {
+            var report = await _repo.FindByIdAsync(id, token);
+            if (report == null)
+                return default;
+
+            report.Views++;
+
+            _repo.Update(report);
+
+            await _repo.SaveChangesAsync();
+
+            return report;
+        }
+
+        public async Task<ReportEntity> CreateAsync(ReportCreateModel report, long createdByUserId, CancellationToken token)
+        {
+            var location = new Point(report.Longitude.Value, report.Latitude.Value) { SRID = 4326 };
+
+            var reportDb = new ReportEntity(
+                report.UserId.Value, report.UserPetId,
+                report.Species.Value, report.Breed, report.Color,
+                report.Sex, report.Size, report.ApproximateAge,
+                report.Weight, report.Description, report.IsNeutered, report.ReportType.Value,
+                report.ReportStatus, report.HasCollar, report.HasTag, report.IncidentDate,
+                location, report.AddressText, report.UseAlternateContact, report.ContactName,
+                report.ContactPhone, report.ContactEmail, report.RewardAmount
+            );
+
+            reportDb.SearchRadiusMeters = report.SearchRadiusMeters;
+            reportDb.OffersReward = report.OffersReward;
+            reportDb.CreatedBy = createdByUserId;
+            reportDb.CreatedAt = reportDb.UpdatedAt = DateTime.UtcNow;
+            reportDb.IsActive = true;
+
+            await _repo.AddAsync(reportDb);
+            await _repo.SaveChangesAsync();
+            return reportDb;
+        }
+
+        public async Task<int> UpdateAsync(ReportEntity reportDb, ReportUpdateModel report, long modifiedByUserId, CancellationToken token)
+        {
+            if (reportDb == default)
+                throw new ArgumentNullException(nameof(reportDb));
+
+            if (report.Species.HasValue)
+                reportDb.Species = report.Species.Value;
+
+            if (!string.IsNullOrEmpty(report.Breed))
+                reportDb.Breed = report.Breed;
+
+            if (!string.IsNullOrEmpty(report.Color))
+                reportDb.Color = report.Color;
+
+            if (report.Sex.HasValue)
+                reportDb.Sex = report.Sex.Value;
+
+            if (report.Size.HasValue)
+                reportDb.Size = report.Size.Value;
+
+            if (report.ApproximateAge.HasValue)
+                reportDb.ApproximateAge = report.ApproximateAge.Value;
+
+            if (report.Weight.HasValue)
+                reportDb.Weight = report.Weight.Value;
+
+            if (!string.IsNullOrEmpty(report.Description))
+                reportDb.Description = report.Description;
+
+            if (report.IsNeutered.HasValue)
+                reportDb.IsNeutered = report.IsNeutered.Value;
+
+            if (report.ReportType.HasValue)
+                reportDb.ReportType = report.ReportType.Value;
+
+            if (report.ReportStatus.HasValue)
+                reportDb.ReportStatus = report.ReportStatus.Value;
+
+            if (report.HasCollar.HasValue)
+                reportDb.HasCollar = report.HasCollar.Value;
+
+            if (report.HasTag.HasValue)
+                reportDb.HasTag = report.HasTag.Value;
+
+            if (report.IncidentDate.HasValue)
+                reportDb.IncidentDate = report.IncidentDate.Value;
+
+            if (report.Latitude.HasValue && report.Longitude.HasValue)
+                reportDb.Location = new Point(report.Longitude.Value, report.Latitude.Value) { SRID = 4326 };
+
+            if (!string.IsNullOrEmpty(report.AddressText))
+                reportDb.AddressText = report.AddressText;
+
+            if (report.SearchRadiusMeters.HasValue)
+                reportDb.SearchRadiusMeters = report.SearchRadiusMeters.Value;
+
+            if (report.UseAlternateContact.HasValue)
+                reportDb.UseAlternateContact = report.UseAlternateContact.Value;
+
+            if (!string.IsNullOrEmpty(report.ContactName))
+                reportDb.ContactName = report.ContactName;
+
+            if (!string.IsNullOrEmpty(report.ContactPhone))
+                reportDb.ContactPhone = report.ContactPhone;
+
+            if (!string.IsNullOrEmpty(report.ContactEmail))
+                reportDb.ContactEmail = report.ContactEmail;
+
+            if (report.OffersReward.HasValue)
+                reportDb.OffersReward = report.OffersReward.Value;
+
+            if (report.RewardAmount.HasValue)
+                reportDb.RewardAmount = report.RewardAmount.Value;
+
+            reportDb.UpdatedByUser(modifiedByUserId);
+            _repo.Update(reportDb);
+
+            int result = await _repo.SaveChangesAsync();
+
+            return result;
+        }
+
+        public async Task<int> DeleteAsync(ReportEntity report, long modifiedByUserId, CancellationToken token)
+        {
+            if (report == default)
+                throw new ArgumentNullException(nameof(report));
+
+            report.IsActive = false;
+
+            report.DeletedByUser(modifiedByUserId);
+            _repo.Update(report);
+
+            return await _repo.SaveChangesAsync();
+        }
+    }
+}
