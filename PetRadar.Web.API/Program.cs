@@ -29,6 +29,7 @@ builder.Services.AddScoped<IVeterinaryAppointmentRepository, VeterinaryAppointme
 builder.Services.AddScoped<IAdoptionAnimalRepository, AdoptionAnimalRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IMatchRepository, MatchRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 builder.Services.AddScoped<IUserDomain, UserDomain>();
 builder.Services.AddScoped<IUserPetDomain, UserPetDomain>();
@@ -36,6 +37,7 @@ builder.Services.AddScoped<IVeterinaryAppointmentDomain, VeterinaryAppointmentDo
 builder.Services.AddScoped<IAdoptionAnimalDomain, AdoptionAnimalDomain>();
 builder.Services.AddScoped<IReportDomain, ReportDomain>();
 builder.Services.AddScoped<IMatchDomain, MatchDomain>();
+builder.Services.AddScoped<IMessageDomain, MessageDomain>();
 
 builder.Services.AddDbContext<PetRadarDbContext>(options =>
     options.UseNpgsql(connectionString, x => x.MigrationsAssembly(Constants.MigrationsAssembly)
