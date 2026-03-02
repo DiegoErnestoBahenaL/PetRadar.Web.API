@@ -20,6 +20,7 @@ namespace PetRadar.Core.Data
         public DbSet<AdoptionAnimalEntity> AdoptionAnimals { get; set; }
         public DbSet<ReportEntity> Reports { get; set; }
         public DbSet<MatchEntity> Matches { get; set; }
+        public DbSet<MessageEntity> Messages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

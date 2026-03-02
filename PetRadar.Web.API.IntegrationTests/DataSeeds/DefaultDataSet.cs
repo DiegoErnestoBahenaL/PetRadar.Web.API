@@ -29,6 +29,11 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
         public static readonly int DefaultLostReportId = 3000;
         public static readonly int DefaultStrayReportId = 3001;
 
+        public static readonly int DefaultRecipientUserId = 1001;
+        public static readonly string DefaultRecipientUserEmail = "recipient@email.com";
+        public static readonly string DefaultRecipientUserName = "Recipient";
+        public static readonly string DefaultRecipientUserLastName = "Two";
+
 
         public UserEntity DefaultUserEntity { get; private set; }
 
@@ -40,12 +45,15 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
 
         public ReportEntity DefaultStrayReportEntity { get; private set; }
 
+        public UserEntity DefaultRecipientUserEntity { get; private set; }
+
         public DefaultDataSet()
         {
             DefaultUserEntity = new UserEntity();
             DefaultPetEntity = new UserPetEntity();
             DefaultLostReportEntity = new ReportEntity();
             DefaultStrayReportEntity = new ReportEntity();
+            DefaultRecipientUserEntity = new UserEntity();
         }
 
         public void SeedData(PetRadarDbContext dbContext)
@@ -67,6 +75,22 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
             
 
             dbContext.Users.Add(DefaultUserEntity);
+            dbContext.SaveChanges();
+
+            var recipientSalt = UserDomain.GenerateSalt();
+            DefaultRecipientUserEntity = new UserEntity()
+            {
+                Id = DefaultRecipientUserId,
+                Email = DefaultRecipientUserEmail,
+                Salt = recipientSalt,
+                Password = UserDomain.GenerateHash(DefaultUserPassword, recipientSalt),
+                Name = DefaultRecipientUserName,
+                LastName = DefaultRecipientUserLastName,
+                Role = RoleEnum.User,
+                IsActive = true
+            };
+
+            dbContext.Users.Add(DefaultRecipientUserEntity);
             dbContext.SaveChanges();
 
             DefaultPetEntity = new UserPetEntity()
