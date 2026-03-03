@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetRadar.DbMigrations", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetRadar.Web.API.IntegrationTests", "..\PetRadar.Web.API.IntegrationTests\PetRadar.Web.API.IntegrationTests.csproj", "{7A023494-F3CB-4EE6-AC10-309D942E0E1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetRadar.Common", "..\PetRadar.Common\PetRadar.Common.csproj", "{3E01E833-D9EF-41CE-8F58-2E537FEEDFF3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{7A023494-F3CB-4EE6-AC10-309D942E0E1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A023494-F3CB-4EE6-AC10-309D942E0E1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A023494-F3CB-4EE6-AC10-309D942E0E1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E01E833-D9EF-41CE-8F58-2E537FEEDFF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E01E833-D9EF-41CE-8F58-2E537FEEDFF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E01E833-D9EF-41CE-8F58-2E537FEEDFF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E01E833-D9EF-41CE-8F58-2E537FEEDFF3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

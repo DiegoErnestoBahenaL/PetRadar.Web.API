@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
+using PetRadar.Common;
 using PetRadar.Core;
 using PetRadar.Core.Data;
 using PetRadar.Core.Data.Entities;
@@ -55,6 +56,35 @@ namespace PetRadar.Web.API.Controllers
             return Ok(new UserViewModel(user));
         }
 
+        [HttpGet("{id}/profilepicture")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces(MediaTypeNames.Image.Jpeg, Common.Constants.MediaTypeNamesImagePng)]
+        public async Task<IActionResult> GetProfilePicture([FromRoute] long id, CancellationToken token)
+        {
+            var user = await _domain.FindByIdAsync(id, token);
+            if (user == default)
+                return NotFound();
+
+            var path = await _domain.GetUserProfilePicturePath(user, token);
+            if (path == null)
+                return NotFound();
+
+            try
+            {
+                byte[] bytes = System.IO.File.ReadAllBytes(path);
+                string mimeType = Common.Constants.GetMimeType(path);
+
+                return File(bytes, mimeType);
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, "Error while trying to retrieve image");
+            }
+            return NotFound();
+        }
+
         [AllowAnonymous]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -93,6 +123,21 @@ namespace PetRadar.Web.API.Controllers
                 return BadRequest(ex.Message);
             }
 
+        }
+
+        [HttpPut("{id}/profilepicture")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadProfilePicture([FromRoute] long id, IFormFile file, CancellationToken token)
+        {
+            var userdb = await _domain.FindByIdAsync(id, token);
+            if (userdb == default)
+                return NotFound();
+
+            await _domain.UpdateProfilePictureAsync(userdb, file, UserJwt.Id, token);
+            return NoContent();
         }
 
         [HttpPut("{id}")]
