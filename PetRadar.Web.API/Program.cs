@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using PetRadar.Core.Data;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain;
+using PetRadar.Core.Helpers;
 using PetRadar.Web.API;
 using PetRadar.Web.API.Services;
 using System.Text;
@@ -22,6 +23,7 @@ var configuration = new ConfigurationBuilder()
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+builder.Services.AddSingleton<IFileHelperService, FileHelperService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserPetRepository, UserPetRepository>();

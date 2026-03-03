@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic;
+using PetRadar.Common;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
+using PetRadar.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +20,28 @@ namespace PetRadar.Core.Domain
     public class UserDomain : IUserDomain
     {
         private readonly IUserRepository _repo;
-        
-        public UserDomain(IUserRepository repo) {  _repo = repo; }
+        private readonly IFileHelperService _fileHelperService; 
+        private readonly ILogger<UserDomain> _logger;
+
+        public UserDomain(IUserRepository repo, IFileHelperService fileHelperService, ILogger<UserDomain> logger) 
+        {  
+            _repo = repo; 
+            _fileHelperService = fileHelperService;
+            _logger = logger;
+        }
 
         public Task<List<UserEntity>> GetAllAsync(CancellationToken token)
         {
             return _repo.GetAllAsync(token);
+        }
+
+        public Task<string?> GetUserProfilePicturePath(UserEntity user, CancellationToken token)
+        {
+            if (user.ProfilePhotoURL == null)
+                return Task.FromResult<string?>(null);
+
+            string path = _fileHelperService.GetImagePath(user.ProfilePhotoURL);
+            return Task.FromResult<string?>(path);
         }
 
         public async Task<UserEntity?> FindByIdAsync(long id, CancellationToken token = default)
@@ -121,6 +141,27 @@ namespace PetRadar.Core.Domain
 
             int result = await _repo.SaveChangesAsync();
 
+            return result;
+        }
+
+        public async Task<int> UpdateProfilePictureAsync(UserEntity userdb, IFormFile file, long modifiedByUserId, CancellationToken token)
+        {
+
+            if (userdb.ProfilePhotoURL != null)
+            {
+                _fileHelperService.DeleteImage(userdb.ProfilePhotoURL, _logger);
+
+                userdb.ProfilePhotoURL = null;
+            }
+
+            string relativePath = await _fileHelperService.SaveImage(file);
+
+            userdb.ProfilePhotoURL = relativePath;
+
+            userdb.UpdatedByUser(modifiedByUserId);
+            _repo.Update(userdb);
+
+            int result = await _repo.SaveChangesAsync();
             return result;
         }
 
