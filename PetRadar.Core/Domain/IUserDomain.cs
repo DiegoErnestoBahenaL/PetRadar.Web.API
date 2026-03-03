@@ -1,4 +1,5 @@
-﻿using PetRadar.Core.Data.Entities;
+﻿using Microsoft.AspNetCore.Http;
+using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -11,11 +12,13 @@ namespace PetRadar.Core.Domain
     public interface IUserDomain
     {
         Task<List<UserEntity>> GetAllAsync(CancellationToken token);
+        Task<string?> GetUserProfilePicturePath (UserEntity user, CancellationToken token);
         Task<UserEntity?> FindByIdAsync(long id, CancellationToken token);
         Task<UserEntity?> FindByEmailAsync(string email, CancellationToken token);
         Task<UserEntity?> FindByEmailAndPasswordAsync(string email, string password, CancellationToken token);
         Task<UserEntity> CreateAsync(UserCreateModel user, long createdByUserId, CancellationToken token);
         Task<int> UpdateAsync(UserEntity userdb, UserUpdateModel user, long modifiedByUserId, CancellationToken token);
+        Task<int> UpdateProfilePictureAsync(UserEntity userdb, IFormFile file, long modifiedByUserId, CancellationToken token);
         Task<int> DeleteAsync(UserEntity user, long modifiedByUserId, CancellationToken token);
     }
 }

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PetRadar.Core\PetRadar.Core.csproj" />
+	<ProjectReference Include="..\PetRadar.Common\PetRadar.Common.csproj" />
 	<ProjectReference Include="..\PetRadar.DbMigrations\PetRadar.DbMigrations.csproj" />
   </ItemGroup>
 </Project>
