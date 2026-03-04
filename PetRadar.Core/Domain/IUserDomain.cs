@@ -18,6 +18,7 @@ namespace PetRadar.Core.Domain
         Task<UserEntity?> FindByEmailAndPasswordAsync(string email, string password, CancellationToken token);
         Task<UserEntity> CreateAsync(UserCreateModel user, long createdByUserId, CancellationToken token);
         Task<int> UpdateAsync(UserEntity userdb, UserUpdateModel user, long modifiedByUserId, CancellationToken token);
+        Task<int> VerifyEmailAsync(UserEntity userdb, long modifiedByUserId);
         Task<int> UpdateProfilePictureAsync(UserEntity userdb, IFormFile file, long modifiedByUserId, CancellationToken token);
         Task<int> DeleteAsync(UserEntity user, long modifiedByUserId, CancellationToken token);
     }
