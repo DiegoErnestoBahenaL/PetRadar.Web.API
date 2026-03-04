@@ -14,6 +14,7 @@ namespace PetRadar.Web.API.ViewModels
         public string? OrganizationName { get; set; }
         public string? OrganizationAddress { get; set; }
         public string? OrganizationPhone { get; set; }
+        public bool EmailVerified { get; set; } 
 
         public UserViewModel() { }
 
@@ -29,6 +30,7 @@ namespace PetRadar.Web.API.ViewModels
             OrganizationName = entity.OrganizationName;
             OrganizationAddress = entity.OrganizationAddress;
             OrganizationPhone = entity.OrganizationPhone;
+            EmailVerified = entity.EmailVerified;
         }
 
         public static List<UserViewModel> FromList (List<UserEntity> entities)
