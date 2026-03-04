@@ -10,6 +10,8 @@ using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Domain;
 using PetRadar.Core.Domain.Models;
+using PetRadar.Core.Helpers;
+using PetRadar.Web.API.Services;
 using PetRadar.Web.API.ViewModels;
 using System.Net.Mime;
 
@@ -23,11 +25,16 @@ namespace PetRadar.Web.API.Controllers
 
         private readonly ILogger<UsersController> _logger;
         private readonly IUserDomain _domain;
+        private readonly IJwtHelper _jwtHelper;
+        private readonly IEmailHelperService _emailHelperService;
 
-        public UsersController(ILogger<UsersController> logger, IUserDomain domain)
+
+        public UsersController(ILogger<UsersController> logger, IUserDomain domain, IJwtHelper jwtHelper, IEmailHelperService emailHelperService)
         {
             _logger = logger;
             _domain = domain;
+            _jwtHelper = jwtHelper;
+            _emailHelperService = emailHelperService;
         }
 
         [HttpGet]
@@ -102,6 +109,10 @@ namespace PetRadar.Web.API.Controllers
 
                 userdb = await _domain.CreateAsync(user, UserJwt.Id, token);
 
+                var jwtToken = _jwtHelper.GetToken(userdb);
+
+                var result = await _emailHelperService.SendVerificationEmail(userdb, jwtToken.Token);
+
                 return CreatedAtAction(nameof(Get), new { id = userdb.Id }, new UserViewModel(userdb));
 
             }
@@ -110,6 +121,10 @@ namespace PetRadar.Web.API.Controllers
             catch (InvalidOperationException)
             {
                 userdb = await _domain.CreateAsync(user, createdByUserId: 1, token);
+
+                var jwtToken = _jwtHelper.GetToken(userdb);
+
+                var result = await _emailHelperService.SendVerificationEmail(userdb, jwtToken.Token);
 
                 return CreatedAtAction(nameof(Get), new { id = userdb.Id }, new UserViewModel(userdb));
             }

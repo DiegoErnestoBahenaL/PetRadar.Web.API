@@ -23,4 +23,20 @@
 	<ProjectReference Include="..\PetRadar.Common\PetRadar.Common.csproj" />
 	<ProjectReference Include="..\PetRadar.DbMigrations\PetRadar.DbMigrations.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.QA.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.Development.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.LocalIntegration.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+	
 </Project>

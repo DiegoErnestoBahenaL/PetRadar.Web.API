@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using PetRadar.Core.Domain;
 using PetRadar.Core.Domain.Models;
@@ -79,6 +80,40 @@ namespace PetRadar.Web.API.Controllers
             userToken = _jwtHelper.GetToken(userDb);
 
             return Ok(userToken);
+        }
+
+        [HttpGet("VerifyEmail/{token}")]
+
+        public async Task<IActionResult> VerifyEmail([FromRoute] string token, CancellationToken cancellationToken)
+        {
+           bool validToken = _jwtHelper.ValidateDateFromToken(token);
+
+            if (validToken)
+            {
+                var claimsPrincipal = _jwtHelper.GetPrincipalFromRefreshToken(token);
+                
+                long userId = long.Parse(claimsPrincipal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "0");
+
+                var userDb = await _userDomain.FindByIdAsync(userId, cancellationToken);
+
+                if (userDb == default)
+                {
+                    return BadRequest();
+                }
+
+                if (userDb.EmailVerified)
+                {
+                    return BadRequest("Email is already verified");
+                }
+
+                await _userDomain.VerifyEmailAsync(userDb, userId);
+
+                return Ok("Email verified successfully");
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
 

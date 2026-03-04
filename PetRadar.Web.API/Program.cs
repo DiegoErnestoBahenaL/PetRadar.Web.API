@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using PetRadar.Core;
 using PetRadar.Core.Data;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain;
@@ -11,19 +12,12 @@ using System.Text;
 using System.Text.Json.Serialization;
 
 
-var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-
 var builder = WebApplication.CreateBuilder(args);
-
-var configuration = new ConfigurationBuilder()
-          .AddJsonFile("appsettings.json")
-          .AddJsonFile($"appsettings.{environmentName}.json", true)
-          .Build();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddSingleton<IFileHelperService, FileHelperService>();
+builder.Services.AddSingleton<IEmailHelperService, EmailHelperService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserPetRepository, UserPetRepository>();
@@ -42,6 +36,11 @@ builder.Services.AddScoped<IReportDomain, ReportDomain>();
 builder.Services.AddScoped<IMatchDomain, MatchDomain>();
 builder.Services.AddScoped<IMessageDomain, MessageDomain>();
 builder.Services.AddScoped<INotificationDomain, NotificationDomain>();
+
+builder.Services.AddOptions<PetRadarCoreOptions>()
+    .Bind(builder.Configuration.GetSection(nameof(PetRadarCoreOptions)))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 builder.Services.AddDbContext<PetRadarDbContext>(options =>
     options.UseNpgsql(connectionString, x => x.MigrationsAssembly(Constants.MigrationsAssembly)
