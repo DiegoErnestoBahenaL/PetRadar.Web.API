@@ -21,12 +21,14 @@ namespace PetRadar.Core.Domain
     {
         private readonly IUserRepository _repo;
         private readonly IFileHelperService _fileHelperService; 
+        private readonly IEmailHelperService _emailHelperService;
         private readonly ILogger<UserDomain> _logger;
 
-        public UserDomain(IUserRepository repo, IFileHelperService fileHelperService, ILogger<UserDomain> logger) 
+        public UserDomain(IUserRepository repo, IFileHelperService fileHelperService, ILogger<UserDomain> logger, IEmailHelperService emailHelperService) 
         {  
             _repo = repo; 
             _fileHelperService = fileHelperService;
+            _emailHelperService = emailHelperService;
             _logger = logger;
         }
 
@@ -144,6 +146,16 @@ namespace PetRadar.Core.Domain
             return result;
         }
 
+        public async Task<int> VerifyEmailAsync(UserEntity userdb, long modifiedByUserId)
+        {
+            
+            userdb.EmailVerified = true;
+            userdb.UpdatedByUser(modifiedByUserId);
+            _repo.Update(userdb);
+
+            int result = await _repo.SaveChangesAsync();
+            return result;
+        }
         public async Task<int> UpdateProfilePictureAsync(UserEntity userdb, IFormFile file, long modifiedByUserId, CancellationToken token)
         {
 
