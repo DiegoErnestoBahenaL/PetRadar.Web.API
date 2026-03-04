@@ -12,15 +12,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 
 
-var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-
 var builder = WebApplication.CreateBuilder(args);
-
-var configuration = new ConfigurationBuilder()
-          .AddJsonFile("appsettings.json")
-          .AddJsonFile($"appsettings.{environmentName}.json", true)
-          .Build();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
@@ -46,7 +38,7 @@ builder.Services.AddScoped<IMessageDomain, MessageDomain>();
 builder.Services.AddScoped<INotificationDomain, NotificationDomain>();
 
 builder.Services.AddOptions<PetRadarCoreOptions>()
-    .Bind(configuration.GetSection(nameof(PetRadarCoreOptions)))
+    .Bind(builder.Configuration.GetSection(nameof(PetRadarCoreOptions)))
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
