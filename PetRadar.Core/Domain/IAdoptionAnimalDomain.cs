@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Domain.Models;
 using System;
@@ -12,9 +13,12 @@ namespace PetRadar.Core.Domain
     {
         Task<List<AdoptionAnimalEntity>> GetAllAsync(CancellationToken token);
         Task<List<AdoptionAnimalEntity>> GetAllByShelterIdAsync(long shelterId, CancellationToken token);
+        Task<string?> GetMainPicturePath(AdoptionAnimalEntity animalDb, CancellationToken token);
         Task<AdoptionAnimalEntity?> FindByIdAsync(long id, CancellationToken token);
         Task<AdoptionAnimalEntity> CreateAsync(AdoptionAnimalCreateModel animal, long createdByUserId, CancellationToken token);
         Task<int> UpdateAsync(AdoptionAnimalEntity animalDb, AdoptionAnimalUpdateModel animal, long modifiedByUserId, CancellationToken token);
+        Task<int> UpdateMainPictureAsync(AdoptionAnimalEntity animalDb, IFormFile file, long modifiedByUserId, CancellationToken token);
+
         Task<int> DeleteAsync(AdoptionAnimalEntity animal, long modifiedByUserId, CancellationToken token);
     }
 }
