@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
+using PetRadar.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +15,14 @@ namespace PetRadar.Core.Domain
     public class UserPetDomain : IUserPetDomain
     {
         private readonly IUserPetRepository _repo;
+        private readonly IFileHelperService _fileHelperService;
+        private readonly ILogger<UserPetDomain> _logger;
 
-        public UserPetDomain(IUserPetRepository repo)
+        public UserPetDomain(IUserPetRepository repo, IFileHelperService fileHelperService, ILogger<UserPetDomain> logger)
         {
             _repo = repo;
+            _fileHelperService = fileHelperService;
+            _logger = logger;
         }
 
         public Task<List<UserPetEntity>> GetAllAsync(CancellationToken token)
@@ -36,7 +43,14 @@ namespace PetRadar.Core.Domain
 
             return pet;
         }
+        public Task<string?> GetMainPicturePath(UserPetEntity petdb, CancellationToken token)
+        {
+            if (petdb.PhotoURL == null)
+                return Task.FromResult<string?>(null);
 
+            string path = _fileHelperService.GetImagePath(petdb.PhotoURL);
+            return Task.FromResult<string?>(path);
+        }
         public async Task<UserPetEntity> CreateAsync(UserPetCreateModel pet, long createdByUserId, CancellationToken token)
         {
             var petdb = new UserPetEntity(
@@ -103,6 +117,27 @@ namespace PetRadar.Core.Domain
 
             int result = await _repo.SaveChangesAsync();
 
+            return result;
+        }
+
+        public async Task<int> UpdateMainPictureAsync(UserPetEntity petdb, IFormFile file, long modifiedByUserId, CancellationToken token)
+        {
+
+            if (petdb.PhotoURL != null)
+            {
+                _fileHelperService.DeleteImage(petdb.PhotoURL, _logger);
+
+                petdb.PhotoURL = null;
+            }
+
+            string relativePath = await _fileHelperService.SaveImage(file);
+
+            petdb.PhotoURL = relativePath;
+
+            petdb.UpdatedByUser(modifiedByUserId);
+            _repo.Update(petdb);
+
+            int result = await _repo.SaveChangesAsync();
             return result;
         }
 

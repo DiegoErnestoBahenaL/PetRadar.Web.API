@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
+using PetRadar.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +15,14 @@ namespace PetRadar.Core.Domain
     public class AdoptionAnimalDomain : IAdoptionAnimalDomain
     {
         private readonly IAdoptionAnimalRepository _repo;
+        private readonly IFileHelperService _fileHelperService;
+        private readonly ILogger<UserPetDomain> _logger;
 
-        public AdoptionAnimalDomain(IAdoptionAnimalRepository repo)
+        public AdoptionAnimalDomain(IAdoptionAnimalRepository repo, IFileHelperService fileHelperService, ILogger<UserPetDomain> logger)
         {
             _repo = repo;
+            _fileHelperService = fileHelperService;
+            _logger = logger;
         }
 
         public Task<List<AdoptionAnimalEntity>> GetAllAsync(CancellationToken token)
@@ -41,6 +48,15 @@ namespace PetRadar.Core.Domain
             await _repo.SaveChangesAsync();
 
             return animal;
+        }
+
+        public Task<string?> GetMainPicturePath(AdoptionAnimalEntity animalDb, CancellationToken token)
+        {
+            if (animalDb.PhotoURL == null)
+                return Task.FromResult<string?>(null);
+
+            string path = _fileHelperService.GetImagePath(animalDb.PhotoURL);
+            return Task.FromResult<string?>(path);
         }
 
         public async Task<AdoptionAnimalEntity> CreateAsync(AdoptionAnimalCreateModel animal, long createdByUserId, CancellationToken token)
@@ -132,6 +148,27 @@ namespace PetRadar.Core.Domain
 
             int result = await _repo.SaveChangesAsync();
 
+            return result;
+        }
+
+        public async Task<int> UpdateMainPictureAsync(AdoptionAnimalEntity animalDb, IFormFile file, long modifiedByUserId, CancellationToken token)
+        {
+
+            if (animalDb.PhotoURL != null)
+            {
+                _fileHelperService.DeleteImage(animalDb.PhotoURL, _logger);
+
+                animalDb.PhotoURL = null;
+            }
+
+            string relativePath = await _fileHelperService.SaveImage(file);
+
+            animalDb.PhotoURL = relativePath;
+
+            animalDb.UpdatedByUser(modifiedByUserId);
+            _repo.Update(animalDb);
+
+            int result = await _repo.SaveChangesAsync();
             return result;
         }
 
