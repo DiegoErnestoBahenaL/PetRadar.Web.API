@@ -62,6 +62,35 @@ namespace PetRadar.Web.API.Controllers
             return Ok(new UserPetViewModel(pet));
         }
 
+        [HttpGet("{id}/mainpicture")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces(MediaTypeNames.Image.Jpeg, Common.Constants.MediaTypeNamesImagePng)]
+        public async Task<IActionResult> GetMainPicture([FromRoute] long id, CancellationToken token)
+        {
+            var pet = await _domain.FindByIdAsync(id, token);
+            if (pet == default)
+                return NotFound();
+
+            var path = await _domain.GetMainPicturePath(pet, token);
+            if (path == null)
+                return NotFound();
+
+            try
+            {
+                byte[] bytes = System.IO.File.ReadAllBytes(path);
+                string mimeType = Common.Constants.GetMimeType(path);
+
+                return File(bytes, mimeType);
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, "Error while trying to retrieve image");
+            }
+            return NotFound();
+        }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -93,6 +122,21 @@ namespace PetRadar.Web.API.Controllers
                 return NotFound();
 
             await _domain.UpdateAsync(petdb, pet, UserJwt.Id, token);
+            return NoContent();
+        }
+
+        [HttpPut("{id}/mainpicture")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadMainPicture([FromRoute] long id, IFormFile file, CancellationToken token)
+        {
+            var userdb = await _domain.FindByIdAsync(id, token);
+            if (userdb == default)
+                return NotFound();
+
+            await _domain.UpdateMainPictureAsync(userdb, file, UserJwt.Id, token);
             return NoContent();
         }
 
