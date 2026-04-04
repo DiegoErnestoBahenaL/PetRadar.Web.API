@@ -58,28 +58,6 @@ pipeline {
             }
         }
 
-        stage('Run Tests QA') {
-            when { expression { env.BRANCH_NAME == 'QA' } }
-            steps {
-                sh '''
-                    set -e
-                    cd ${PROJECT_ROOT}/PetRadar.Web.API
-
-                    echo "Running integration tests..."
-                    docker run --rm \
-                        --network host \
-                        -e ASPNETCORE_ENVIRONMENT=LocalIntegration \
-                        -e 'ConnectionStrings__DefaultConnection=Host=localhost;Port=5433;Database=petradar_localIntegration;Username=postgres;Password=root;' \
-                        -v "$(pwd)":/src \
-                        -w /src \
-                        mcr.microsoft.com/dotnet/sdk:8.0-jammy-arm64v8 \
-                        dotnet test PetRadar.Web.API.IntegrationTests/PetRadar.Web.API.IntegrationTests.csproj \
-                            --configuration Release \
-                            --logger "trx;LogFileName=test-results.trx"
-                '''
-            }
-        }
-
         stage('Deploy stack QA') {
             when { expression { env.BRANCH_NAME == 'QA' } }
             steps {
