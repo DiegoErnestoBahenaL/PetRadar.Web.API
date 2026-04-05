@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
+using PetRadar.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +16,14 @@ namespace PetRadar.Core.Domain
     public class ReportDomain : IReportDomain
     {
         private readonly IReportRepository _repo;
+        private readonly IFileHelperService _fileHelperService;
+        private readonly ILogger<ReportDomain> _logger;
 
-        public ReportDomain(IReportRepository repo)
+        public ReportDomain(IReportRepository repo, IFileHelperService fileHelperService, ILogger<ReportDomain> logger)
         {
             _repo = repo;
+            _fileHelperService = fileHelperService;
+            _logger = logger;
         }
 
         public Task<List<ReportEntity>> GetAllAsync(CancellationToken token)
@@ -42,6 +49,35 @@ namespace PetRadar.Core.Domain
             await _repo.SaveChangesAsync();
 
             return report;
+        }
+
+        public Task<string?> GetMainPicturePath(ReportEntity reportDb, CancellationToken token)
+        {
+            if (reportDb.PhotoURL == null)
+                return Task.FromResult<string?>(null);
+
+            string path = _fileHelperService.GetImagePath(reportDb.PhotoURL);
+            return Task.FromResult<string?>(path);
+        }
+
+        public async Task<int> UpdateMainPictureAsync(ReportEntity reportDb, IFormFile file, long modifiedByUserId, CancellationToken token)
+        {
+            if (reportDb.PhotoURL != null)
+            {
+                _fileHelperService.DeleteImage(reportDb.PhotoURL, _logger);
+
+                reportDb.PhotoURL = null;
+            }
+
+            string relativePath = await _fileHelperService.SaveImage(file);
+
+            reportDb.PhotoURL = relativePath;
+
+            reportDb.UpdatedByUser(modifiedByUserId);
+            _repo.Update(reportDb);
+
+            int result = await _repo.SaveChangesAsync();
+            return result;
         }
 
         public async Task<ReportEntity> CreateAsync(ReportCreateModel report, long createdByUserId, CancellationToken token)
