@@ -62,6 +62,49 @@ namespace PetRadar.Web.API.Controllers
             return Ok(new ReportViewModel(report));
         }
 
+        [HttpGet("{id}/mainpicture")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces(MediaTypeNames.Image.Jpeg, Common.Constants.MediaTypeNamesImagePng)]
+        public async Task<IActionResult> GetMainPicture([FromRoute] long id, CancellationToken token)
+        {
+            var report = await _domain.FindByIdAsync(id, token);
+            if (report == default)
+                return NotFound();
+
+            var path = await _domain.GetMainPicturePath(report, token);
+            if (path == null)
+                return NotFound();
+
+            try
+            {
+                byte[] bytes = System.IO.File.ReadAllBytes(path);
+                string mimeType = Common.Constants.GetMimeType(path);
+
+                return File(bytes, mimeType);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while trying to retrieve image");
+            }
+            return NotFound();
+        }
+
+        [HttpPut("{id}/mainpicture")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadMainPicture([FromRoute] long id, IFormFile file, CancellationToken token)
+        {
+            var reportDb = await _domain.FindByIdAsync(id, token);
+            if (reportDb == default)
+                return NotFound();
+
+            await _domain.UpdateMainPictureAsync(reportDb, file, UserJwt.Id, token);
+            return NoContent();
+        }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
