@@ -13,7 +13,11 @@ namespace PetRadar.Common
 
         public static List<string> ValidImagesExtensions = [".jpg", ".jpeg", ".png"];
 
+        public const int MaxAdditionalPhotos = 5;
+
         public const string ImagesDirectoryName = "Images";
+
+        public const string AdditionalPhotosDirectoryName = "AdditionalPhotos";
 
         public const string SecuredDirectoryName = "Secured";
 

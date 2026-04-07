@@ -140,6 +140,94 @@ namespace PetRadar.Web.API.Controllers
             return NoContent();
         }
 
+        [HttpGet("{id}/additionalphotos")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces(MediaTypeNames.Application.Json)]
+        public async Task<IActionResult> GetAdditionalPhotosNames([FromRoute] long id, CancellationToken token)
+        {
+            var userPetDb = await _domain.FindByIdAsync(id, token);
+            if (userPetDb == default)
+                return NotFound();
+
+            if (userPetDb.AdditionalPhotosURL == null)
+                return BadRequest(new { message = "No additional photos uploaded yet." });
+
+            var additionalPhotoUrls = _domain.GetAdditionalPhotoNames(userPetDb);
+            return Ok(additionalPhotoUrls);
+        }
+
+        [HttpGet("{id}/additionalphotos/{photoName}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Produces(MediaTypeNames.Image.Jpeg, Common.Constants.MediaTypeNamesImagePng)]
+
+        public async Task<IActionResult> GetAdditionalPhoto([FromRoute] long id, [FromRoute] string photoName, CancellationToken token)
+        {
+            var userPetDb = await _domain.FindByIdAsync(id, token);
+            if (userPetDb == default)
+                return NotFound();
+
+            if (userPetDb.AdditionalPhotosURL == null)
+                return BadRequest(new { message = "No additional photos uploaded yet." });
+
+            var path = _domain.GetAdditionalPhotoPath(userPetDb.AdditionalPhotosURL, photoName);
+
+            if (path == null)
+                return NotFound();
+
+            try
+            {
+                byte[] bytes = System.IO.File.ReadAllBytes(path);
+                string mimeType = Common.Constants.GetMimeType(path);
+                return File(bytes, mimeType);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while trying to retrieve image");
+            }
+            return NotFound();
+        }
+
+
+        [HttpPut("{id}/additionalphotos")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadAdditionalPhotos([FromRoute] long id, List<IFormFile> files, CancellationToken token)
+        {
+            if (files == null || files.Count == 0)
+                return BadRequest(new { message = "No images provided." });
+
+            var userPetDb = await _domain.FindByIdAsync(id, token);
+            if (userPetDb == default)
+                return NotFound();
+
+            string? additionalPhotosGuid = null;
+
+            if (userPetDb.AdditionalPhotosURL != null)
+            {
+                var existingImages = _domain.GetAdditionalPhotoNames(userPetDb);
+
+                if (existingImages.Count + files.Count > Common.Constants.MaxAdditionalPhotos)
+                {
+                    return BadRequest(new { message = $"You can upload a maximum of {Common.Constants.MaxAdditionalPhotos} additional photos." });
+                }
+
+                // Extract the guid from the existing AdditionalPhotosURL
+                additionalPhotosGuid = userPetDb.AdditionalPhotosURL
+                    .TrimEnd('/', '\\')
+                    .Split(['/', '\\'])
+                    .Last();
+            }
+
+            await _domain.UploadAdditionalPhotosAsync(userPetDb, files, additionalPhotosGuid, UserJwt.Id, token);
+            return NoContent();
+        }
+
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -152,6 +240,32 @@ namespace PetRadar.Web.API.Controllers
 
             await _domain.DeleteAsync(petdb, UserJwt.Id, token);
             return NoContent();
+        }
+
+        [HttpDelete("{id}/additionalphotos/{photoName}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+        public async Task<IActionResult> DeleteAdditionalPhoto([FromRoute] long id, [FromRoute] string photoName, CancellationToken token)
+        {
+            var userPetDb = await _domain.FindByIdAsync(id, token);
+            if (userPetDb == default)
+                return NotFound();
+            if (userPetDb.AdditionalPhotosURL == null)
+                return BadRequest(new { message = "No additional photos uploaded yet." });
+            var path = _domain.GetAdditionalPhotoPath(userPetDb.AdditionalPhotosURL, photoName);
+            if (path == null)
+                return NotFound();
+            try
+            {
+                System.IO.File.Delete(path);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while trying to delete image");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while trying to delete the image." });
+            }
         }
     }
 }
