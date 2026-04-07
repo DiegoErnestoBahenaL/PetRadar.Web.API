@@ -223,8 +223,17 @@ namespace PetRadar.Web.API.Controllers
                     .Split(['/', '\\'])
                     .Last();
             }
+            else
+            {
+                if (files.Count > Common.Constants.MaxAdditionalPhotos)
+                {
+                    return BadRequest(new { message = $"You can upload a maximum of {Common.Constants.MaxAdditionalPhotos} additional photos." });
+                }
+
+            }
 
             await _domain.UploadAdditionalPhotosAsync(userPetDb, files, additionalPhotosGuid, UserJwt.Id, token);
+
             return NoContent();
         }
 
