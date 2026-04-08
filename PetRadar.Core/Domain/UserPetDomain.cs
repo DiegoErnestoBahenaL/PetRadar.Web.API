@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using NetTopologySuite.Utilities;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
