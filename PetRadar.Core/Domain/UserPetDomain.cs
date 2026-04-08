@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using PetRadar.Common;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
 using PetRadar.Core.Helpers;
+using PetRadar.Core.Helpers.PetRadarProcessing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,12 +19,14 @@ namespace PetRadar.Core.Domain
         private readonly IUserPetRepository _repo;
         private readonly IFileHelperService _fileHelperService;
         private readonly ILogger<UserPetDomain> _logger;
+        private readonly IPetRadarProcessingHelperService _processingHelperService;
 
-        public UserPetDomain(IUserPetRepository repo, IFileHelperService fileHelperService, ILogger<UserPetDomain> logger)
+        public UserPetDomain(IUserPetRepository repo, IFileHelperService fileHelperService, ILogger<UserPetDomain> logger, IPetRadarProcessingHelperService processingHelperService)
         {
             _repo = repo;
             _fileHelperService = fileHelperService;
             _logger = logger;
+            _processingHelperService = processingHelperService;
         }
 
         public Task<List<UserPetEntity>> GetAllAsync(CancellationToken token)
@@ -51,6 +55,8 @@ namespace PetRadar.Core.Domain
             string path = _fileHelperService.GetImagePath(petdb.PhotoURL);
             return Task.FromResult<string?>(path);
         }
+
+
         public async Task<UserPetEntity> CreateAsync(UserPetCreateModel pet, long createdByUserId, CancellationToken token)
         {
             var petdb = new UserPetEntity(
@@ -122,7 +128,24 @@ namespace PetRadar.Core.Domain
 
         public async Task<int> UpdateMainPictureAsync(UserPetEntity petdb, IFormFile file, long modifiedByUserId, CancellationToken token)
         {
+           
+            await using var imageStream = file.OpenReadStream();
 
+            try
+            {
+                var validationResult = await _processingHelperService.ValidateCatOrDogAsync(imageStream, file.FileName, file.ContentType);
+
+                if (petdb.Species != Data.Entities.Enums.PetSpeciesEnum.NotSet && 
+                    petdb.Species.ToString().ToLower() != validationResult.DetectedClass.ToLower())
+                {
+                    throw new BadHttpRequestException("The image detected class is different from the registered species.");
+                }
+            }
+            catch (BadHttpRequestException ex) 
+            { 
+                throw new BadHttpRequestException($"Image validation failed: {ex.Message}");
+            }
+             
             if (petdb.PhotoURL != null)
             {
                 _fileHelperService.DeleteImage(petdb.PhotoURL, _logger);
@@ -137,6 +160,51 @@ namespace PetRadar.Core.Domain
             petdb.UpdatedByUser(modifiedByUserId);
             _repo.Update(petdb);
 
+            int result = await _repo.SaveChangesAsync();
+            return result;
+        }
+
+        public List<string> GetAdditionalPhotoNames(UserPetEntity petdb)
+        {
+            if (petdb.AdditionalPhotosURL == null)
+                return [];
+
+            List<string> paths = _fileHelperService.GetGalleryImageNames(petdb.AdditionalPhotosURL);
+            return paths;
+        }
+
+        public string? GetAdditionalPhotoPath(string relativePath, string imageName)
+        {
+
+            string imageRelativePath = Path.Combine(relativePath, imageName);
+
+            string path = string.Empty;
+
+            try 
+            {
+                path = _fileHelperService.GetImagePath(imageRelativePath);
+            }
+            catch (PetRadarException ex)
+            {
+                _logger.LogError(ex, "Error retrieving additional photo at path: {ImageRelativePath}", imageRelativePath);
+                return null;
+            }
+
+            return path;
+        }
+
+        public async Task<int> UploadAdditionalPhotosAsync (UserPetEntity petdb, List<IFormFile> files, string? guid, long modifiedByUserId, CancellationToken token)
+        {
+
+            string? relativePath = await _fileHelperService.SaveImagesInGallery(files, guid);
+
+            if (relativePath != null)
+            {
+                petdb.AdditionalPhotosURL = relativePath;
+            }
+
+            petdb.UpdatedByUser(modifiedByUserId);
+            _repo.Update(petdb);
             int result = await _repo.SaveChangesAsync();
             return result;
         }
