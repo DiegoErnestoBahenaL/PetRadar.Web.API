@@ -6,6 +6,7 @@ using PetRadar.Core.Data;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain;
 using PetRadar.Core.Helpers;
+using PetRadar.Core.Helpers.PetRadarProcessing;
 using PetRadar.Web.API;
 using PetRadar.Web.API.Services;
 using System.Text;
@@ -16,8 +17,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddSingleton<IFileHelperService, FileHelperService>();
 builder.Services.AddSingleton<IEmailHelperService, EmailHelperService>();
+builder.Services.AddSingleton<IPetRadarProcessingHelperService, PetRadarProcessingHelperService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserPetRepository, UserPetRepository>();
