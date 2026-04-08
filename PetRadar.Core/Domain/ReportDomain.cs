@@ -187,6 +187,55 @@ namespace PetRadar.Core.Domain
             return result;
         }
 
+        public List<string> GetAdditionalPhotoNames(ReportEntity reportDb)
+        {
+            if (reportDb.AdditionalPhotosURL == null)
+                return [];
+
+            return _fileHelperService.GetGalleryImageNames(reportDb.AdditionalPhotosURL);
+        }
+
+        public string? GetAdditionalPhotoPath(string relativePath, string imageName)
+        {
+            // Delegates to the file helper which validates the filename (blocks path traversal)
+            // and verifies the image exists on disk.
+            return _fileHelperService.GetGalleryImagePath(relativePath, imageName);
+        }
+
+        public async Task<int> UploadAdditionalPhotosAsync(ReportEntity reportDb, List<IFormFile> files, string? guid, long modifiedByUserId, CancellationToken token)
+        {
+            string? relativePath = await _fileHelperService.SaveImagesInGallery(files, guid);
+
+            if (relativePath != null)
+            {
+                reportDb.AdditionalPhotosURL = relativePath;
+            }
+
+            reportDb.UpdatedByUser(modifiedByUserId);
+            _repo.Update(reportDb);
+            int result = await _repo.SaveChangesAsync();
+            return result;
+        }
+
+        public async Task<int> DeleteAdditionalPhotoAsync(ReportEntity reportDb, string photoName, long modifiedByUserId, CancellationToken token)
+        {
+            if (reportDb == default)
+                throw new ArgumentNullException(nameof(reportDb));
+
+            if (string.IsNullOrEmpty(reportDb.AdditionalPhotosURL))
+                throw new InvalidOperationException("Report has no additional photos gallery.");
+
+            var path = GetAdditionalPhotoPath(reportDb.AdditionalPhotosURL, photoName);
+            if (path == null)
+                throw new FileNotFoundException($"Additional photo '{photoName}' not found.");
+
+            System.IO.File.Delete(path);
+
+            reportDb.UpdatedByUser(modifiedByUserId);
+            _repo.Update(reportDb);
+            return await _repo.SaveChangesAsync();
+        }
+
         public async Task<int> DeleteAsync(ReportEntity report, long modifiedByUserId, CancellationToken token)
         {
             if (report == default)

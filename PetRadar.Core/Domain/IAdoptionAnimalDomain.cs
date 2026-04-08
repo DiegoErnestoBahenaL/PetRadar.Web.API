@@ -18,6 +18,10 @@ namespace PetRadar.Core.Domain
         Task<AdoptionAnimalEntity> CreateAsync(AdoptionAnimalCreateModel animal, long createdByUserId, CancellationToken token);
         Task<int> UpdateAsync(AdoptionAnimalEntity animalDb, AdoptionAnimalUpdateModel animal, long modifiedByUserId, CancellationToken token);
         Task<int> UpdateMainPictureAsync(AdoptionAnimalEntity animalDb, IFormFile file, long modifiedByUserId, CancellationToken token);
+        List<string> GetAdditionalPhotoNames(AdoptionAnimalEntity animalDb);
+        string? GetAdditionalPhotoPath(string relativePath, string imageName);
+        Task<int> UploadAdditionalPhotosAsync(AdoptionAnimalEntity animalDb, List<IFormFile> files, string? guid, long modifiedByUserId, CancellationToken token);
+        Task<int> DeleteAdditionalPhotoAsync(AdoptionAnimalEntity animalDb, string photoName, long modifiedByUserId, CancellationToken token);
 
         Task<int> DeleteAsync(AdoptionAnimalEntity animal, long modifiedByUserId, CancellationToken token);
     }
