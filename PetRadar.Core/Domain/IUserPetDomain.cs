@@ -21,6 +21,7 @@ namespace PetRadar.Core.Domain
         Task<int> UpdateAsync(UserPetEntity petdb, UserPetUpdateModel pet, long modifiedByUserId, CancellationToken token);
         Task<int> UpdateMainPictureAsync(UserPetEntity petdb, IFormFile file, long modifiedByUserId, CancellationToken token);
         Task<int> UploadAdditionalPhotosAsync(UserPetEntity petdb, List<IFormFile> files, string? guid, long modifiedByUserId, CancellationToken token);
+        Task<int> DeleteAdditionalPhotoAsync(UserPetEntity petdb, string photoName, long modifiedByUserId, CancellationToken token);
         Task<int> DeleteAsync(UserPetEntity pet, long modifiedByUserId, CancellationToken token);
     }
 }
