@@ -136,8 +136,18 @@ namespace PetRadar.Web.API.Controllers
             if (userdb == default)
                 return NotFound();
 
-            await _domain.UpdateMainPictureAsync(userdb, file, UserJwt.Id, token);
-            return NoContent();
+            try
+            {
+                await _domain.UpdateMainPictureAsync(userdb, file, UserJwt.Id, token);
+                return NoContent();
+            }
+            catch (BadHttpRequestException ex)
+            {
+                // Este BadRequest capturará el error generado cuando la API externa responda con HTTP 400
+                // o si la validación de especie en el dominio falla.
+                return BadRequest(new { message = ex.Message });
+            }
+
         }
 
         [HttpGet("{id}/additionalphotos")]

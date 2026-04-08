@@ -5,6 +5,7 @@ using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
 using PetRadar.Core.Helpers;
+using PetRadar.Core.Helpers.PetRadarProcessing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,12 +19,14 @@ namespace PetRadar.Core.Domain
         private readonly IUserPetRepository _repo;
         private readonly IFileHelperService _fileHelperService;
         private readonly ILogger<UserPetDomain> _logger;
+        private readonly IPetRadarProcessingHelperService _processingHelperService;
 
-        public UserPetDomain(IUserPetRepository repo, IFileHelperService fileHelperService, ILogger<UserPetDomain> logger)
+        public UserPetDomain(IUserPetRepository repo, IFileHelperService fileHelperService, ILogger<UserPetDomain> logger, IPetRadarProcessingHelperService processingHelperService)
         {
             _repo = repo;
             _fileHelperService = fileHelperService;
             _logger = logger;
+            _processingHelperService = processingHelperService;
         }
 
         public Task<List<UserPetEntity>> GetAllAsync(CancellationToken token)
@@ -125,7 +128,24 @@ namespace PetRadar.Core.Domain
 
         public async Task<int> UpdateMainPictureAsync(UserPetEntity petdb, IFormFile file, long modifiedByUserId, CancellationToken token)
         {
+           
+            await using var imageStream = file.OpenReadStream();
 
+            try
+            {
+                var validationResult = await _processingHelperService.ValidateCatOrDogAsync(imageStream, file.FileName, file.ContentType);
+
+                if (petdb.Species != Data.Entities.Enums.PetSpeciesEnum.NotSet && 
+                    petdb.Species.ToString().ToLower() != validationResult.DetectedClass.ToLower())
+                {
+                    throw new BadHttpRequestException("The image detected class is different from the registered species.");
+                }
+            }
+            catch (BadHttpRequestException ex) 
+            { 
+                throw new BadHttpRequestException($"Image validation failed: {ex.Message}");
+            }
+             
             if (petdb.PhotoURL != null)
             {
                 _fileHelperService.DeleteImage(petdb.PhotoURL, _logger);

@@ -13,5 +13,7 @@ namespace PetRadar.Core
         public string MailGunAPIKey { get; set; }
         [Required, MinLength(1)]
         public string BaseURL { get; set; }
+        [Required, MinLength(1)]
+        public string PetRadarProcessingBaseURL { get; set; }
     }
 }
