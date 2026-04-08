@@ -51,13 +51,18 @@ namespace PetRadar.Core.Helpers.PetRadarProcessing
 
             if (!response.IsSuccessStatusCode)
             {
+
+                var errorResponse = JsonConvert.DeserializeObject<HttpExceptionResponse>(body);
+
+
                 if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
                 {
-                    throw new BadHttpRequestException(body);
+
+                    throw new BadHttpRequestException(errorResponse.Detail);
                 }
                 else
                 {
-                    throw new HttpRequestException($"Error calling PetRadarProcessing API: {response.StatusCode}, Body: {body}");
+                    throw new HttpRequestException($"Error calling PetRadarProcessing API: {response.StatusCode}, Body: {errorResponse.Detail}");
                 }
             }
 
