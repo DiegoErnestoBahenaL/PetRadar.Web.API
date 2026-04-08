@@ -143,8 +143,8 @@ namespace PetRadar.Web.API.Controllers
             }
             catch (BadHttpRequestException ex)
             {
-                // Este BadRequest capturar· el error generado cuando la API externa responda con HTTP 400
-                // o si la validaciÛn de especie en el dominio falla.
+                // Este BadRequest capturar√° el error generado cuando la API externa responda con HTTP 400
+                // o si la validaci√≥n de especie en el dominio falla.
                 return BadRequest(new { message = ex.Message });
             }
 
@@ -270,14 +270,17 @@ namespace PetRadar.Web.API.Controllers
             var userPetDb = await _domain.FindByIdAsync(id, token);
             if (userPetDb == default)
                 return NotFound();
+
             if (userPetDb.AdditionalPhotosURL == null)
                 return BadRequest(new { message = "No additional photos uploaded yet." });
+
             var path = _domain.GetAdditionalPhotoPath(userPetDb.AdditionalPhotosURL, photoName);
             if (path == null)
                 return NotFound();
+
             try
             {
-                System.IO.File.Delete(path);
+                await _domain.DeleteAdditionalPhotoAsync(userPetDb, photoName, UserJwt.Id, token);
                 return NoContent();
             }
             catch (Exception ex)

@@ -175,22 +175,9 @@ namespace PetRadar.Core.Domain
 
         public string? GetAdditionalPhotoPath(string relativePath, string imageName)
         {
-
-            string imageRelativePath = Path.Combine(relativePath, imageName);
-
-            string path = string.Empty;
-
-            try 
-            {
-                path = _fileHelperService.GetImagePath(imageRelativePath);
-            }
-            catch (PetRadarException ex)
-            {
-                _logger.LogError(ex, "Error retrieving additional photo at path: {ImageRelativePath}", imageRelativePath);
-                return null;
-            }
-
-            return path;
+            // Delegates to the file helper which validates the filename (blocks path traversal)
+            // and verifies the image exists on disk.
+            return _fileHelperService.GetGalleryImagePath(relativePath, imageName);
         }
 
         public async Task<int> UploadAdditionalPhotosAsync (UserPetEntity petdb, List<IFormFile> files, string? guid, long modifiedByUserId, CancellationToken token)
@@ -207,6 +194,25 @@ namespace PetRadar.Core.Domain
             _repo.Update(petdb);
             int result = await _repo.SaveChangesAsync();
             return result;
+        }
+
+        public async Task<int> DeleteAdditionalPhotoAsync(UserPetEntity petdb, string photoName, long modifiedByUserId, CancellationToken token)
+        {
+            if (petdb == default)
+                throw new ArgumentNullException(nameof(petdb));
+
+            if (string.IsNullOrEmpty(petdb.AdditionalPhotosURL))
+                throw new InvalidOperationException("Pet has no additional photos gallery.");
+
+            var path = GetAdditionalPhotoPath(petdb.AdditionalPhotosURL, photoName);
+            if (path == null)
+                throw new FileNotFoundException($"Additional photo '{photoName}' not found.");
+
+            File.Delete(path);
+
+            petdb.UpdatedByUser(modifiedByUserId);
+            _repo.Update(petdb);
+            return await _repo.SaveChangesAsync();
         }
 
         public async Task<int> DeleteAsync(UserPetEntity pet, long modifiedByUserId, CancellationToken token)

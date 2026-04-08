@@ -16,9 +16,9 @@ namespace PetRadar.Core.Domain
     {
         private readonly IAdoptionAnimalRepository _repo;
         private readonly IFileHelperService _fileHelperService;
-        private readonly ILogger<UserPetDomain> _logger;
+        private readonly ILogger<AdoptionAnimalDomain> _logger;
 
-        public AdoptionAnimalDomain(IAdoptionAnimalRepository repo, IFileHelperService fileHelperService, ILogger<UserPetDomain> logger)
+        public AdoptionAnimalDomain(IAdoptionAnimalRepository repo, IFileHelperService fileHelperService, ILogger<AdoptionAnimalDomain> logger)
         {
             _repo = repo;
             _fileHelperService = fileHelperService;
@@ -170,6 +170,55 @@ namespace PetRadar.Core.Domain
 
             int result = await _repo.SaveChangesAsync();
             return result;
+        }
+
+        public List<string> GetAdditionalPhotoNames(AdoptionAnimalEntity animalDb)
+        {
+            if (animalDb.AdditionalPhotosURL == null)
+                return [];
+
+            return _fileHelperService.GetGalleryImageNames(animalDb.AdditionalPhotosURL);
+        }
+
+        public string? GetAdditionalPhotoPath(string relativePath, string imageName)
+        {
+            // Delegates to the file helper which validates the filename (blocks path traversal)
+            // and verifies the image exists on disk.
+            return _fileHelperService.GetGalleryImagePath(relativePath, imageName);
+        }
+
+        public async Task<int> UploadAdditionalPhotosAsync(AdoptionAnimalEntity animalDb, List<IFormFile> files, string? guid, long modifiedByUserId, CancellationToken token)
+        {
+            string? relativePath = await _fileHelperService.SaveImagesInGallery(files, guid);
+
+            if (relativePath != null)
+            {
+                animalDb.AdditionalPhotosURL = relativePath;
+            }
+
+            animalDb.UpdatedByUser(modifiedByUserId);
+            _repo.Update(animalDb);
+            int result = await _repo.SaveChangesAsync();
+            return result;
+        }
+
+        public async Task<int> DeleteAdditionalPhotoAsync(AdoptionAnimalEntity animalDb, string photoName, long modifiedByUserId, CancellationToken token)
+        {
+            if (animalDb == default)
+                throw new ArgumentNullException(nameof(animalDb));
+
+            if (string.IsNullOrEmpty(animalDb.AdditionalPhotosURL))
+                throw new InvalidOperationException("Adoption animal has no additional photos gallery.");
+
+            var path = GetAdditionalPhotoPath(animalDb.AdditionalPhotosURL, photoName);
+            if (path == null)
+                throw new FileNotFoundException($"Additional photo '{photoName}' not found.");
+
+            File.Delete(path);
+
+            animalDb.UpdatedByUser(modifiedByUserId);
+            _repo.Update(animalDb);
+            return await _repo.SaveChangesAsync();
         }
 
         public async Task<int> DeleteAsync(AdoptionAnimalEntity animal, long modifiedByUserId, CancellationToken token)

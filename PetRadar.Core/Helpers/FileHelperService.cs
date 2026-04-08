@@ -130,6 +130,25 @@ namespace PetRadar.Core.Helpers
             }
         }
 
+        public string? GetGalleryImagePath(string galleryRelativePath, string imageName)
+        {
+            // Prevent path traversal: only accept simple filenames, no directory components
+            // (e.g. reject "..\..\evil.txt", "folder/file.jpg", absolute paths, etc.).
+            if (string.IsNullOrWhiteSpace(imageName) || imageName != Path.GetFileName(imageName))
+                return null;
+
+            string imageRelativePath = Path.Combine(galleryRelativePath, imageName);
+
+            try
+            {
+                return GetImagePath(imageRelativePath);
+            }
+            catch (PetRadarException)
+            {
+                return null;
+            }
+        }
+
         public List<string> GetGalleryImageNames(string galleryRelativePath)
         {
             string workingDirectory = _hostEnv.ContentRootPath;

@@ -15,5 +15,6 @@ namespace PetRadar.Core.Helpers
         void DeleteImage(string imagePath, ILogger logger);
         Task<string?> SaveImagesInGallery(List<IFormFile> images, string? guid);
         List<string> GetGalleryImageNames(string galleryRelativePath);
+        string? GetGalleryImagePath(string galleryRelativePath, string imageName);
     }
 }
