@@ -5,6 +5,7 @@ using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
 using PetRadar.Core.Helpers;
+using PetRadar.Core.Helpers.PetRadarProcessing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,12 +19,14 @@ namespace PetRadar.Core.Domain
         private readonly IReportRepository _repo;
         private readonly IFileHelperService _fileHelperService;
         private readonly ILogger<ReportDomain> _logger;
+        private readonly IPetRadarProcessingHelperService _processingHelperService;
 
-        public ReportDomain(IReportRepository repo, IFileHelperService fileHelperService, ILogger<ReportDomain> logger)
+        public ReportDomain(IReportRepository repo, IFileHelperService fileHelperService, ILogger<ReportDomain> logger, IPetRadarProcessingHelperService processingHelperService)
         {
             _repo = repo;
             _fileHelperService = fileHelperService;
             _logger = logger;
+            _processingHelperService = processingHelperService;
         }
 
         public Task<List<ReportEntity>> GetAllAsync(CancellationToken token)
@@ -62,6 +65,23 @@ namespace PetRadar.Core.Domain
 
         public async Task<int> UpdateMainPictureAsync(ReportEntity reportDb, IFormFile file, long modifiedByUserId, CancellationToken token)
         {
+            await using var imageStream = file.OpenReadStream();
+
+            try
+            {
+                var validationResult = await _processingHelperService.ValidateCatOrDogAsync(imageStream, file.FileName, file.ContentType);
+
+                if (reportDb.Species != Data.Entities.Enums.PetSpeciesEnum.NotSet && 
+                    reportDb.Species.ToString().ToLower() != validationResult.DetectedClass.ToLower())
+                {
+                    throw new BadHttpRequestException("The image detected class is different from the registered species.");
+                }
+            }
+            catch (BadHttpRequestException ex) 
+            { 
+                throw new BadHttpRequestException($"Image validation failed: {ex.Message}");
+            }
+
             if (reportDb.PhotoURL != null)
             {
                 _fileHelperService.DeleteImage(reportDb.PhotoURL, _logger);
@@ -204,6 +224,26 @@ namespace PetRadar.Core.Domain
 
         public async Task<int> UploadAdditionalPhotosAsync(ReportEntity reportDb, List<IFormFile> files, string? guid, long modifiedByUserId, CancellationToken token)
         {
+            try
+            {
+                foreach (var file in files)
+                {
+                    await using var imageStream = file.OpenReadStream();
+
+                    var validationResult = await _processingHelperService.ValidateCatOrDogAsync(imageStream, file.FileName, file.ContentType);
+
+                    if (reportDb.Species != Data.Entities.Enums.PetSpeciesEnum.NotSet &&
+                        reportDb.Species.ToString().ToLower() != validationResult.DetectedClass.ToLower())
+                    {
+                        throw new BadHttpRequestException("The image detected class is different from the registered species.");
+                    }
+                }
+            }
+            catch (BadHttpRequestException ex)
+            {
+                throw new BadHttpRequestException($"Image validation failed: {ex.Message}");
+            }
+
             string? relativePath = await _fileHelperService.SaveImagesInGallery(files, guid);
 
             if (relativePath != null)

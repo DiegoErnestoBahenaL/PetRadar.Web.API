@@ -99,8 +99,16 @@ namespace PetRadar.Web.API.Controllers
             var reportDb = await _domain.FindByIdAsync(id, token);
             if (reportDb == default)
                 return NotFound(Constants.NotFoundProblemDetails);
-            await _domain.UpdateMainPictureAsync(reportDb, file, UserJwt.Id, token);
-            return NoContent();
+
+            try
+            {
+                await _domain.UpdateMainPictureAsync(reportDb, file, UserJwt.Id, token);
+                return NoContent();
+            }
+            catch (BadHttpRequestException ex)
+            {
+                return BadRequest(Constants.BadRequestProblemDetails(ex.Message));
+            }
         }
 
         [HttpPost]
@@ -226,7 +234,14 @@ namespace PetRadar.Web.API.Controllers
                 }
             }
 
-            await _domain.UploadAdditionalPhotosAsync(reportDb, files, additionalPhotosGuid, UserJwt.Id, token);
+            try 
+            {
+                await _domain.UploadAdditionalPhotosAsync(reportDb, files, additionalPhotosGuid, UserJwt.Id, token);
+            }
+            catch (BadHttpRequestException ex)
+            {
+                return BadRequest(Constants.BadRequestProblemDetails(ex.Message));
+            }
 
             return NoContent();
         }
