@@ -183,6 +183,30 @@ namespace PetRadar.Core.Domain
         public async Task<int> UploadAdditionalPhotosAsync (UserPetEntity petdb, List<IFormFile> files, string? guid, long modifiedByUserId, CancellationToken token)
         {
 
+            // Validate each image before saving any of them. If any image fails validation,
+            // the entire operation is aborted and no images are saved.
+            try
+            {
+                foreach (var file in files)
+                {
+                    await using var imageStream = file.OpenReadStream();
+
+                    var validationResult = await _processingHelperService.ValidateCatOrDogAsync(imageStream, file.FileName, file.ContentType);
+
+                    if (petdb.Species != Data.Entities.Enums.PetSpeciesEnum.NotSet &&
+                        petdb.Species.ToString().ToLower() != validationResult.DetectedClass.ToLower())
+                    {
+                        throw new BadHttpRequestException("The image detected class is different from the registered species.");
+                    }
+
+                }
+            }
+            catch (BadHttpRequestException ex)
+            {
+                throw new BadHttpRequestException($"Image validation failed: {ex.Message}");
+            }
+
+
             string? relativePath = await _fileHelperService.SaveImagesInGallery(files, guid);
 
             if (relativePath != null)

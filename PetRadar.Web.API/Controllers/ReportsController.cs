@@ -57,7 +57,7 @@ namespace PetRadar.Web.API.Controllers
             var report = await _domain.FindByIdAsync(id, token);
 
             if (report == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             return Ok(new ReportViewModel(report));
         }
@@ -70,12 +70,11 @@ namespace PetRadar.Web.API.Controllers
         {
             var report = await _domain.FindByIdAsync(id, token);
             if (report == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             var path = await _domain.GetMainPicturePath(report, token);
             if (path == null)
-                return NotFound();
-
+                return NotFound(Constants.NotFoundProblemDetails);
             try
             {
                 byte[] bytes = System.IO.File.ReadAllBytes(path);
@@ -99,8 +98,7 @@ namespace PetRadar.Web.API.Controllers
         {
             var reportDb = await _domain.FindByIdAsync(id, token);
             if (reportDb == default)
-                return NotFound();
-
+                return NotFound(Constants.NotFoundProblemDetails);
             await _domain.UpdateMainPictureAsync(reportDb, file, UserJwt.Id, token);
             return NoContent();
         }
@@ -116,7 +114,7 @@ namespace PetRadar.Web.API.Controllers
             var user = await _userDomain.FindByIdAsync(report.UserId.Value, token);
 
             if (user == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             var reportDb = await _domain.CreateAsync(report, UserJwt.Id, token);
 
@@ -133,7 +131,7 @@ namespace PetRadar.Web.API.Controllers
             var reportDb = await _domain.FindByIdAsync(id, token);
 
             if (reportDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             await _domain.UpdateAsync(reportDb, report, UserJwt.Id, token);
             return NoContent();
@@ -148,10 +146,10 @@ namespace PetRadar.Web.API.Controllers
         {
             var reportDb = await _domain.FindByIdAsync(id, token);
             if (reportDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             if (reportDb.AdditionalPhotosURL == null)
-                return BadRequest(new { message = "No additional photos uploaded yet." });
+                return BadRequest(Constants.BadRequestProblemDetails( "No additional photos uploaded yet."));
 
             var additionalPhotoUrls = _domain.GetAdditionalPhotoNames(reportDb);
             return Ok(additionalPhotoUrls);
@@ -166,15 +164,15 @@ namespace PetRadar.Web.API.Controllers
         {
             var reportDb = await _domain.FindByIdAsync(id, token);
             if (reportDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             if (reportDb.AdditionalPhotosURL == null)
-                return BadRequest(new { message = "No additional photos uploaded yet." });
+                return BadRequest(Constants.BadRequestProblemDetails("No additional photos uploaded yet."));
 
             var path = _domain.GetAdditionalPhotoPath(reportDb.AdditionalPhotosURL, photoName);
 
             if (path == null)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             try
             {
@@ -186,7 +184,7 @@ namespace PetRadar.Web.API.Controllers
             {
                 _logger.LogError(ex, "Error while trying to retrieve image");
             }
-            return NotFound();
+            return NotFound(Constants.NotFoundProblemDetails);
         }
 
         [HttpPut("{id}/additionalphotos")]
@@ -201,7 +199,7 @@ namespace PetRadar.Web.API.Controllers
 
             var reportDb = await _domain.FindByIdAsync(id, token);
             if (reportDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             string? additionalPhotosGuid = null;
 
@@ -211,7 +209,7 @@ namespace PetRadar.Web.API.Controllers
 
                 if (existingImages.Count + files.Count > Common.Constants.MaxAdditionalPhotos)
                 {
-                    return BadRequest(new { message = $"You can upload a maximum of {Common.Constants.MaxAdditionalPhotos} additional photos." });
+                    return BadRequest(Constants.BadRequestProblemDetails($"You can upload a maximum of {Common.Constants.MaxAdditionalPhotos} additional photos."));
                 }
 
                 // Extract the guid from the existing AdditionalPhotosURL
@@ -224,7 +222,7 @@ namespace PetRadar.Web.API.Controllers
             {
                 if (files.Count > Common.Constants.MaxAdditionalPhotos)
                 {
-                    return BadRequest(new { message = $"You can upload a maximum of {Common.Constants.MaxAdditionalPhotos} additional photos." });
+                    return BadRequest(Constants.BadRequestProblemDetails($"You can upload a maximum of {Common.Constants.MaxAdditionalPhotos} additional photos."));
                 }
             }
 
@@ -241,15 +239,14 @@ namespace PetRadar.Web.API.Controllers
         {
             var reportDb = await _domain.FindByIdAsync(id, token);
             if (reportDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             if (reportDb.AdditionalPhotosURL == null)
-                return BadRequest(new { message = "No additional photos uploaded yet." });
+                return BadRequest(Constants.BadRequestProblemDetails("No additional photos uploaded yet."));
 
             var path = _domain.GetAdditionalPhotoPath(reportDb.AdditionalPhotosURL, photoName);
             if (path == null)
-                return NotFound();
-
+                return NotFound(Constants.NotFoundProblemDetails);
             try
             {
                 await _domain.DeleteAdditionalPhotoAsync(reportDb, photoName, UserJwt.Id, token);
@@ -258,7 +255,7 @@ namespace PetRadar.Web.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while trying to delete image");
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while trying to delete the image." });
+                throw; // Let the global exception handler deal with this
             }
         }
 
@@ -270,7 +267,7 @@ namespace PetRadar.Web.API.Controllers
             var reportDb = await _domain.FindByIdAsync(id, token);
 
             if (reportDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             await _domain.DeleteAsync(reportDb, UserJwt.Id, token);
             return NoContent();

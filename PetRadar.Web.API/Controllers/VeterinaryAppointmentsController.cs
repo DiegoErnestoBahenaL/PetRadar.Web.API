@@ -46,7 +46,7 @@ namespace PetRadar.Web.API.Controllers
             var pet = await _userPetDomain.FindByIdAsync(petId, token);
 
             if (pet == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             var appointments = await _domain.GetAllByPetIdAsync(pet.Id, token);
 
@@ -63,7 +63,7 @@ namespace PetRadar.Web.API.Controllers
             var user = await _userDomain.FindByIdAsync(userId, token);
 
             if (user == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             var appointments = await _domain.GetAllByUserIdAsync(user.Id, token);
 
@@ -80,7 +80,7 @@ namespace PetRadar.Web.API.Controllers
             var appointment = await _domain.FindByIdAsync(id, token);
 
             if (appointment == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             return Ok(new VeterinaryAppointmentViewModel(appointment));
         }
@@ -96,7 +96,7 @@ namespace PetRadar.Web.API.Controllers
             var pet = await _userPetDomain.FindByIdAsync(appointment.PetId.Value, token);
 
             if (pet == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             var appointmentDb = await _domain.CreateAsync(appointment, UserJwt.Id, token);
 
@@ -113,7 +113,7 @@ namespace PetRadar.Web.API.Controllers
             var appointmentDb = await _domain.FindByIdAsync(id, token);
 
             if (appointmentDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             await _domain.UpdateAsync(appointmentDb, appointment, UserJwt.Id, token);
             return NoContent();
@@ -127,7 +127,7 @@ namespace PetRadar.Web.API.Controllers
             var appointmentDb = await _domain.FindByIdAsync(id, token);
 
             if (appointmentDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             await _domain.DeleteAsync(appointmentDb, UserJwt.Id, token);
             return NoContent();
