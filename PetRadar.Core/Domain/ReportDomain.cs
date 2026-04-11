@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using PetRadar.Core.Data.Entities;
+using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
 using PetRadar.Core.Helpers;
@@ -71,11 +72,15 @@ namespace PetRadar.Core.Domain
             {
                 var validationResult = await _processingHelperService.ValidateCatOrDogAsync(imageStream, file.FileName, file.ContentType);
 
-                if (reportDb.Species != Data.Entities.Enums.PetSpeciesEnum.NotSet && 
+                if (reportDb.Species != PetSpeciesEnum.NotSet && 
                     reportDb.Species.ToString().ToLower() != validationResult.DetectedClass.ToLower())
                 {
                     throw new BadHttpRequestException("The image detected class is different from the registered species.");
                 }
+
+                reportDb.Species = validationResult.DetectedClass.ToLower() == "dog" ? PetSpeciesEnum.Dog :
+                               validationResult.DetectedClass.ToLower() == "cat" ?PetSpeciesEnum.Cat :
+                               reportDb.Species; // If the detected class is neither dog nor cat, keep the existing species.
             }
             catch (BadHttpRequestException ex) 
             { 
@@ -94,9 +99,28 @@ namespace PetRadar.Core.Domain
             reportDb.PhotoURL = relativePath;
 
             reportDb.UpdatedByUser(modifiedByUserId);
+
             _repo.Update(reportDb);
 
             int result = await _repo.SaveChangesAsync();
+
+            try
+            {
+                var characteristicsResult = await _processingHelperService.GetAnimalCharacteristicsAsync(reportDb.Species, imageStream, file.FileName, file.ContentType);
+
+                if (characteristicsResult != null)
+                {
+                    reportDb.Breed = characteristicsResult.TopPredictedBreed;
+                    reportDb.UpdatedByUser(modifiedByUserId);
+                    _repo.Update(reportDb);
+                    await _repo.SaveChangesAsync();
+                }
+            }
+            catch (BadHttpRequestException ex)
+            {
+                throw new BadHttpRequestException($"Image characteristics extraction failed: {ex.Message}");
+            }
+
             return result;
         }
 
@@ -104,11 +128,13 @@ namespace PetRadar.Core.Domain
         {
             var location = new Point(report.Longitude.Value, report.Latitude.Value) { SRID = 4326 };
 
+            //Defaulting to Stray for now, as the ReportType won't be sent from the client when creating a report.
+            //This can be updated later when the client is sending the ReportType.
             var reportDb = new ReportEntity(
                 report.UserId.Value, report.UserPetId,
                 report.Species.Value, report.Breed, report.Color,
                 report.Sex, report.Size, report.ApproximateAge,
-                report.Weight, report.Description, report.IsNeutered, report.ReportType.Value,
+                report.Weight, report.Description, report.IsNeutered, ReportTypeEnum.Stray,
                 report.ReportStatus, report.HasCollar, report.HasTag, report.IncidentDate,
                 location, report.AddressText, report.UseAlternateContact, report.ContactName,
                 report.ContactPhone, report.ContactEmail, report.RewardAmount

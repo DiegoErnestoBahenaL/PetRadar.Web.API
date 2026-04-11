@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using PetRadar.Core.Data.Entities.Enums;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -25,7 +26,7 @@ namespace PetRadar.Core.Helpers.PetRadarProcessing
 
         public async Task<ValidationResponse> ValidateCatOrDogAsync(Stream imageStream, string fileName, string contentType)
         {
-            // Reiniciar la posición del stream si es posible
+            // Reiniciar la posiciï¿½n del stream si es posible
             if (imageStream.CanSeek)
             {
                 imageStream.Position = 0;
@@ -41,7 +42,7 @@ namespace PetRadar.Core.Helpers.PetRadarProcessing
             // Usar el MemoryStream en lugar del original de la llamada
             using var fileContent = new ByteArrayContent(memoryStream.ToArray());
 
-            fileContent.Headers.ContentType =  new MediaTypeHeaderValue(string.IsNullOrWhiteSpace(contentType) ? "application/octet-stream" : contentType);
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(string.IsNullOrWhiteSpace(contentType) ? "application/octet-stream" : contentType);
 
             form.Add(fileContent, "image", fileName);
 
@@ -67,7 +68,56 @@ namespace PetRadar.Core.Helpers.PetRadarProcessing
             }
 
             return JsonConvert.DeserializeObject<ValidationResponse>(body);
-            
+
+        }
+
+        public async Task<CharacteristicsResponse> GetAnimalCharacteristicsAsync(PetSpeciesEnum species, Stream imageStream, string fileName, string contentType)
+        {
+
+            if (species == PetSpeciesEnum.NotSet)
+            {
+                throw new BadHttpRequestException("Species must be set to either Dog or Cat.");
+            }
+
+            // Reiniciar la posiciï¿½n del stream si es posible
+            if (imageStream.CanSeek)
+            {
+                imageStream.Position = 0;
+            }
+            // Copiamos a un MemoryStream para asegurar que la lectura del stream HTTP no falle
+            using var memoryStream = new MemoryStream();
+            await imageStream.CopyToAsync(memoryStream);
+            memoryStream.Position = 0;
+
+            using var form = new MultipartFormDataContent();
+
+            // Usar el MemoryStream en lugar del original de la llamada
+            using var fileContent = new ByteArrayContent(memoryStream.ToArray());
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(string.IsNullOrWhiteSpace(contentType) ? "application/octet-stream" : contentType);
+            form.Add(fileContent, "image", fileName);
+            using var response = await _httpClient.PostAsync($"/images/{species.ToString().ToLower()}/extractcharacteristics", form, CancellationToken.None);
+            var body = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorResponse = JsonConvert.DeserializeObject<HttpExceptionResponse>(body);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+
+                    throw new BadHttpRequestException(errorResponse.Detail);
+                }
+                else
+                {
+                    throw new HttpRequestException($"Error calling PetRadarProcessing API: {response.StatusCode}, Body: {errorResponse.Detail}");
+                }
+
+            }
+
+            var characteristics = JsonConvert.DeserializeObject<CharacteristicsResponse>(body);
+
+            // Translate breed labels returned by the EfficientNet classifier into
+            // Spanish (Mexican context) before handing the response back.
+            return BreedTranslationHelper.TranslateCharacteristicsResponse(species, characteristics);
         }
     }
 }
