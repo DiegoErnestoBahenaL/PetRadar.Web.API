@@ -52,17 +52,17 @@ namespace PetRadar.Web.API.Controllers
         {
 
             if (tokenModel == default)
-                return BadRequest("Invalid client request");
+                return BadRequest(Constants.BadRequestProblemDetails("Invalid client request"));
 
             var principal = _jwtHelper.GetPrincipalFromRefreshToken(tokenModel.RefreshToken);
 
             if (principal == null)
-                return BadRequest("Invalid refresh token");
+                return BadRequest(Constants.BadRequestProblemDetails("Invalid refresh token"));
 
             var emailClaim = principal.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
 
             if (emailClaim == null || string.IsNullOrEmpty(emailClaim.Value))
-                return BadRequest("Invalid refresh token");
+                return BadRequest(Constants.BadRequestProblemDetails("Invalid refresh token"));
 
             var username = emailClaim.Value;
 
@@ -72,7 +72,7 @@ namespace PetRadar.Web.API.Controllers
 
             if (userDb == default || !refreshTokenIsValid)
             {
-                return BadRequest("Invalid refresh token");
+                return BadRequest(Constants.BadRequestProblemDetails("Invalid refresh token"));
             }
 
             var userToken = new UserTokenViewModel();
@@ -103,7 +103,7 @@ namespace PetRadar.Web.API.Controllers
 
                 if (userDb.EmailVerified)
                 {
-                    return BadRequest("Email is already verified");
+                    return BadRequest(Constants.BadRequestProblemDetails("Email is already verified"));
                 }
 
                 await _userDomain.VerifyEmailAsync(userDb, userId);
@@ -112,7 +112,7 @@ namespace PetRadar.Web.API.Controllers
             }
             else
             {
-                return BadRequest();
+                return BadRequest(Constants.BadRequestProblemDetails("Invalid token"));
             }
         }
 

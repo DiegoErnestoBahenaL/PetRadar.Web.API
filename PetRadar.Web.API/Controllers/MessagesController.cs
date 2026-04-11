@@ -64,7 +64,7 @@ namespace PetRadar.Web.API.Controllers
             var message = await _domain.FindByIdAsync(id, token);
 
             if (message == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             return Ok(new MessageViewModel(message));
         }
@@ -91,7 +91,7 @@ namespace PetRadar.Web.API.Controllers
             var messageDb = await _domain.FindByIdAsync(id, token);
 
             if (messageDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             await _domain.UpdateAsync(messageDb, message, UserJwt.Id, token);
             return NoContent();
@@ -105,7 +105,7 @@ namespace PetRadar.Web.API.Controllers
             var messageDb = await _domain.FindByIdAsync(id, token);
 
             if (messageDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             await _domain.DeleteAsync(messageDb, UserJwt.Id, token);
             return NoContent();

@@ -57,7 +57,7 @@ namespace PetRadar.Web.API.Controllers
             var pet = await _domain.FindByIdAsync(id, token);
 
             if (pet == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             return Ok(new UserPetViewModel(pet));
         }
@@ -70,12 +70,11 @@ namespace PetRadar.Web.API.Controllers
         {
             var pet = await _domain.FindByIdAsync(id, token);
             if (pet == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             var path = await _domain.GetMainPicturePath(pet, token);
             if (path == null)
-                return NotFound();
-
+                return NotFound(Constants.NotFoundProblemDetails);
             try
             {
                 byte[] bytes = System.IO.File.ReadAllBytes(path);
@@ -88,7 +87,7 @@ namespace PetRadar.Web.API.Controllers
 
                 _logger.LogError(ex, "Error while trying to retrieve image");
             }
-            return NotFound();
+            return NotFound(Constants.NotFoundProblemDetails);
         }
 
         [HttpPost]
@@ -101,7 +100,7 @@ namespace PetRadar.Web.API.Controllers
             var user = await _userDomain.FindByIdAsync(pet.UserId.Value, token);
 
             if (user == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
 
             var petDb = await _domain.CreateAsync(pet, UserJwt.Id, token);
@@ -119,7 +118,7 @@ namespace PetRadar.Web.API.Controllers
             var petdb = await _domain.FindByIdAsync(id, token);
 
             if (petdb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             await _domain.UpdateAsync(petdb, pet, UserJwt.Id, token);
             return NoContent();
@@ -134,7 +133,7 @@ namespace PetRadar.Web.API.Controllers
         {
             var userdb = await _domain.FindByIdAsync(id, token);
             if (userdb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             try
             {
@@ -143,9 +142,9 @@ namespace PetRadar.Web.API.Controllers
             }
             catch (BadHttpRequestException ex)
             {
-                // Este BadRequest capturará el error generado cuando la API externa responda con HTTP 400
-                // o si la validación de especie en el dominio falla.
-                return BadRequest(new { message = ex.Message });
+                //This BadRequest will catch errors thrown when the external API responds with HTTP 400,
+                //or if the validation of the species in the domain fails.
+                return BadRequest(Constants.BadRequestProblemDetails(ex.Message));
             }
 
         }
@@ -159,10 +158,10 @@ namespace PetRadar.Web.API.Controllers
         {
             var userPetDb = await _domain.FindByIdAsync(id, token);
             if (userPetDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             if (userPetDb.AdditionalPhotosURL == null)
-                return BadRequest(new { message = "No additional photos uploaded yet." });
+                return BadRequest(Constants.BadRequestProblemDetails("No additional photos uploaded yet."));
 
             var additionalPhotoUrls = _domain.GetAdditionalPhotoNames(userPetDb);
             return Ok(additionalPhotoUrls);
@@ -178,15 +177,15 @@ namespace PetRadar.Web.API.Controllers
         {
             var userPetDb = await _domain.FindByIdAsync(id, token);
             if (userPetDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             if (userPetDb.AdditionalPhotosURL == null)
-                return BadRequest(new { message = "No additional photos uploaded yet." });
+                return BadRequest(Constants.BadRequestProblemDetails("No additional photos uploaded yet."));
 
             var path = _domain.GetAdditionalPhotoPath(userPetDb.AdditionalPhotosURL, photoName);
 
             if (path == null)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             try
             {
@@ -198,7 +197,7 @@ namespace PetRadar.Web.API.Controllers
             {
                 _logger.LogError(ex, "Error while trying to retrieve image");
             }
-            return NotFound();
+            return NotFound(Constants.NotFoundProblemDetails);
         }
 
 
@@ -214,7 +213,7 @@ namespace PetRadar.Web.API.Controllers
 
             var userPetDb = await _domain.FindByIdAsync(id, token);
             if (userPetDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             string? additionalPhotosGuid = null;
 
@@ -224,7 +223,7 @@ namespace PetRadar.Web.API.Controllers
 
                 if (existingImages.Count + files.Count > Common.Constants.MaxAdditionalPhotos)
                 {
-                    return BadRequest(new { message = $"You can upload a maximum of {Common.Constants.MaxAdditionalPhotos} additional photos." });
+                    return BadRequest(Constants.BadRequestProblemDetails($"You can upload a maximum of {Common.Constants.MaxAdditionalPhotos} additional photos."));
                 }
 
                 // Extract the guid from the existing AdditionalPhotosURL
@@ -237,13 +236,22 @@ namespace PetRadar.Web.API.Controllers
             {
                 if (files.Count > Common.Constants.MaxAdditionalPhotos)
                 {
-                    return BadRequest(new { message = $"You can upload a maximum of {Common.Constants.MaxAdditionalPhotos} additional photos." });
+                    return BadRequest(Constants.BadRequestProblemDetails($"You can upload a maximum of {Common.Constants.MaxAdditionalPhotos} additional photos."));
                 }
 
             }
 
-            await _domain.UploadAdditionalPhotosAsync(userPetDb, files, additionalPhotosGuid, UserJwt.Id, token);
+            try 
+            {
+                await _domain.UploadAdditionalPhotosAsync(userPetDb, files, additionalPhotosGuid, UserJwt.Id, token);
 
+            }
+            catch (BadHttpRequestException ex)
+            {
+                //This BadRequest will catch errors thrown when the external API responds with HTTP 400,
+                //or if the validation of the species in the domain fails.
+                return BadRequest(Constants.BadRequestProblemDetails(ex.Message));
+            }
             return NoContent();
         }
 
@@ -255,7 +263,7 @@ namespace PetRadar.Web.API.Controllers
             var petdb = await _domain.FindByIdAsync(id, token);
 
             if (petdb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             await _domain.DeleteAsync(petdb, UserJwt.Id, token);
             return NoContent();
@@ -269,14 +277,14 @@ namespace PetRadar.Web.API.Controllers
         {
             var userPetDb = await _domain.FindByIdAsync(id, token);
             if (userPetDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             if (userPetDb.AdditionalPhotosURL == null)
-                return BadRequest(new { message = "No additional photos uploaded yet." });
+                return BadRequest(Constants.BadRequestProblemDetails("No additional photos uploaded yet."));
 
             var path = _domain.GetAdditionalPhotoPath(userPetDb.AdditionalPhotosURL, photoName);
             if (path == null)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             try
             {
@@ -286,7 +294,8 @@ namespace PetRadar.Web.API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while trying to delete image");
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while trying to delete the image." });
+
+                throw; // Re-throw the exception to be handled by global error handling middleware
             }
         }
     }

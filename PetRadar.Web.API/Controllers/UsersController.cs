@@ -1,11 +1,6 @@
-using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using PetRadar.Common;
-using PetRadar.Core;
-using PetRadar.Core.Data;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Domain;
@@ -58,7 +53,7 @@ namespace PetRadar.Web.API.Controllers
             var user = await _domain.FindByIdAsync(id, token);
 
             if (user == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             return Ok(new UserViewModel(user));
         }
@@ -71,12 +66,11 @@ namespace PetRadar.Web.API.Controllers
         {
             var user = await _domain.FindByIdAsync(id, token);
             if (user == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             var path = await _domain.GetUserProfilePicturePath(user, token);
             if (path == null)
-                return NotFound();
-
+                return NotFound(Constants.NotFoundProblemDetails);
             try
             {
                 byte[] bytes = System.IO.File.ReadAllBytes(path);
@@ -89,7 +83,7 @@ namespace PetRadar.Web.API.Controllers
 
                 _logger.LogError(ex, "Error while trying to retrieve image");
             }
-            return NotFound();
+            return NotFound(Constants.NotFoundProblemDetails);
         }
 
         [AllowAnonymous]
@@ -149,7 +143,7 @@ namespace PetRadar.Web.API.Controllers
         {
             var userdb = await _domain.FindByIdAsync(id, token);
             if (userdb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             await _domain.UpdateProfilePictureAsync(userdb, file, UserJwt.Id, token);
             return NoContent();
@@ -179,7 +173,7 @@ namespace PetRadar.Web.API.Controllers
             var userdb = await _domain.FindByIdAsync(id, token);
 
             if (userdb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
             //Use JWT info
             await _domain.DeleteAsync(userdb, UserJwt.Id, token);
             return NoContent();
