@@ -72,11 +72,15 @@ namespace PetRadar.Core.Domain
             {
                 var validationResult = await _processingHelperService.ValidateCatOrDogAsync(imageStream, file.FileName, file.ContentType);
 
-                if (reportDb.Species != Data.Entities.Enums.PetSpeciesEnum.NotSet && 
+                if (reportDb.Species != PetSpeciesEnum.NotSet && 
                     reportDb.Species.ToString().ToLower() != validationResult.DetectedClass.ToLower())
                 {
                     throw new BadHttpRequestException("The image detected class is different from the registered species.");
                 }
+
+                reportDb.Species = validationResult.DetectedClass.ToLower() == "dog" ? PetSpeciesEnum.Dog :
+                               validationResult.DetectedClass.ToLower() == "cat" ?PetSpeciesEnum.Cat :
+                               reportDb.Species; // If the detected class is neither dog nor cat, keep the existing species.
             }
             catch (BadHttpRequestException ex) 
             { 
