@@ -18,6 +18,8 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddHttpClient();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddSingleton<IFileHelperService, FileHelperService>();
 builder.Services.AddSingleton<IEmailHelperService, EmailHelperService>();
@@ -104,7 +106,7 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
-
+app.UseExceptionHandler();
 // Configure the HTTP request pipeline.
 app.UseHttpsRedirection();
 

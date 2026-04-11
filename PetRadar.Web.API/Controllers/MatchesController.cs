@@ -68,7 +68,7 @@ namespace PetRadar.Web.API.Controllers
             var match = await _domain.FindByIdAsync(id, token);
 
             if (match == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             return Ok(new MatchViewModel(match));
         }
@@ -84,12 +84,12 @@ namespace PetRadar.Web.API.Controllers
             var lostReport = await _reportDomain.FindByIdAsync(match.LostReportId, token);
 
             if (lostReport == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             var strayReport = await _reportDomain.FindByIdAsync(match.StrayReportId, token);
 
             if (strayReport == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             var matchDb = await _domain.CreateAsync(match, UserJwt.Id, token);
 
@@ -106,7 +106,7 @@ namespace PetRadar.Web.API.Controllers
             var matchDb = await _domain.FindByIdAsync(id, token);
 
             if (matchDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             await _domain.UpdateAsync(matchDb, match, UserJwt.Id, token);
             return NoContent();
@@ -120,7 +120,7 @@ namespace PetRadar.Web.API.Controllers
             var matchDb = await _domain.FindByIdAsync(id, token);
 
             if (matchDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             await _domain.DeleteAsync(matchDb, UserJwt.Id, token);
             return NoContent();

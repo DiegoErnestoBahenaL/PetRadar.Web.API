@@ -55,7 +55,7 @@ namespace PetRadar.Web.API.Controllers
             var notification = await _domain.FindByIdAsync(id, token);
 
             if (notification == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             return Ok(new NotificationViewModel(notification));
         }
@@ -71,7 +71,7 @@ namespace PetRadar.Web.API.Controllers
             var user = await _userDomain.FindByIdAsync(notification.UserId.Value, token);
 
             if (user == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             var notificationDb = await _domain.CreateAsync(notification, UserJwt.Id, token);
 
@@ -102,7 +102,7 @@ namespace PetRadar.Web.API.Controllers
             var notificationDb = await _domain.FindByIdAsync(id, token);
 
             if (notificationDb == default)
-                return NotFound();
+                return NotFound(Constants.NotFoundProblemDetails);
 
             await _domain.DeleteAsync(notificationDb, UserJwt.Id, token);
             return NoContent();
