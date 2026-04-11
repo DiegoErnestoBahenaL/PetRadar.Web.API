@@ -78,9 +78,18 @@ namespace PetRadar.Core.Domain
                     throw new BadHttpRequestException("The image detected class is different from the registered species.");
                 }
 
-                reportDb.Species = validationResult.DetectedClass.ToLower() == "dog" ? PetSpeciesEnum.Dog :
-                               validationResult.DetectedClass.ToLower() == "cat" ?PetSpeciesEnum.Cat :
-                               reportDb.Species; // If the detected class is neither dog nor cat, keep the existing species.
+                if (reportDb.Species == PetSpeciesEnum.NotSet)
+                {
+
+                    if (validationResult.DetectedClass.ToLower() == "cat")
+                    {
+                        reportDb.Species = PetSpeciesEnum.Cat;
+                    }
+                    else if (validationResult.DetectedClass.ToLower() == "dog")
+                    {
+                        reportDb.Species = PetSpeciesEnum.Dog;
+                    }
+                }           
             }
             catch (BadHttpRequestException ex) 
             { 
@@ -134,11 +143,19 @@ namespace PetRadar.Core.Domain
                 report.UserId.Value, report.UserPetId,
                 report.Species.Value, report.Breed, report.Color,
                 report.Sex, report.Size, report.ApproximateAge,
-                report.Weight, report.Description, report.IsNeutered, ReportTypeEnum.Stray,
+                report.Weight, report.Description, report.IsNeutered, report.ReportType.Value,
                 report.ReportStatus, report.HasCollar, report.HasTag, report.IncidentDate,
                 location, report.AddressText, report.UseAlternateContact, report.ContactName,
                 report.ContactPhone, report.ContactEmail, report.RewardAmount
             );
+
+            //If the report type is different than Lost, default the species to NotSet,
+            //and the report type to stray
+            if (report.ReportType.Value != ReportTypeEnum.Lost)
+            {
+                reportDb.Species = PetSpeciesEnum.NotSet;
+                reportDb.ReportType = ReportTypeEnum.Stray;
+            }
 
             reportDb.SearchRadiusMeters = report.SearchRadiusMeters;
             reportDb.OffersReward = report.OffersReward;
