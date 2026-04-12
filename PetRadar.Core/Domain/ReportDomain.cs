@@ -135,6 +135,9 @@ namespace PetRadar.Core.Domain
 
         public async Task<ReportEntity> CreateAsync(ReportCreateModel report, long createdByUserId, CancellationToken token)
         {
+
+            _logger.LogInformation("Creating report with type {Type} with species {Species}, breed {Breed}", report.ReportType, report.Species, report.Breed);
+
             var location = new Point(report.Longitude.Value, report.Latitude.Value) { SRID = 4326 };
 
             //Defaulting to Stray for now, as the ReportType won't be sent from the client when creating a report.
