@@ -330,6 +330,27 @@ namespace PetRadar.Core.Domain
             report.IsActive = false;
 
             report.DeletedByUser(modifiedByUserId);
+            
+            if (report.PhotoURL != null)
+            {
+                _fileHelperService.DeleteImage(report.PhotoURL, _logger);
+                report.PhotoURL = null;
+            }
+
+            if (report.AdditionalPhotosURL != null)
+            {
+                var additionalPhotoNames = GetAdditionalPhotoNames(report);
+                foreach (var photoName in additionalPhotoNames)
+                {
+                    var path = GetAdditionalPhotoPath(report.AdditionalPhotosURL, photoName);
+                    if (path != null)
+                    {
+                        _fileHelperService.DeleteImage(path, _logger);
+                    }
+                }
+                report.AdditionalPhotosURL = null;
+            }
+
             _repo.Update(report);
 
             return await _repo.SaveChangesAsync();
