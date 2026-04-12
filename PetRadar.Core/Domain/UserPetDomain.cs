@@ -246,6 +246,27 @@ namespace PetRadar.Core.Domain
 
             pet.IsActive = false;
 
+            if (pet.PhotoURL != null)
+            {
+                _fileHelperService.DeleteImage(pet.PhotoURL, _logger);
+                pet.PhotoURL = null;
+            }
+
+            if (pet.AdditionalPhotosURL != null)
+            {
+                var additionalPhotoNames = GetAdditionalPhotoNames(pet);
+                foreach (var photoName in additionalPhotoNames)
+                {
+                    var path = GetAdditionalPhotoPath(pet.AdditionalPhotosURL, photoName);
+
+                    if (path != null)
+                    {
+                        _fileHelperService.DeleteImage(path, _logger);
+                    }
+                }
+                pet.AdditionalPhotosURL = null;
+            }
+
             pet.DeletedByUser(modifiedByUserId);
             _repo.Update(pet);
 

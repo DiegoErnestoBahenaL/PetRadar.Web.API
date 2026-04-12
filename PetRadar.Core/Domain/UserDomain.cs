@@ -187,6 +187,13 @@ namespace PetRadar.Core.Domain
 
             user.IsActive = false;
 
+            // Delete profile picture if exists
+            if (user.ProfilePhotoURL != null)
+            {
+                _fileHelperService.DeleteImage(user.ProfilePhotoURL, _logger);
+                user.ProfilePhotoURL = null;
+            }
+
             user.DeletedByUser(modifiedByUserId);
             _repo.Update(user);
 
