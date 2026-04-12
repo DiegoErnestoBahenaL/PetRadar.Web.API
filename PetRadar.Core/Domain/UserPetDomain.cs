@@ -248,7 +248,15 @@ namespace PetRadar.Core.Domain
 
             if (pet.PhotoURL != null)
             {
-                _fileHelperService.DeleteImage(pet.PhotoURL, _logger);
+                try
+                {
+                  _fileHelperService.DeleteImage(pet.PhotoURL, _logger);
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Error while deleting image {message}", ex.Message);
+                }
                 pet.PhotoURL = null;
             }
 
@@ -261,7 +269,16 @@ namespace PetRadar.Core.Domain
 
                     if (path != null)
                     {
-                        _fileHelperService.DeleteImage(path, _logger);
+                        try
+                        {
+                            _fileHelperService.DeleteImage(path, _logger);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Error while deleting image {message}", ex.Message);
+
+                        }
+
                     }
                 }
                 pet.AdditionalPhotosURL = null;

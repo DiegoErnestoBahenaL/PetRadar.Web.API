@@ -190,7 +190,16 @@ namespace PetRadar.Core.Domain
             // Delete profile picture if exists
             if (user.ProfilePhotoURL != null)
             {
-                _fileHelperService.DeleteImage(user.ProfilePhotoURL, _logger);
+                try
+                {
+                    _fileHelperService.DeleteImage(user.ProfilePhotoURL, _logger);
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Error while deleting image {message}", ex.Message);
+                }
+
                 user.ProfilePhotoURL = null;
             }
 
