@@ -14,7 +14,7 @@ namespace PetRadar.Core.Domain
         Task<List<ReportEntity>> GetAllAsync(CancellationToken token);
         Task<List<ReportEntity>> GetAllByUserIdAsync(long userId, CancellationToken token);
         Task<ReportEntity?> FindByIdAsync(long id, CancellationToken token);
-        Task<string?> GetMainPicturePath(ReportEntity reportDb, CancellationToken token);
+        string? GetMainPicturePath(ReportEntity reportDb, CancellationToken token);
         Task<ReportEntity> CreateAsync(ReportCreateModel report, long createdByUserId, CancellationToken token);
         Task<int> UpdateAsync(ReportEntity reportDb, ReportUpdateModel report, long modifiedByUserId, CancellationToken token);
         Task<int> UpdateMainPictureAsync(ReportEntity reportDb, IFormFile file, long modifiedByUserId, CancellationToken token);
