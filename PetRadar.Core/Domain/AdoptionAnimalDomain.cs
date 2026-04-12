@@ -268,6 +268,27 @@ namespace PetRadar.Core.Domain
             animal.IsActive = false;
 
             animal.DeletedByUser(modifiedByUserId);
+
+            if (animal.PhotoURL != null)
+            {
+                _fileHelperService.DeleteImage(animal.PhotoURL, _logger);
+                animal.PhotoURL = null;
+            }
+
+            if (!string.IsNullOrEmpty(animal.AdditionalPhotosURL))
+            {
+                var additionalPhotoNames = GetAdditionalPhotoNames(animal);
+                foreach (var photoName in additionalPhotoNames)
+                {
+                    var path = GetAdditionalPhotoPath(animal.AdditionalPhotosURL, photoName);
+                    if (path != null)
+                    {
+                        File.Delete(path);
+                    }
+                }
+                animal.AdditionalPhotosURL = null;
+            }
+
             _repo.Update(animal);
 
             return await _repo.SaveChangesAsync();
