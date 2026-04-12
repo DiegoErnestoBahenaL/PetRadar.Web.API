@@ -37,13 +37,21 @@ namespace PetRadar.Core.Domain
             return _repo.GetAllAsync(token);
         }
 
-        public Task<string?> GetUserProfilePicturePath(UserEntity user, CancellationToken token)
+        public string? GetUserProfilePicturePath(UserEntity user, CancellationToken token)
         {
             if (user.ProfilePhotoURL == null)
-                return Task.FromResult<string?>(null);
+                return null;
 
-            string path = _fileHelperService.GetImagePath(user.ProfilePhotoURL);
-            return Task.FromResult<string?>(path);
+            try
+            {
+              return _fileHelperService.GetImagePath(user.ProfilePhotoURL);
+
+            }
+            catch (PetRadarException ex)
+            {
+                _logger.LogWarning(ex, "Profile picture not found for user {userId}: {message}", user.Id, ex.Message);
+                return null;
+            }
         }
 
         public async Task<UserEntity?> FindByIdAsync(long id, CancellationToken token = default)

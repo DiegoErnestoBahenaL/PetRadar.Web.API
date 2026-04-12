@@ -47,13 +47,19 @@ namespace PetRadar.Core.Domain
 
             return pet;
         }
-        public Task<string?> GetMainPicturePath(UserPetEntity petdb, CancellationToken token)
+        public string? GetMainPicturePath(UserPetEntity petdb, CancellationToken token)
         {
             if (petdb.PhotoURL == null)
-                return Task.FromResult<string?>(null);
-
-            string path = _fileHelperService.GetImagePath(petdb.PhotoURL);
-            return Task.FromResult<string?>(path);
+                return null;
+            try
+            {
+                return _fileHelperService.GetImagePath(petdb.PhotoURL);
+            }
+            catch (PetRadarException ex)
+            {
+                _logger.LogWarning(ex, "Main picture not found for user pet {petId}: {message}", petdb.Id, ex.Message);
+                return null;
+            }
         }
 
 
@@ -169,8 +175,16 @@ namespace PetRadar.Core.Domain
             if (petdb.AdditionalPhotosURL == null)
                 return [];
 
-            List<string> paths = _fileHelperService.GetGalleryImageNames(petdb.AdditionalPhotosURL);
-            return paths;
+            try
+            {
+                List<string> paths = _fileHelperService.GetGalleryImageNames(petdb.AdditionalPhotosURL);
+                return paths;
+            }
+            catch (PetRadarException ex)
+            {
+                _logger.LogWarning(ex, "Additional photos gallery not found for user pet {petId}: {message}", petdb.Id, ex.Message);
+                return [];
+            }
         }
 
         public string? GetAdditionalPhotoPath(string relativePath, string imageName)

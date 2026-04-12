@@ -68,7 +68,7 @@ namespace PetRadar.Web.API.Controllers
             if (user == default)
                 return NotFound(Constants.NotFoundProblemDetails);
 
-            var path = await _domain.GetUserProfilePicturePath(user, token);
+            var path = _domain.GetUserProfilePicturePath(user, token);
             if (path == null)
                 return NotFound(Constants.NotFoundProblemDetails);
             try

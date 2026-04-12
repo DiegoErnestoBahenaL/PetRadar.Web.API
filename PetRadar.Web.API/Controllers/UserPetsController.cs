@@ -72,7 +72,7 @@ namespace PetRadar.Web.API.Controllers
             if (pet == default)
                 return NotFound(Constants.NotFoundProblemDetails);
 
-            var path = await _domain.GetMainPicturePath(pet, token);
+            var path = _domain.GetMainPicturePath(pet, token);
             if (path == null)
                 return NotFound(Constants.NotFoundProblemDetails);
             try

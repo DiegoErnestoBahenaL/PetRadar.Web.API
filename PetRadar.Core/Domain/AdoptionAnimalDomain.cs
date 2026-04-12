@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using PetRadar.Common;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
@@ -53,13 +54,19 @@ namespace PetRadar.Core.Domain
             return animal;
         }
 
-        public Task<string?> GetMainPicturePath(AdoptionAnimalEntity animalDb, CancellationToken token)
+        public string? GetMainPicturePath(AdoptionAnimalEntity animalDb, CancellationToken token)
         {
             if (animalDb.PhotoURL == null)
-                return Task.FromResult<string?>(null);
-
-            string path = _fileHelperService.GetImagePath(animalDb.PhotoURL);
-            return Task.FromResult<string?>(path);
+                return null;
+            try
+            { 
+                 return _fileHelperService.GetImagePath(animalDb.PhotoURL);
+            }
+            catch (FileNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Main picture not found for animal {animalId}: {message}", animalDb.Id, ex.Message);
+                return null;
+            }
         }
 
         public async Task<AdoptionAnimalEntity> CreateAsync(AdoptionAnimalCreateModel animal, long createdByUserId, CancellationToken token)
@@ -196,7 +203,15 @@ namespace PetRadar.Core.Domain
             if (animalDb.AdditionalPhotosURL == null)
                 return [];
 
-            return _fileHelperService.GetGalleryImageNames(animalDb.AdditionalPhotosURL);
+            try
+            {
+                return _fileHelperService.GetGalleryImageNames(animalDb.AdditionalPhotosURL);
+            }
+            catch (PetRadarException ex)
+            {
+                _logger.LogWarning(ex, "Additional photos gallery not found for animal {animalId}: {message}", animalDb.Id, ex.Message);
+                return [];
+            }
         }
 
         public string? GetAdditionalPhotoPath(string relativePath, string imageName)

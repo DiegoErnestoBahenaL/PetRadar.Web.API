@@ -12,7 +12,7 @@ namespace PetRadar.Core.Domain
     public interface IUserDomain
     {
         Task<List<UserEntity>> GetAllAsync(CancellationToken token);
-        Task<string?> GetUserProfilePicturePath (UserEntity user, CancellationToken token);
+        string? GetUserProfilePicturePath(UserEntity user, CancellationToken token);
         Task<UserEntity?> FindByIdAsync(long id, CancellationToken token);
         Task<UserEntity?> FindByEmailAsync(string email, CancellationToken token);
         Task<UserEntity?> FindByEmailAndPasswordAsync(string email, string password, CancellationToken token);
