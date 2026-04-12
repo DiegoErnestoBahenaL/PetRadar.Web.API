@@ -13,7 +13,7 @@ namespace PetRadar.Core.Domain
     {
         Task<List<UserPetEntity>> GetAllAsync(CancellationToken token);
         Task<List<UserPetEntity>> GetAllByUserIdAsync(long userId, CancellationToken token);
-        Task<string?> GetMainPicturePath(UserPetEntity petdb, CancellationToken token);
+        string? GetMainPicturePath(UserPetEntity petdb, CancellationToken token);
         List<string> GetAdditionalPhotoNames(UserPetEntity petdb);
         string? GetAdditionalPhotoPath(string relativePath, string imageName);
         Task<UserPetEntity?> FindByIdAsync(long id, CancellationToken token);

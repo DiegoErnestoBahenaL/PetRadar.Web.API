@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
+using PetRadar.Common;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Data.Repositories;
@@ -55,13 +56,19 @@ namespace PetRadar.Core.Domain
             return report;
         }
 
-        public Task<string?> GetMainPicturePath(ReportEntity reportDb, CancellationToken token)
+        public string? GetMainPicturePath(ReportEntity reportDb, CancellationToken token)
         {
             if (reportDb.PhotoURL == null)
-                return Task.FromResult<string?>(null);
-
-            string path = _fileHelperService.GetImagePath(reportDb.PhotoURL);
-            return Task.FromResult<string?>(path);
+                return null;
+            try
+            {
+                return _fileHelperService.GetImagePath(reportDb.PhotoURL);
+            }
+            catch (PetRadarException ex)
+            {
+                _logger.LogWarning(ex, "Main picture not found for report {reportId}: {message}", reportDb.Id, ex.Message);
+                return null;
+            }
         }
 
         public async Task<int> UpdateMainPictureAsync(ReportEntity reportDb, IFormFile file, long modifiedByUserId, CancellationToken token)
@@ -258,7 +265,15 @@ namespace PetRadar.Core.Domain
             if (reportDb.AdditionalPhotosURL == null)
                 return [];
 
-            return _fileHelperService.GetGalleryImageNames(reportDb.AdditionalPhotosURL);
+            try
+            {
+                return _fileHelperService.GetGalleryImageNames(reportDb.AdditionalPhotosURL);
+            }
+            catch (PetRadarException ex)
+            {
+                _logger.LogWarning(ex, "Additional photos gallery not found for report {reportId}: {message}", reportDb.Id, ex.Message);
+                return [];
+            }
         }
 
         public string? GetAdditionalPhotoPath(string relativePath, string imageName)
@@ -333,7 +348,14 @@ namespace PetRadar.Core.Domain
             
             if (report.PhotoURL != null)
             {
-                _fileHelperService.DeleteImage(report.PhotoURL, _logger);
+                try
+                {
+                    _fileHelperService.DeleteImage(report.PhotoURL, _logger);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Error while deleting image {message}", ex.Message);
+                }
                 report.PhotoURL = null;
             }
 
@@ -345,7 +367,14 @@ namespace PetRadar.Core.Domain
                     var path = GetAdditionalPhotoPath(report.AdditionalPhotosURL, photoName);
                     if (path != null)
                     {
-                        _fileHelperService.DeleteImage(path, _logger);
+                        try
+                        {
+                            _fileHelperService.DeleteImage(path, _logger);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Error while deleting image {message}", ex.Message);
+                        }
                     }
                 }
                 report.AdditionalPhotosURL = null;
