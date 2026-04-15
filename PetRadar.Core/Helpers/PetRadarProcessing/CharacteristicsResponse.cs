@@ -10,7 +10,13 @@ namespace PetRadar.Core.Helpers.PetRadarProcessing
     public class CharacteristicsResponse
     {
         [JsonProperty("topPredictedBreed")]
-        public string  TopPredictedBreed { get; set; }
+        public string TopPredictedBreed { get; set; }
+
+        [JsonProperty("colors")]
+        public List<ColorExtracted> Colors { get; set; } = new List<ColorExtracted>();
+
+        [JsonProperty("pattern")]
+        public string Pattern { get; set; }
 
         [JsonProperty("confidence")]
         public decimal Confidence { get; set; } = 0M;
@@ -30,4 +36,14 @@ namespace PetRadar.Core.Helpers.PetRadarProcessing
         [JsonProperty("confidence")]
         public decimal Confidence { get; set; } = 0M;
     }
+
+    public class ColorExtracted
+    {
+        [JsonProperty("color")]
+        public string Color { get; set; }
+
+        [JsonProperty("proportion")]
+        public decimal Proportion { get; set; } = 0M;
+    }
+
 }
