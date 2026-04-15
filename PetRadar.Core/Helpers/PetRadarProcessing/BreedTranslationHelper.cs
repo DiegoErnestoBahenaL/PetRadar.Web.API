@@ -176,7 +176,7 @@ namespace PetRadar.Core.Helpers.PetRadarProcessing
             {"bicolor", "Bicolor"},
             {"irregular", "Irregular" },
             {"solid", "Uniforme" },
-            {"bicolor", "Bicolor" }
+            {"tricolor", "Tricolor" }
         };
 
         public static readonly Dictionary<string, string> ColorTranslations = new(StringComparer.OrdinalIgnoreCase)
