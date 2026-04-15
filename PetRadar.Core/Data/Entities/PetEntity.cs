@@ -14,10 +14,10 @@ namespace PetRadar.Core.Data.Entities
         [Required]
         public PetSpeciesEnum Species { get; set; } = PetSpeciesEnum.NotSet;
 
-        [StringLength(maximumLength: 100)]
+        [StringLength(maximumLength: 255)]
         public string? Breed { get; set; }
 
-        [StringLength(maximumLength: 100)]
+        [StringLength(maximumLength: 255)]
         public string? Color { get; set; }
 
         public PetSexEnum? Sex { get; set; }
