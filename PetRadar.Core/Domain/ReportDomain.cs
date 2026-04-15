@@ -127,6 +127,7 @@ namespace PetRadar.Core.Domain
                 if (characteristicsResult != null)
                 {
                     reportDb.Breed = characteristicsResult.TopPredictedBreed;
+                    reportDb.Color = $"{string.Join(',', characteristicsResult.Colors.Select(x => x))} - {characteristicsResult.Pattern}";
                     reportDb.UpdatedByUser(modifiedByUserId);
                     _repo.Update(reportDb);
                     await _repo.SaveChangesAsync();

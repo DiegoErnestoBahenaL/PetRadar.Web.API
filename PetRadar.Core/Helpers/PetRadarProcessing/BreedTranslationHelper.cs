@@ -162,6 +162,35 @@ namespace PetRadar.Core.Helpers.PetRadarProcessing
             { "yorkshire_terrier",              "Yorkshire Terrier" },
         };
 
+        public static readonly Dictionary<string, string> CatPatternTranslations = new(StringComparer.OrdinalIgnoreCase)
+        {
+            {"solid", "Uniforme" },
+            {"bicolor", "Bicolor" },
+            {"calico", "Calicó" },
+            {"tabby", "Atigrado" },
+            {"tortoiseshell", "Carey" }
+        };
+
+        public static readonly Dictionary<string, string> DogPatternTranslations = new(StringComparer.OrdinalIgnoreCase)
+        {
+            {"bicolor", "Bicolor"},
+            {"irregular", "Irregular" },
+            {"solid", "Uniforme" },
+            {"bicolor", "Bicolor" }
+        };
+
+        public static readonly Dictionary<string, string> ColorTranslations = new(StringComparer.OrdinalIgnoreCase)
+        {
+            {"black", "Negro" },
+            {"white", "Blanco" },
+            {"gray", "Gris" },
+            {"brown", "Café" },
+            {"orange", "Naranja" },
+            {"cream", "Crema" },
+            {"beige", "Beige" },
+            {"ginger", "Rojizo" }
+        };
+
         /// <summary>
         /// Translates a single English breed label (as emitted by the EfficientNet
         /// classifier) into its Spanish (Mexican context) equivalent. If the breed
@@ -197,6 +226,63 @@ namespace PetRadar.Core.Helpers.PetRadarProcessing
 
             return Humanize(englishBreed);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="englishColor"></param>
+        /// <returns></returns>
+        public static string TranslateColor(string englishColor)
+        {
+            if (string.IsNullOrWhiteSpace(englishColor))
+
+                return englishColor;
+
+           if(ColorTranslations.TryGetValue(englishColor, out var translation))
+
+                return translation;
+
+
+            var alternateKey = englishColor.Contains('_')
+                 ? englishColor.Replace('_', ' ')
+                 : englishColor.Replace(' ', '_');
+
+            if (ColorTranslations.TryGetValue(alternateKey, out translation))
+                return translation;
+
+            return Humanize(englishColor);
+        }
+
+
+        public static string TranslatePattern(PetSpeciesEnum species, string englishPattern)
+        {
+            if (string.IsNullOrWhiteSpace(englishPattern))
+                return englishPattern;
+
+            var dictionary = species switch
+            {
+                PetSpeciesEnum.Cat => CatPatternTranslations,
+                PetSpeciesEnum.Dog => DogPatternTranslations,
+                _ => null
+            };
+
+            if (dictionary is null)
+                return Humanize(englishPattern);
+
+
+            if (dictionary.TryGetValue(englishPattern, out var translation))
+                return translation;
+
+            // Tolerate minor formatting differences between the API payload and the
+            // dictionary keys (e.g. spaces vs underscores).
+            var alternateKey = englishPattern.Contains('_')
+                ? englishPattern.Replace('_', ' ')
+                : englishPattern.Replace(' ', '_');
+
+            if (dictionary.TryGetValue(alternateKey, out translation))
+                return translation;
+
+            return Humanize(englishPattern);
+        }
 
         /// <summary>
         /// Translates every breed reference inside a <see cref="CharacteristicsResponse"/>
@@ -210,11 +296,21 @@ namespace PetRadar.Core.Helpers.PetRadarProcessing
 
             response.TopPredictedBreed = TranslateBreed(species, response.TopPredictedBreed);
 
-            if (response.TopPredictions is not null)
+            response.Pattern = TranslatePattern(species, response.Pattern);
+
+            if (response.TopPredictions != null)
             {
                 foreach (var prediction in response.TopPredictions)
                 {
                     prediction.Breed = TranslateBreed(species, prediction.Breed);
+                }
+            }
+
+            if (response.Colors != null)
+            {
+                foreach (var color in response.Colors)
+                {
+                    color.Color = TranslateColor(color.Color);
                 }
             }
 
