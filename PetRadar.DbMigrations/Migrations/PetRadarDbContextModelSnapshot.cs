@@ -398,6 +398,9 @@ namespace PetRadar.DbMigrations.Migrations
                     b.Property<bool?>("HasTag")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("ImageAnalysisResult")
+                        .HasColumnType("jsonb");
+
                     b.Property<DateTimeOffset?>("IncidentDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -563,18 +566,18 @@ namespace PetRadar.DbMigrations.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 15, 23, 35, 31, 87, DateTimeKind.Unspecified).AddTicks(278), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 19, 15, 57, 24, 962, DateTimeKind.Unspecified).AddTicks(4041), new TimeSpan(0, 0, 0, 0, 0)),
                             CreatedBy = 1L,
-                            Email = "sa@test.com",
+                            Email = "sa@petradar.com",
                             EmailVerified = true,
                             IsActive = true,
                             LastName = "Admmin",
                             Name = "Super",
-                            Password = new byte[] { 238, 3, 166, 48, 159, 15, 66, 87, 163, 251, 219, 192, 118, 223, 109, 10, 30, 11, 129, 233, 80, 166, 67, 92, 57, 125, 170, 152, 123, 106, 55, 203, 179, 235, 121, 158, 39, 20, 40, 182, 11, 243, 246, 141, 90, 43, 216, 132, 14, 83, 154, 28, 34, 124, 222, 217, 210, 113, 84, 46, 165, 42, 0, 188, 79, 95, 224, 220, 156, 85, 143, 9, 110, 218, 49, 26, 41, 152, 153, 46, 142, 33, 168, 164, 138, 109, 5, 103, 22, 1, 197, 135, 166, 21, 53, 221, 35, 56, 13, 177, 230, 16, 92, 16, 127, 90, 217, 74, 195, 165, 6, 28, 243, 18, 237, 241, 156, 252, 246, 244, 251, 74, 20, 134, 201, 25, 57, 183, 193, 145, 188, 185, 68, 9, 174, 156, 152, 99, 225, 45, 100, 147, 68, 252, 52, 152, 100, 48, 7, 40, 122, 194, 22, 64, 240, 195, 7, 144, 79, 176, 138, 129, 237, 132, 32, 125, 128, 7, 136, 243, 131, 48, 13, 235, 2, 100, 233, 131, 225, 56, 136, 221, 219, 160, 185, 250, 229, 29, 228, 84, 150, 104, 182, 167, 176, 111, 226, 123, 128, 85, 48, 31, 92, 25, 63, 185, 223, 41, 7, 122, 95, 41, 249, 162, 104, 10, 168, 7, 146, 156, 209, 69, 140, 79, 96, 126, 106, 231, 51, 68, 223, 145, 26, 210, 96, 241, 115, 101, 83, 59, 83, 36, 213, 102, 226, 172, 123, 104, 37, 68, 226, 112, 180, 4, 42, 3 },
+                            Password = new byte[0],
                             PhoneNumber = "000000000",
                             Role = "SuperAdmin",
-                            Salt = new byte[] { 154, 199, 17, 190, 153, 92, 29, 20, 255, 237, 236, 217, 145, 122, 66, 187, 117, 51, 192, 225, 138, 94, 30, 185, 78, 201, 37, 182, 30, 122, 157, 94, 229, 209, 16, 79, 130, 53, 159, 203, 119, 23, 101, 69, 94, 100, 101, 28, 150, 118, 167, 169, 105, 20, 141, 93, 199, 124, 232, 47, 244, 190, 9, 243, 19, 35, 245, 240, 197, 145, 105, 6, 144, 53, 21, 201, 153, 109, 200, 13, 140, 3, 55, 11, 87, 111, 5, 37, 9, 219, 162, 217, 245, 104, 138, 4, 38, 120, 176, 129, 119, 118, 131, 111, 73, 116, 153, 116, 224, 120, 119, 25, 127, 66, 38, 90, 16, 92, 239, 132, 150, 84, 55, 32, 121, 253, 3, 95 },
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 15, 23, 35, 31, 87, DateTimeKind.Unspecified).AddTicks(278), new TimeSpan(0, 0, 0, 0, 0)),
+                            Salt = new byte[0],
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 19, 15, 57, 24, 962, DateTimeKind.Unspecified).AddTicks(4041), new TimeSpan(0, 0, 0, 0, 0)),
                             UpdatedBy = 0L
                         });
                 });

@@ -21,6 +21,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+builder.Services.AddSingleton<IPasswordHelper, PasswordHelper>();
 builder.Services.AddSingleton<IFileHelperService, FileHelperService>();
 builder.Services.AddSingleton<IEmailHelperService, EmailHelperService>();
 builder.Services.AddSingleton<IPetRadarProcessingHelperService, PetRadarProcessingHelperService>();
@@ -50,7 +51,7 @@ builder.Services.AddOptions<PetRadarCoreOptions>()
 
 builder.Services.AddDbContext<PetRadarDbContext>(options =>
     options.UseNpgsql(connectionString, x => x.MigrationsAssembly(Constants.MigrationsAssembly)
-    .UseNetTopologySuite()
+.UseNetTopologySuite()
     ));
 
 
