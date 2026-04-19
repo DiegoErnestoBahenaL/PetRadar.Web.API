@@ -1,5 +1,6 @@
 ﻿using NetTopologySuite.Geometries;
 using PetRadar.Core.Data.Entities.Enums;
+using PetRadar.Core.Helpers.PetRadarProcessing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -56,8 +57,7 @@ namespace PetRadar.Core.Data.Entities
         public bool OffersReward { get; set; } = false;
         public decimal? RewardAmount { get; set; }
         public int Views { get; set; } = 0;
-        [Column(TypeName = "jsonb")]
-        public string? ImageAnalysisResult { get; set; }
+        public CharacteristicsResponse? ImageAnalysisResult { get; set; }
 
         public ReportEntity() : base() { }
 

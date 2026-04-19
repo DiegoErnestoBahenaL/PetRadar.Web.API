@@ -10,6 +10,8 @@ namespace PetRadar.Common
     {
         public const int SuperAdminId = 1;
 
+        public static readonly DateTimeOffset SuperAdminCreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1));
+
         public const int MaxImageSize = 5242880;
 
         public static List<string> ValidImagesExtensions = [".jpg", ".jpeg", ".png"];
