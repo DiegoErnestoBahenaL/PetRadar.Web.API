@@ -20,13 +20,15 @@ namespace PetRadar.Core.Domain
     public class UserDomain : IUserDomain
     {
         private readonly IUserRepository _repo;
+        private readonly IPasswordHelper _passwordHelper;
         private readonly IFileHelperService _fileHelperService; 
         private readonly IEmailHelperService _emailHelperService;
         private readonly ILogger<UserDomain> _logger;
 
-        public UserDomain(IUserRepository repo, IFileHelperService fileHelperService, ILogger<UserDomain> logger, IEmailHelperService emailHelperService) 
+        public UserDomain(IUserRepository repo, IPasswordHelper passwordHelper, IFileHelperService fileHelperService, ILogger<UserDomain> logger, IEmailHelperService emailHelperService) 
         {  
             _repo = repo; 
+            _passwordHelper = passwordHelper;
             _fileHelperService = fileHelperService;
             _emailHelperService = emailHelperService;
             _logger = logger;
@@ -77,7 +79,7 @@ namespace PetRadar.Core.Domain
             if (user == null)
                 return default;
 
-            var pwd = GenerateHash(password, user.Salt);
+            var pwd = _passwordHelper.GenerateHash(password, user.Salt);
 
             if (user.Password.SequenceEqual(pwd))
                 return user;
@@ -97,8 +99,8 @@ namespace PetRadar.Core.Domain
                 throw new PetRadarException("Can't create duplicated data");
 
 
-            var salt = GenerateSalt();
-            var hashPassword = GenerateHash(user.Password, salt);
+            var salt = _passwordHelper.GenerateSalt();
+            var hashPassword = _passwordHelper.GenerateHash(user.Password, salt);
 
             var userdb = new UserEntity(user.Email, hashPassword, salt, user.Name, user.LastName, user.PhoneNumber, 
                 user.OrganizationName, user.OrganizationAddress, user.OrganizationPhone,user.Role, createdByUserId);
@@ -119,9 +121,9 @@ namespace PetRadar.Core.Domain
 
             if (!string.IsNullOrEmpty(user.Password))
             {
-                userdb.Salt = GenerateSalt();
+                userdb.Salt = _passwordHelper.GenerateSalt();
 
-                userdb.Password = GenerateHash(user.Password, userdb.Salt);
+                userdb.Password = _passwordHelper.GenerateHash(user.Password, userdb.Salt);
             }
 
             if (!string.IsNullOrEmpty(user.Name))
@@ -216,24 +218,5 @@ namespace PetRadar.Core.Domain
 
             return await _repo.SaveChangesAsync();
         }
-
-
-        public static byte[] GenerateHash(string password, byte[] salt)
-        {
-            if (string.IsNullOrEmpty(password))
-                throw new ArgumentException("Cannot be null or empty", nameof(password));
-
-            return KeyDerivation.Pbkdf2(password, salt, KeyDerivationPrf.HMACSHA256, iterationCount: 10000, 256);
-        }
-
-        public static byte[] GenerateSalt()
-        {
-            byte[] salt = new byte[128];
-          
-            RandomNumberGenerator.Fill(salt);
-
-            return salt;
-        }
-
     }
 }

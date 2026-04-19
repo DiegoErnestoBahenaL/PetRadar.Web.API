@@ -74,8 +74,8 @@ namespace PetRadar.DbMigrations.Migrations
                     DeletedBy = table.Column<long>(type: "bigint", nullable: true),
                     DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Species = table.Column<string>(type: "text", nullable: false),
-                    Breed = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    Color = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Breed = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Color = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Sex = table.Column<string>(type: "text", nullable: true),
                     Size = table.Column<string>(type: "text", nullable: true),
                     ApproximateAge = table.Column<decimal>(type: "numeric", nullable: true),
@@ -153,8 +153,8 @@ namespace PetRadar.DbMigrations.Migrations
                     DeletedBy = table.Column<long>(type: "bigint", nullable: true),
                     DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Species = table.Column<string>(type: "text", nullable: false),
-                    Breed = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    Color = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Breed = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Color = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Sex = table.Column<string>(type: "text", nullable: true),
                     Size = table.Column<string>(type: "text", nullable: true),
                     ApproximateAge = table.Column<decimal>(type: "numeric", nullable: true),
@@ -199,6 +199,7 @@ namespace PetRadar.DbMigrations.Migrations
                     OffersReward = table.Column<bool>(type: "boolean", nullable: false),
                     RewardAmount = table.Column<decimal>(type: "numeric", nullable: true),
                     Views = table.Column<int>(type: "integer", nullable: false),
+                    ImageAnalysisResult = table.Column<string>(type: "jsonb", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedBy = table.Column<long>(type: "bigint", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -207,8 +208,8 @@ namespace PetRadar.DbMigrations.Migrations
                     DeletedBy = table.Column<long>(type: "bigint", nullable: true),
                     DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Species = table.Column<string>(type: "text", nullable: false),
-                    Breed = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    Color = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Breed = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Color = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Sex = table.Column<string>(type: "text", nullable: true),
                     Size = table.Column<string>(type: "text", nullable: true),
                     ApproximateAge = table.Column<decimal>(type: "numeric", nullable: true),
@@ -364,7 +365,7 @@ namespace PetRadar.DbMigrations.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "CreatedBy", "DeletedAt", "DeletedBy", "Email", "EmailVerified", "IsActive", "LastName", "Name", "OrganizationAddress", "OrganizationName", "OrganizationPhone", "Password", "PhoneNumber", "ProfilePhotoURL", "Role", "Salt", "UpdatedAt", "UpdatedBy" },
-                values: new object[] { 1L, new DateTimeOffset(new DateTime(2026, 3, 2, 14, 19, 21, 1, DateTimeKind.Unspecified).AddTicks(7002), new TimeSpan(0, 0, 0, 0, 0)), 1L, null, null, "sa@test.com", true, true, "Admmin", "Super", null, null, null, new byte[] { 164, 193, 183, 4, 4, 17, 81, 155, 17, 176, 18, 20, 95, 52, 154, 245, 224, 211, 32, 167, 186, 15, 55, 70, 220, 163, 88, 15, 119, 159, 14, 55, 50, 230, 128, 142, 106, 42, 221, 167, 90, 196, 68, 239, 35, 8, 25, 116, 229, 161, 109, 55, 191, 141, 7, 81, 50, 204, 227, 117, 43, 102, 2, 87, 33, 134, 87, 30, 224, 131, 58, 221, 6, 246, 98, 224, 68, 126, 123, 114, 244, 26, 64, 59, 136, 15, 27, 89, 160, 127, 102, 89, 121, 188, 210, 226, 77, 126, 3, 185, 150, 26, 214, 80, 235, 107, 73, 201, 72, 48, 153, 173, 55, 12, 6, 154, 182, 17, 155, 71, 47, 39, 158, 112, 11, 81, 173, 75, 12, 68, 148, 143, 8, 146, 157, 179, 237, 183, 79, 173, 192, 230, 64, 177, 5, 71, 242, 207, 25, 5, 98, 250, 102, 122, 119, 51, 109, 235, 67, 122, 203, 158, 192, 196, 243, 28, 209, 48, 125, 89, 121, 98, 122, 55, 66, 53, 140, 136, 166, 32, 156, 45, 146, 6, 254, 161, 48, 136, 96, 56, 171, 125, 20, 215, 59, 153, 119, 209, 111, 97, 173, 31, 202, 191, 190, 140, 149, 7, 173, 163, 204, 102, 136, 74, 50, 207, 250, 49, 125, 176, 133, 51, 174, 13, 55, 28, 151, 142, 114, 204, 193, 74, 37, 205, 150, 225, 196, 203, 151, 61, 10, 96, 31, 229, 13, 149, 169, 126, 215, 187, 100, 162, 143, 156, 120, 15 }, "000000000", null, "SuperAdmin", new byte[] { 187, 232, 58, 40, 51, 124, 4, 209, 181, 231, 237, 220, 82, 15, 51, 52, 250, 173, 195, 124, 142, 4, 163, 209, 138, 147, 234, 223, 12, 101, 119, 15, 39, 65, 100, 118, 135, 254, 217, 164, 17, 32, 132, 5, 16, 19, 219, 71, 57, 80, 65, 62, 29, 21, 92, 173, 75, 37, 191, 230, 32, 141, 55, 248, 92, 173, 12, 174, 155, 231, 86, 129, 190, 71, 176, 243, 139, 77, 52, 81, 214, 245, 249, 35, 212, 97, 21, 218, 142, 59, 34, 45, 136, 86, 19, 185, 250, 249, 204, 150, 38, 235, 250, 3, 17, 10, 81, 22, 223, 47, 53, 109, 214, 59, 34, 180, 187, 246, 181, 115, 58, 94, 91, 27, 148, 26, 236, 237 }, new DateTimeOffset(new DateTime(2026, 3, 2, 14, 19, 21, 1, DateTimeKind.Unspecified).AddTicks(7002), new TimeSpan(0, 0, 0, 0, 0)), 0L });
+                values: new object[] { 1L, new DateTimeOffset(new DateTime(2026, 4, 19, 15, 57, 24, 962, DateTimeKind.Unspecified).AddTicks(4041), new TimeSpan(0, 0, 0, 0, 0)), 1L, null, null, "sa@petradar.com", true, true, "Admmin", "Super", null, null, null, new byte[0], "000000000", null, "SuperAdmin", new byte[0], new DateTimeOffset(new DateTime(2026, 4, 19, 15, 57, 24, 962, DateTimeKind.Unspecified).AddTicks(4041), new TimeSpan(0, 0, 0, 0, 0)), 0L });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AdoptionAnimals_AdopterId",
@@ -430,6 +431,12 @@ namespace PetRadar.DbMigrations.Migrations
                 name: "IX_VeterinaryAppointments_PetId",
                 table: "VeterinaryAppointments",
                 column: "PetId");
+
+
+            //Super Admin credentials will be updated in a separate migration
+            //to avoid hardcoding sensitive information in the initial migration
+
+            CustomInitialMigration.UpAfterAll(migrationBuilder);
         }
 
         /// <inheritdoc />
