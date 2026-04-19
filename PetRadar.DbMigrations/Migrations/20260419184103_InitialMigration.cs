@@ -199,7 +199,6 @@ namespace PetRadar.DbMigrations.Migrations
                     OffersReward = table.Column<bool>(type: "boolean", nullable: false),
                     RewardAmount = table.Column<decimal>(type: "numeric", nullable: true),
                     Views = table.Column<int>(type: "integer", nullable: false),
-                    ImageAnalysisResult = table.Column<string>(type: "jsonb", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedBy = table.Column<long>(type: "bigint", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -217,7 +216,8 @@ namespace PetRadar.DbMigrations.Migrations
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     PhotoURL = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     AdditionalPhotosURL = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    IsNeutered = table.Column<bool>(type: "boolean", nullable: true)
+                    IsNeutered = table.Column<bool>(type: "boolean", nullable: true),
+                    ImageAnalysisResult = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -365,7 +365,7 @@ namespace PetRadar.DbMigrations.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "CreatedBy", "DeletedAt", "DeletedBy", "Email", "EmailVerified", "IsActive", "LastName", "Name", "OrganizationAddress", "OrganizationName", "OrganizationPhone", "Password", "PhoneNumber", "ProfilePhotoURL", "Role", "Salt", "UpdatedAt", "UpdatedBy" },
-                values: new object[] { 1L, new DateTimeOffset(new DateTime(2026, 4, 19, 15, 57, 24, 962, DateTimeKind.Unspecified).AddTicks(4041), new TimeSpan(0, 0, 0, 0, 0)), 1L, null, null, "sa@petradar.com", true, true, "Admmin", "Super", null, null, null, new byte[0], "000000000", null, "SuperAdmin", new byte[0], new DateTimeOffset(new DateTime(2026, 4, 19, 15, 57, 24, 962, DateTimeKind.Unspecified).AddTicks(4041), new TimeSpan(0, 0, 0, 0, 0)), 0L });
+                values: new object[] { 1L, new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, -6, 0, 0, 0)), 1L, null, null, "sa@petradar.com", true, true, "Admin", "Super", null, null, null, new byte[0], "000000000", null, "SuperAdmin", new byte[0], new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, -6, 0, 0, 0)), 0L });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AdoptionAnimals_AdopterId",
@@ -432,10 +432,7 @@ namespace PetRadar.DbMigrations.Migrations
                 table: "VeterinaryAppointments",
                 column: "PetId");
 
-
-            //Super Admin credentials will be updated in a separate migration
-            //to avoid hardcoding sensitive information in the initial migration
-
+            //SuperAdmin Credentials 
             CustomInitialMigration.UpAfterAll(migrationBuilder);
         }
 
