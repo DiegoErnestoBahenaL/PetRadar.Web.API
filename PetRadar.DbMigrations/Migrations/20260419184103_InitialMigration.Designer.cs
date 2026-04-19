@@ -13,7 +13,7 @@ using PetRadar.Core.Data;
 namespace PetRadar.DbMigrations.Migrations
 {
     [DbContext(typeof(PetRadarDbContext))]
-    [Migration("20260419155726_InitialMigration")]
+    [Migration("20260419184103_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -401,9 +401,6 @@ namespace PetRadar.DbMigrations.Migrations
                     b.Property<bool?>("HasTag")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("ImageAnalysisResult")
-                        .HasColumnType("jsonb");
-
                     b.Property<DateTimeOffset?>("IncidentDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -569,18 +566,18 @@ namespace PetRadar.DbMigrations.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedAt = new DateTimeOffset(new DateTime(2026, 4, 19, 15, 57, 24, 962, DateTimeKind.Unspecified).AddTicks(4041), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, -6, 0, 0, 0)),
                             CreatedBy = 1L,
                             Email = "sa@petradar.com",
                             EmailVerified = true,
                             IsActive = true,
-                            LastName = "Admmin",
+                            LastName = "Admin",
                             Name = "Super",
                             Password = new byte[0],
                             PhoneNumber = "000000000",
                             Role = "SuperAdmin",
                             Salt = new byte[0],
-                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 4, 19, 15, 57, 24, 962, DateTimeKind.Unspecified).AddTicks(4041), new TimeSpan(0, 0, 0, 0, 0)),
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, -6, 0, 0, 0)),
                             UpdatedBy = 0L
                         });
                 });
@@ -860,6 +857,89 @@ namespace PetRadar.DbMigrations.Migrations
                     b.HasOne("PetRadar.Core.Data.Entities.UserPetEntity", "UserPet")
                         .WithMany()
                         .HasForeignKey("UserPetId");
+
+                    b.OwnsOne("PetRadar.Core.Helpers.PetRadarProcessing.CharacteristicsResponse", "ImageAnalysisResult", b1 =>
+                        {
+                            b1.Property<long>("ReportEntityId")
+                                .HasColumnType("bigint");
+
+                            b1.Property<decimal>("Confidence")
+                                .HasColumnType("numeric");
+
+                            b1.Property<string>("Pattern")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("TopPredictedBreed")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("ReportEntityId");
+
+                            b1.ToTable("Reports");
+
+                            b1.ToJson("ImageAnalysisResult");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ReportEntityId");
+
+                            b1.OwnsMany("PetRadar.Core.Helpers.PetRadarProcessing.ColorExtracted", "Colors", b2 =>
+                                {
+                                    b2.Property<long>("CharacteristicsResponseReportEntityId")
+                                        .HasColumnType("bigint");
+
+                                    b2.Property<int>("Id")
+                                        .ValueGeneratedOnAdd()
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("Color")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<decimal>("Proportion")
+                                        .HasColumnType("numeric");
+
+                                    b2.HasKey("CharacteristicsResponseReportEntityId", "Id");
+
+                                    b2.ToTable("Reports");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("CharacteristicsResponseReportEntityId");
+                                });
+
+                            b1.OwnsMany("PetRadar.Core.Helpers.PetRadarProcessing.TopPrediction", "TopPredictions", b2 =>
+                                {
+                                    b2.Property<long>("CharacteristicsResponseReportEntityId")
+                                        .HasColumnType("bigint");
+
+                                    b2.Property<int>("Id")
+                                        .ValueGeneratedOnAdd()
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("Breed")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<decimal>("Confidence")
+                                        .HasColumnType("numeric");
+
+                                    b2.Property<int>("Rank")
+                                        .HasColumnType("integer");
+
+                                    b2.HasKey("CharacteristicsResponseReportEntityId", "Id");
+
+                                    b2.ToTable("Reports");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("CharacteristicsResponseReportEntityId");
+                                });
+
+                            b1.Navigation("Colors");
+
+                            b1.Navigation("TopPredictions");
+                        });
+
+                    b.Navigation("ImageAnalysisResult");
 
                     b.Navigation("User");
 

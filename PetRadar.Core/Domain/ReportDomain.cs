@@ -128,6 +128,7 @@ namespace PetRadar.Core.Domain
                 {
                     reportDb.Breed = characteristicsResult.TopPredictedBreed;
                     reportDb.Color = $"{string.Join(',', characteristicsResult.Colors.Select(x => x.Color))} - {characteristicsResult.Pattern}";
+                    reportDb.ImageAnalysisResult = characteristicsResult;
                     reportDb.UpdatedByUser(modifiedByUserId);
                     _repo.Update(reportDb);
                     await _repo.SaveChangesAsync();
@@ -143,8 +144,6 @@ namespace PetRadar.Core.Domain
 
         public async Task<ReportEntity> CreateAsync(ReportCreateModel report, long createdByUserId, CancellationToken token)
         {
-
-            _logger.LogInformation("Creating report with type {Type} with species {Species}, breed {Breed}", report.ReportType, report.Species, report.Breed);
 
             var location = new Point(report.Longitude.Value, report.Latitude.Value) { SRID = 4326 };
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PetRadar.Common;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Domain;
@@ -97,6 +98,13 @@ namespace PetRadar.Core.Data
                 .Property(x => x.Size)
                 .HasConversion<string>();
 
+            modelBuilder.Entity<ReportEntity>()
+                .OwnsOne(x => x.ImageAnalysisResult, y => {
+                    y.ToJson();
+                    y.OwnsMany(y => y.TopPredictions);
+                    y.OwnsMany(y => y.Colors);
+                });
+
             modelBuilder.Entity<MatchEntity>()
                 .Property(x => x.Status)
                 .HasConversion<string>();
@@ -106,11 +114,13 @@ namespace PetRadar.Core.Data
                 .HasConversion<string>();
 
             modelBuilder.Entity<UserEntity>()
-                .HasData(new UserEntity("sa@petradar.com",Array.Empty<byte>(),Array.Empty<byte>(), "Super", "Admmin", "000000000", null,null,null, RoleEnum.SuperAdmin, 1) 
+                .HasData(new UserEntity("sa@petradar.com",Array.Empty<byte>(),Array.Empty<byte>(), "Super", "Admin", "000000000", null,null,null, RoleEnum.SuperAdmin, Constants.SuperAdminId) 
                     { 
-                        Id = 1,
+                        Id = Constants.SuperAdminId,
                         EmailVerified = true,
                         IsActive = true,
+                        CreatedAt = Constants.SuperAdminCreatedAt,
+                        UpdatedAt = Constants.SuperAdminCreatedAt
                     }
                 );
         }
