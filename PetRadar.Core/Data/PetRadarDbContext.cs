@@ -33,9 +33,6 @@ namespace PetRadar.Core.Data
                 .Property(x => x.Role)
                 .HasConversion<string>();
 
-            var salt = UserDomain.GenerateSalt();
-            var hashPassword = UserDomain.GenerateHash("test", salt);
-
             modelBuilder.Entity<UserPetEntity>()
                 .Property(x => x.Sex)
                 .HasConversion<string>();
@@ -109,7 +106,7 @@ namespace PetRadar.Core.Data
                 .HasConversion<string>();
 
             modelBuilder.Entity<UserEntity>()
-                .HasData(new UserEntity("sa@test.com",hashPassword,salt, "Super", "Admmin", "000000000", null,null,null, RoleEnum.SuperAdmin, 1) 
+                .HasData(new UserEntity("sa@petradar.com",Array.Empty<byte>(),Array.Empty<byte>(), "Super", "Admmin", "000000000", null,null,null, RoleEnum.SuperAdmin, 1) 
                     { 
                         Id = 1,
                         EmailVerified = true,

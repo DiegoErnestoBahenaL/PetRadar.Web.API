@@ -3,6 +3,7 @@ using PetRadar.Core.Data;
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Domain;
+using PetRadar.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,46 +50,47 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
 
         public DefaultDataSet()
         {
+            var passwordHelper = new PasswordHelper();
+            var salt = passwordHelper.GenerateSalt();
             DefaultUserEntity = new UserEntity();
             DefaultPetEntity = new UserPetEntity();
             DefaultLostReportEntity = new ReportEntity();
             DefaultStrayReportEntity = new ReportEntity();
             DefaultRecipientUserEntity = new UserEntity();
-        }
 
-        public void SeedData(PetRadarDbContext dbContext)
-        {
-
-            var salt = UserDomain.GenerateSalt();
             DefaultUserEntity = new UserEntity()
             {
                 Id = DefaultUserId,
                 Email = DefaultUserEmail,
                 Salt = salt,
-                Password = UserDomain.GenerateHash(DefaultUserPassword, salt),
+                Password = passwordHelper.GenerateHash(DefaultUserPassword, salt),
                 Name = DefaultUserName,
                 LastName = DefaultUserLastName,
                 PhoneNumber = DefaultUserPhoneNumber,
                 Role = DefaultUserRole,
                 IsActive = true
             };
-            
 
-            dbContext.Users.Add(DefaultUserEntity);
-            dbContext.SaveChanges();
-
-            var recipientSalt = UserDomain.GenerateSalt();
+            var recipientSalt = passwordHelper.GenerateSalt();
             DefaultRecipientUserEntity = new UserEntity()
             {
                 Id = DefaultRecipientUserId,
                 Email = DefaultRecipientUserEmail,
                 Salt = recipientSalt,
-                Password = UserDomain.GenerateHash(DefaultUserPassword, recipientSalt),
+                Password = passwordHelper.GenerateHash(DefaultUserPassword, recipientSalt),
                 Name = DefaultRecipientUserName,
                 LastName = DefaultRecipientUserLastName,
                 Role = RoleEnum.User,
                 IsActive = true
             };
+
+
+        }
+
+        public void SeedData(PetRadarDbContext dbContext)
+        {
+            dbContext.Users.Add(DefaultUserEntity);
+            dbContext.SaveChanges();
 
             dbContext.Users.Add(DefaultRecipientUserEntity);
             dbContext.SaveChanges();

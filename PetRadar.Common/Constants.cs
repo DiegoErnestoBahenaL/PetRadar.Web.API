@@ -8,6 +8,7 @@ namespace PetRadar.Common
 {
     public static class Constants
     {
+        public const int SuperAdminId = 1;
 
         public const int MaxImageSize = 5242880;
 
