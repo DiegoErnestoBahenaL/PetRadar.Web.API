@@ -14,6 +14,7 @@ namespace PetRadar.Core.Domain
         Task<List<MatchEntity>> GetAllByLostReportIdAsync(long lostReportId, CancellationToken token);
         Task<List<MatchEntity>> GetAllByStrayReportIdAsync(long strayReportId, CancellationToken token);
         Task<MatchEntity?> FindByIdAsync(long id, CancellationToken token);
+        Task<int> GenerateMatches(ReportEntity strayReport, CancellationToken token);
         Task<MatchEntity> CreateAsync(MatchCreateModel match, long createdByUserId, CancellationToken token);
         Task<int> UpdateAsync(MatchEntity matchDb, MatchUpdateModel match, long modifiedByUserId, CancellationToken token);
         Task<int> DeleteAsync(MatchEntity match, long modifiedByUserId, CancellationToken token);

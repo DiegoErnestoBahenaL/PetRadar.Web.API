@@ -13,5 +13,6 @@ namespace PetRadar.Core.Data.Repositories
         Task<List<MatchEntity>> GetAllByLostReportIdAsync(long lostReportId, CancellationToken token);
         Task<List<MatchEntity>> GetAllByStrayReportIdAsync(long strayReportId, CancellationToken token);
         Task<MatchEntity?> FindByIdAsync(long id, CancellationToken token);
+        Task<MatchEntity?> FindByReportsIdsAsync(long lostReportId, long strayReportId, CancellationToken token);
     }
 }
