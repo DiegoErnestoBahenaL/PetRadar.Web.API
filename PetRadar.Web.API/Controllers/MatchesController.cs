@@ -18,11 +18,13 @@ namespace PetRadar.Web.API.Controllers
         private readonly ILogger<MatchesController> _logger;
         private readonly IMatchDomain _domain;
         private readonly IReportDomain _reportDomain;
+        private readonly IUserDomain _userDomain;
 
-        public MatchesController(ILogger<MatchesController> logger, IMatchDomain domain, IReportDomain reportDomain)
+        public MatchesController(ILogger<MatchesController> logger, IMatchDomain domain, IReportDomain reportDomain, IUserDomain userDomain)
         {
             _logger = logger;
             _domain = domain;
+            _userDomain = userDomain;
             _reportDomain = reportDomain;
         }
 
@@ -33,6 +35,25 @@ namespace PetRadar.Web.API.Controllers
         public async Task<ActionResult<IList<MatchViewModel>>> Get(CancellationToken token)
         {
             var matches = await _domain.GetAllAsync(token);
+
+            return Ok(MatchViewModel.FromList(matches));
+        }
+
+        [HttpGet("user/{userId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces(MediaTypeNames.Application.Json)]
+
+        public async Task<ActionResult<IList<MatchViewModel>>> GetByUserId([FromRoute] long userId, CancellationToken token)
+        {
+
+            var user = await _userDomain.FindByIdAsync(userId, token);
+
+            if (user == default)
+                return NotFound(Constants.NotFoundProblemDetails);
+
+            var matches = await _domain.GetAllByUserIdAsync(userId, token);
 
             return Ok(MatchViewModel.FromList(matches));
         }
@@ -93,7 +114,7 @@ namespace PetRadar.Web.API.Controllers
 
             var matchDb = await _domain.CreateAsync(match, UserJwt.Id, token);
 
-            return CreatedAtAction(nameof(Get), new { id = matchDb.Id }, new MatchViewModel(matchDb));
+            return CreatedAtAction(nameof(Get), new { id = matchDb.Id }, new MatchViewModel(matchDb, lostReport, strayReport));
         }
 
         [HttpPut("{id}")]
