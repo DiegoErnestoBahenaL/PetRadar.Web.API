@@ -22,13 +22,15 @@ namespace PetRadar.Core.Domain
         private readonly IFileHelperService _fileHelperService;
         private readonly ILogger<ReportDomain> _logger;
         private readonly IPetRadarProcessingHelperService _processingHelperService;
+        private readonly IMatchDomain _matchDomain;
 
-        public ReportDomain(IReportRepository repo, IFileHelperService fileHelperService, ILogger<ReportDomain> logger, IPetRadarProcessingHelperService processingHelperService)
+        public ReportDomain(IReportRepository repo, IFileHelperService fileHelperService, ILogger<ReportDomain> logger, IPetRadarProcessingHelperService processingHelperService, IMatchDomain matchDomain)
         {
             _repo = repo;
             _fileHelperService = fileHelperService;
             _logger = logger;
             _processingHelperService = processingHelperService;
+            _matchDomain = matchDomain;
         }
 
         public Task<List<ReportEntity>> GetAllAsync(CancellationToken token)
@@ -137,6 +139,16 @@ namespace PetRadar.Core.Domain
             catch (BadHttpRequestException ex)
             {
                 throw new BadHttpRequestException($"Image characteristics extraction failed: {ex.Message}");
+            }
+
+            try
+            {
+                await _matchDomain.GenerateMatches(reportDb, token);
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError(ex, "Matches creation process failed: {message}",ex.Message);
             }
 
             return result;
