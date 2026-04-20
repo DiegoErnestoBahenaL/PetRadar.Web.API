@@ -25,15 +25,15 @@ namespace PetRadar.Core.Data.Entities
         [ForeignKey(nameof(RecipientId))]
         public UserEntity Recipient { get; set; }
 
-        public long? ReportId { get; set; }
-
-        [ForeignKey(nameof(ReportId))]
-        public ReportEntity? Report { get; set; }
-
         public long? MatchId { get; set; }
 
         [ForeignKey(nameof(MatchId))]
         public MatchEntity? Match { get; set; }
+
+        public long? AdoptionAnimalId { get; set; }
+
+        [ForeignKey(nameof(AdoptionAnimalId))]
+        public AdoptionAnimalEntity? AdoptionAnimal { get; set; }
 
         [Required]
         public string Content { get; set; } = string.Empty;
@@ -47,13 +47,13 @@ namespace PetRadar.Core.Data.Entities
 
         public MessageEntity() { }
 
-        public MessageEntity(long senderId, long recipientId, string content, long? reportId = null, long? matchId = null)
+        public MessageEntity(long senderId, long recipientId, string content, long? matchId = null, long? adoptionAnimalId = null)
         {
             SenderId = senderId;
             RecipientId = recipientId;
             Content = content;
-            ReportId = reportId;
             MatchId = matchId;
+            AdoptionAnimalId = adoptionAnimalId;
         }
 
     }

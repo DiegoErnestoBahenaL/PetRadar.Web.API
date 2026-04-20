@@ -30,6 +30,9 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
         public static readonly int DefaultLostReportId = 3000;
         public static readonly int DefaultStrayReportId = 3001;
 
+        public static readonly int DefaultMatchId = 4000;
+        public static readonly int DefaultAdoptionAnimalId = 5000;
+
         public static readonly int DefaultRecipientUserId = 1001;
         public static readonly string DefaultRecipientUserEmail = "recipient@email.com";
         public static readonly string DefaultRecipientUserName = "Recipient";
@@ -46,6 +49,10 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
 
         public ReportEntity DefaultStrayReportEntity { get; private set; }
 
+        public MatchEntity DefaultMatchEntity { get; private set; }
+        
+        public AdoptionAnimalEntity DefaultAdoptionAnimalEntity { get; private set; }
+
         public UserEntity DefaultRecipientUserEntity { get; private set; }
 
         public DefaultDataSet()
@@ -56,6 +63,8 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
             DefaultPetEntity = new UserPetEntity();
             DefaultLostReportEntity = new ReportEntity();
             DefaultStrayReportEntity = new ReportEntity();
+            DefaultMatchEntity = new MatchEntity();
+            DefaultAdoptionAnimalEntity = new AdoptionAnimalEntity();
             DefaultRecipientUserEntity = new UserEntity();
 
             DefaultUserEntity = new UserEntity()
@@ -166,6 +175,34 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
             };
 
             dbContext.Reports.AddRange(DefaultLostReportEntity, DefaultStrayReportEntity);
+            dbContext.SaveChanges();
+
+            DefaultMatchEntity = new MatchEntity(DefaultLostReportId, DefaultStrayReportId, 0.5, "Default Match", null)
+            {
+                Id = DefaultMatchId,
+                Score = 0.5,
+                Status = MatchStatusEnum.Pending,
+                IsActive = true,
+                CreatedBy = DefaultUserId,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow,
+                UpdatedBy = DefaultUserId
+            };
+
+            dbContext.Matches.Add(DefaultMatchEntity);
+            dbContext.SaveChanges();
+
+            DefaultAdoptionAnimalEntity = new AdoptionAnimalEntity(DefaultUserId, "TestAdoptionAnimal", PetSpeciesEnum.Dog, "Labrador", "Golden", PetSexEnum.Male, PetSizeEnum.Large, 3, 25.0m, "Adopt this dog", true, "Playful", true, true, false, true, false, null)
+            {
+                Id = DefaultAdoptionAnimalId,
+                IsActive = true,
+                CreatedBy = DefaultUserId,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow,
+                UpdatedBy = DefaultUserId
+            };
+
+            dbContext.AdoptionAnimals.Add(DefaultAdoptionAnimalEntity);
             dbContext.SaveChanges();
         }
     }

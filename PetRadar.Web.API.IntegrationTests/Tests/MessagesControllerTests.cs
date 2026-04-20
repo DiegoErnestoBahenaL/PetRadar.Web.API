@@ -52,8 +52,8 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
                 senderId: DefaultDataSet.DefaultUserId,
                 recipientId: DefaultDataSet.DefaultRecipientUserId,
                 content: "Hello, I think I found your pet!",
-                reportId: DefaultDataSet.DefaultLostReportId,
-                matchId: null
+                matchId: null,
+                adoptionAnimalId: null
             );
 
             var jsonModel = JsonConvert.SerializeObject(createModel);
@@ -74,8 +74,8 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             Assert.Equal(DefaultDataSet.DefaultUserId, createdMessage.SenderId);
             Assert.Equal(DefaultDataSet.DefaultRecipientUserId, createdMessage.RecipientId);
             Assert.Equal("Hello, I think I found your pet!", createdMessage.Content);
-            Assert.Equal(DefaultDataSet.DefaultLostReportId, createdMessage.ReportId);
             Assert.Null(createdMessage.MatchId);
+            Assert.Null(createdMessage.AdoptionAnimalId);
             Assert.False(createdMessage.Read);
             Assert.Null(createdMessage.ReadDate);
 
@@ -136,6 +136,100 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             Assert.NotNull(messages);
             Assert.True(messages.Count > 0);
             Assert.Contains(messages, m => m.Id == createdMessageId);
+        }
+
+        [Fact, TestPriority(51)]
+        public async Task Create_With_MatchId_Returns_Created_Successfully()
+        {
+            // Arrange
+            var createModel = new MessageCreateModel(
+                senderId: DefaultDataSet.DefaultUserId,
+                recipientId: DefaultDataSet.DefaultRecipientUserId,
+                content: "Match message context",
+                matchId: DefaultDataSet.DefaultMatchId,
+                adoptionAnimalId: null
+            );
+
+            var jsonModel = JsonConvert.SerializeObject(createModel);
+
+            // Act
+            var result = await _client.PostAsync(BaseUrl, new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+
+            var stringContent = await result.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status201Created, (int)result.StatusCode);
+
+            var createdMessage = JsonConvert.DeserializeObject<MessageViewModel>(stringContent);
+
+            Assert.NotNull(createdMessage);
+            Assert.Equal(DefaultDataSet.DefaultMatchId, createdMessage.MatchId);
+        }
+
+        [Fact, TestPriority(52)]
+        public async Task GetByMatchIdConversation_Returns_Messages_Successfully()
+        {
+            // Arrange & Act
+            var result = await _client.GetAsync($"{BaseUrl}/match/{DefaultDataSet.DefaultMatchId}/conversation/{DefaultDataSet.DefaultRecipientUserId}/{DefaultDataSet.DefaultUserId}");
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status200OK, (int)result.StatusCode);
+
+            var stringContent = await result.Content.ReadAsStringAsync();
+            var messages = JsonConvert.DeserializeObject<List<MessageViewModel>>(stringContent);
+
+            Assert.NotNull(messages);
+            Assert.True(messages.Count > 0);
+            Assert.Contains(messages, m => m.MatchId == DefaultDataSet.DefaultMatchId);
+        }
+
+        [Fact, TestPriority(53)]
+        public async Task Create_With_AdoptionAnimalId_Returns_Created_Successfully()
+        {
+            // Arrange
+            var createModel = new MessageCreateModel(
+                senderId: DefaultDataSet.DefaultUserId,
+                recipientId: DefaultDataSet.DefaultRecipientUserId,
+                content: "Adoption animal message context",
+                matchId: null,
+                adoptionAnimalId: DefaultDataSet.DefaultAdoptionAnimalId
+            );
+
+            var jsonModel = JsonConvert.SerializeObject(createModel);
+
+            // Act
+            var result = await _client.PostAsync(BaseUrl, new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+
+            var stringContent = await result.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status201Created, (int)result.StatusCode);
+
+            var createdMessage = JsonConvert.DeserializeObject<MessageViewModel>(stringContent);
+
+            Assert.NotNull(createdMessage);
+            Assert.Equal(DefaultDataSet.DefaultAdoptionAnimalId, createdMessage.AdoptionAnimalId);
+        }
+
+        [Fact, TestPriority(54)]
+        public async Task GetByAdoptionAnimalIdConversation_Returns_Messages_Successfully()
+        {
+            // Arrange & Act
+            var result = await _client.GetAsync($"{BaseUrl}/adoptionAnimal/{DefaultDataSet.DefaultAdoptionAnimalId}/conversation/{DefaultDataSet.DefaultRecipientUserId}/{DefaultDataSet.DefaultUserId}");
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status200OK, (int)result.StatusCode);
+
+            var stringContent = await result.Content.ReadAsStringAsync();
+            var messages = JsonConvert.DeserializeObject<List<MessageViewModel>>(stringContent);
+
+            Assert.NotNull(messages);
+            Assert.True(messages.Count > 0);
+            Assert.Contains(messages, m => m.AdoptionAnimalId == DefaultDataSet.DefaultAdoptionAnimalId);
         }
 
         [Fact, TestPriority(6)]
@@ -252,8 +346,8 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
                 senderId: DefaultDataSet.DefaultUserId,
                 recipientId: DefaultDataSet.DefaultRecipientUserId,
                 content: longContent,
-                reportId: null,
-                matchId: null
+                matchId: null,
+                adoptionAnimalId: null
             );
 
             var jsonModel = JsonConvert.SerializeObject(createModel);
@@ -295,8 +389,8 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
                 senderId: DefaultDataSet.DefaultUserId,
                 recipientId: DefaultDataSet.DefaultRecipientUserId,
                 content: "Temporary message",
-                reportId: null,
-                matchId: null
+                matchId: null,
+                adoptionAnimalId: null
             );
 
             var createJson = JsonConvert.SerializeObject(createModel);
@@ -379,6 +473,71 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             Assert.Empty(messages);
         }
 
+        [Fact]
+        public async Task Create_Returns_NotFound_With_Invalid_MatchId()
+        {
+            // Arrange
+            var createModel = new MessageCreateModel(
+                senderId: DefaultDataSet.DefaultUserId,
+                recipientId: DefaultDataSet.DefaultRecipientUserId,
+                content: "Invalid MatchId message",
+                matchId: 999999,
+                adoptionAnimalId: null
+            );
+
+            var jsonModel = JsonConvert.SerializeObject(createModel);
+
+            // Act
+            var result = await _client.PostAsync(BaseUrl, new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status404NotFound, (int)result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Create_Returns_NotFound_With_Invalid_AdoptionAnimalId()
+        {
+            // Arrange
+            var createModel = new MessageCreateModel(
+                senderId: DefaultDataSet.DefaultUserId,
+                recipientId: DefaultDataSet.DefaultRecipientUserId,
+                content: "Invalid AdoptionAnimalId message",
+                matchId: null,
+                adoptionAnimalId: 999999
+            );
+
+            var jsonModel = JsonConvert.SerializeObject(createModel);
+
+            // Act
+            var result = await _client.PostAsync(BaseUrl, new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status404NotFound, (int)result.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetByMatchIdConversation_Returns_NotFound_With_Invalid_MatchId()
+        {
+            // Arrange & Act
+            var result = await _client.GetAsync($"{BaseUrl}/match/999999/conversation/{DefaultDataSet.DefaultRecipientUserId}/{DefaultDataSet.DefaultUserId}");
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status404NotFound, (int)result.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetByAdoptionAnimalIdConversation_Returns_NotFound_With_Invalid_AdoptionAnimalId()
+        {
+            // Arrange & Act
+            var result = await _client.GetAsync($"{BaseUrl}/adoptionAnimal/999999/conversation/{DefaultDataSet.DefaultRecipientUserId}/{DefaultDataSet.DefaultUserId}");
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status404NotFound, (int)result.StatusCode);
+        }
         #endregion
     }
 }

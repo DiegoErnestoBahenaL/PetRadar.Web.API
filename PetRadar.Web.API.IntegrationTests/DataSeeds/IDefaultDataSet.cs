@@ -14,6 +14,8 @@ namespace PetRadar.Web.API.IntegrationTests.DataSeeds
         public UserPetEntity DefaultPetEntity { get; }
         public ReportEntity DefaultLostReportEntity { get; }
         public ReportEntity DefaultStrayReportEntity { get; }
+        public MatchEntity DefaultMatchEntity { get; }
+        public AdoptionAnimalEntity DefaultAdoptionAnimalEntity { get; }
         void SeedData(PetRadarDbContext dbContext);
     }
 }
