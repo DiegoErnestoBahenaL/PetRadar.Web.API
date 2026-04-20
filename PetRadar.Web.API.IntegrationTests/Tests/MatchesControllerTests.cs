@@ -72,8 +72,8 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
 
             Assert.NotNull(createdMatch);
             Assert.True(createdMatch.Id > 0);
-            Assert.Equal(DefaultDataSet.DefaultLostReportId, createdMatch.LostReportId);
-            Assert.Equal(DefaultDataSet.DefaultStrayReportId, createdMatch.StrayReportId);
+            Assert.Equal(DefaultDataSet.DefaultLostReportId, createdMatch.LostReport.Id);
+            Assert.Equal(DefaultDataSet.DefaultStrayReportId, createdMatch.StrayReport.Id);
             Assert.Equal(2.5, createdMatch.DistanceInKM);
             Assert.Equal("Possible match found near park area", createdMatch.Notes);
             Assert.Equal("Pending", createdMatch.Status);
@@ -96,8 +96,8 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
 
             Assert.NotNull(match);
             Assert.Equal(createdMatchId, match.Id);
-            Assert.Equal(DefaultDataSet.DefaultLostReportId, match.LostReportId);
-            Assert.Equal(DefaultDataSet.DefaultStrayReportId, match.StrayReportId);
+            Assert.Equal(DefaultDataSet.DefaultLostReportId, match.LostReport.Id);
+            Assert.Equal(DefaultDataSet.DefaultStrayReportId, match.StrayReport.Id);
             Assert.Equal("Possible match found near park area", match.Notes);
         }
 
