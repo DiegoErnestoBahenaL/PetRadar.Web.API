@@ -11,6 +11,7 @@ namespace PetRadar.Core.Domain
     public interface IMatchDomain
     {
         Task<List<MatchEntity>> GetAllAsync(CancellationToken token);
+        Task<List<MatchEntity>> GetAllByUserIdAsync(long userId, CancellationToken token);
         Task<List<MatchEntity>> GetAllByLostReportIdAsync(long lostReportId, CancellationToken token);
         Task<List<MatchEntity>> GetAllByStrayReportIdAsync(long strayReportId, CancellationToken token);
         Task<MatchEntity?> FindByIdAsync(long id, CancellationToken token);

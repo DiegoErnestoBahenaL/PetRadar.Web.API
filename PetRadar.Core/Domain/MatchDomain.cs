@@ -27,6 +27,11 @@ namespace PetRadar.Core.Domain
             return _repo.GetAllAsync(token);
         }
 
+        public Task<List<MatchEntity>> GetAllByUserIdAsync(long userId, CancellationToken token)
+        {
+            return _repo.GetAllByUserIdAsync(userId, token);
+        }
+
         public Task<List<MatchEntity>> GetAllByLostReportIdAsync(long lostReportId, CancellationToken token)
         {
             return _repo.GetAllByLostReportIdAsync(lostReportId, token);

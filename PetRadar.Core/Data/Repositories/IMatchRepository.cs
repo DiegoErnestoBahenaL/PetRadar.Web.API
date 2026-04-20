@@ -10,6 +10,7 @@ namespace PetRadar.Core.Data.Repositories
     public interface IMatchRepository : IEntityRepository<MatchEntity>
     {
         Task<List<MatchEntity>> GetAllAsync(CancellationToken token);
+        Task<List<MatchEntity>> GetAllByUserIdAsync(long userId, CancellationToken token);
         Task<List<MatchEntity>> GetAllByLostReportIdAsync(long lostReportId, CancellationToken token);
         Task<List<MatchEntity>> GetAllByStrayReportIdAsync(long strayReportId, CancellationToken token);
         Task<MatchEntity?> FindByIdAsync(long id, CancellationToken token);
