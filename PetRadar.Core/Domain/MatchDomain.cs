@@ -148,8 +148,10 @@ namespace PetRadar.Core.Domain
             // For now, we will also look at color matches.
             // This can be improved in the future by looking at the confidence of the color predictions and/or looking at other characteristics.
             possibleMatches = possibleMatches.Where(
-                x => x.ImageAnalysisResult.Colors.SequenceEqual(reportCreated.ImageAnalysisResult.Colors) ||
-                x.ImageAnalysisResult.Colors.Any(c => reportCreated.ImageAnalysisResult.Colors.Contains(c))
+                x => x.ImageAnalysisResult.Colors
+                        .Select(c => c.Color)
+                        .Intersect(reportCreated.ImageAnalysisResult.Colors.Select(c => c.Color))
+                        .Any()
             ).ToList();
 
 
@@ -182,9 +184,13 @@ namespace PetRadar.Core.Domain
                     score += 0.2;
 
 
-                if (possibleMatch.ImageAnalysisResult.Colors.SequenceEqual(reportCreated.ImageAnalysisResult.Colors))
+                var sharedColors = possibleMatch.ImageAnalysisResult.Colors.Select(c => c.Color)
+                    .Intersect(reportCreated.ImageAnalysisResult.Colors.Select(c => c.Color)).ToList();
+
+                if (sharedColors.Count == possibleMatch.ImageAnalysisResult.Colors.Count
+                    && sharedColors.Count == reportCreated.ImageAnalysisResult.Colors.Count)
                     score += 0.15;
-                else if (possibleMatch.ImageAnalysisResult.Colors.Any(c => reportCreated.ImageAnalysisResult.Colors.Contains(c)))
+                else if (sharedColors.Count > 0)
                     score += 0.1;
 
                 
