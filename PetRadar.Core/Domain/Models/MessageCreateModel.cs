@@ -21,19 +21,19 @@ namespace PetRadar.Core.Domain.Models
         [StringLength(maximumLength: 5000, MinimumLength = 1, ErrorMessage = "The field Content must be a string with a minimum length of {2} and a maximum length of {1}")]
         public string Content { get; set; } = string.Empty;
 
-        public long? ReportId { get; set; }
-
         public long? MatchId { get; set; }
+
+        public long? AdoptionAnimalId { get; set; }
 
         public MessageCreateModel(
             long senderId, long recipientId, string content,
-            long? reportId, long? matchId)
+            long? matchId, long? adoptionAnimalId)
         {
             SenderId = senderId;
             RecipientId = recipientId;
             Content = content;
-            ReportId = reportId;
             MatchId = matchId;
+            AdoptionAnimalId = adoptionAnimalId;
         }
     }
 }

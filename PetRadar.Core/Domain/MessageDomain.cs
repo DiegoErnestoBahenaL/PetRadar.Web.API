@@ -33,6 +33,16 @@ namespace PetRadar.Core.Domain
             return _repo.GetAllByRecipientIdAsync(recipientId, token);
         }
 
+        public Task<List<MessageEntity>> GetAllByMatchIdConversationAsync(long matchId, long recipientId, long senderId, CancellationToken token)
+        {
+            return _repo.GetAllByMatchIdConversationAsync(matchId, recipientId, senderId, token);
+        }
+        
+        public Task<List<MessageEntity>> GetAllByAdoptionAnimalIdConversationAsync(long adoptionAnimalId, long recipientId, long senderId, CancellationToken token)
+        {
+            return _repo.GetAllByAdoptionAnimalIdConversationAsync(adoptionAnimalId, recipientId, senderId, token);
+        }
+
         public async Task<MessageEntity?> FindByIdAsync(long id, CancellationToken token = default)
         {
             var message = await _repo.FindByIdAsync(id, token);
@@ -46,7 +56,7 @@ namespace PetRadar.Core.Domain
         {
             var messageDb = new MessageEntity(
                 message.SenderId, message.RecipientId, message.Content,
-                message.ReportId, message.MatchId
+                message.MatchId, message.AdoptionAnimalId
             );
 
             messageDb.CreatedBy = createdByUserId;
