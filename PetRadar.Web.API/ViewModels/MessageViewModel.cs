@@ -7,8 +7,8 @@ namespace PetRadar.Web.API.ViewModels
         public long Id { get; set; }
         public long SenderId { get; set; }
         public long RecipientId { get; set; }
-        public long? ReportId { get; set; }
         public long? MatchId { get; set; }
+        public long? AdoptionAnimalId { get; set; }
         public string Content { get; set; } = string.Empty;
         public bool Read { get; set; }
         public DateTimeOffset SentAt { get; set; }
@@ -21,8 +21,8 @@ namespace PetRadar.Web.API.ViewModels
             Id = entity.Id;
             SenderId = entity.SenderId;
             RecipientId = entity.RecipientId;
-            ReportId = entity.ReportId;
             MatchId = entity.MatchId;
+            AdoptionAnimalId = entity.AdoptionAnimalId;
             Content = entity.Content;
             Read = entity.Read;
             SentAt = entity.SentAt;

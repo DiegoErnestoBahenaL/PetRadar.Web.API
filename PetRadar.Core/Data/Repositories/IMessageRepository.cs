@@ -11,7 +11,9 @@ namespace PetRadar.Core.Data.Repositories
     {
         Task<List<MessageEntity>> GetAllAsync(CancellationToken token);
         Task<List<MessageEntity>> GetAllBySenderIdAsync(long senderId, CancellationToken token);
-        Task<List<MessageEntity>> GetAllByRecipientIdAsync(long recipientId, CancellationToken token);
+        Task<List<MessageEntity>> GetAllByRecipientIdAsync(long recipientId, CancellationToken token);  
+        Task<List<MessageEntity>> GetAllByAdoptionAnimalIdConversationAsync(long adoptionAnimalId, long recipientId, long senderId, CancellationToken token);
+        Task<List<MessageEntity>> GetAllByMatchIdConversationAsync(long matchId, long recipientId, long senderId, CancellationToken token);
         Task<MessageEntity?> FindByIdAsync(long id, CancellationToken token);
     }
 }
