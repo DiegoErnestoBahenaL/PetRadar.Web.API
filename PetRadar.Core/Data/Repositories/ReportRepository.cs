@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PetRadar.Core.Data.Entities;
+using PetRadar.Core.Data.Entities.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,20 @@ namespace PetRadar.Core.Data.Repositories
             var query = ConstructQuery()
                 .Where(x => x.IsActive == true && x.UserId == userId);
 
+            return query.ToListAsync(token);
+        }
+
+        public Task<List<ReportEntity>> GetAllByLostReportTypeAsync(PetSpeciesEnum species, CancellationToken token)
+        {
+            var query = ConstructQuery()
+                .Where(x => x.IsActive == true && x.ReportType == ReportTypeEnum.Lost && x.Species == species);
+            return query.ToListAsync(token);
+        }   
+
+        public Task<List<ReportEntity>> GetAllByStrayReportTypeAsync(PetSpeciesEnum species, CancellationToken token)
+        {
+            var query = ConstructQuery()
+                .Where(x => x.IsActive == true && x.ReportType == ReportTypeEnum.Stray && x.Species == species);
             return query.ToListAsync(token);
         }
 

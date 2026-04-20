@@ -42,5 +42,12 @@ namespace PetRadar.Core.Data.Repositories
                 .Where(x => x.IsActive == true)
                 .SingleOrDefaultAsync(x => x.Id == id, token);
         }
+
+        public Task<MatchEntity?> FindByReportsIdsAsync(long lostReportId, long strayReportId, CancellationToken token)
+        {
+            return _dbContext.Matches
+                .Where(x => x.IsActive == true && x.LostReportId == lostReportId && x.StrayReportId == strayReportId)
+                .FirstOrDefaultAsync(token);
+        }
     }
 }
