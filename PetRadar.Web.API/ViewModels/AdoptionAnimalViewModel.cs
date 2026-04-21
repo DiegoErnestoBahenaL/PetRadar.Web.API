@@ -30,6 +30,8 @@ namespace PetRadar.Web.API.ViewModels
         public long? AdopterId { get; set; }
         public int Views { get; set; }
 
+        public List<AdoptionRequest> AdoptionRequests { get; set; } = new List<AdoptionRequest>();
+
         public AdoptionAnimalViewModel() { }
 
         public AdoptionAnimalViewModel(AdoptionAnimalEntity entity)
@@ -59,6 +61,7 @@ namespace PetRadar.Web.API.ViewModels
             AdoptionDate = entity.AdoptionDate;
             AdopterId = entity.AdopterId;
             Views = entity.Views;
+            AdoptionRequests = entity.AdoptionRequests;
         }
 
         public static List<AdoptionAnimalViewModel> FromList(List<AdoptionAnimalEntity> entities)

@@ -44,6 +44,8 @@ namespace PetRadar.Core.Data.Entities
 
         public int Views { get; set; } = 0;
 
+        public List<AdoptionRequest> AdoptionRequests { get; set; } = [];
+
         public AdoptionAnimalEntity() : base () { }
 
         public AdoptionAnimalEntity(
