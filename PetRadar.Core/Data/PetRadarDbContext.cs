@@ -105,6 +105,12 @@ namespace PetRadar.Core.Data
                     y.OwnsMany(y => y.Colors);
                 });
 
+            modelBuilder.Entity<AdoptionAnimalEntity>()
+                .OwnsMany(x => x.AdoptionRequests, y =>
+                {
+                    y.ToJson();
+                });
+
             modelBuilder.Entity<MatchEntity>()
                 .Property(x => x.Status)
                 .HasConversion<string>();

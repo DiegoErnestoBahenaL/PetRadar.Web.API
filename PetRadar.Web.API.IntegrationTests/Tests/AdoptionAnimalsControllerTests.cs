@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Domain.Models;
 using PetRadar.Web.API.IntegrationTests.DataSeeds;
@@ -195,6 +196,45 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
         }
 
         [Fact, TestPriority(7)]
+        public async Task AddAdoptionRequest_Returns_NoContent_Successfully()
+        {
+            // Arrange
+            var adoptionRequest = new AdoptionRequest
+            {
+                UserId = DefaultDataSet.DefaultUserId,
+                Name = "John Doe",
+                PhoneNumber = "1234567890",
+                Address = "123 Main St",
+                HouseType = "House",
+                HasGarden = true,
+                LivesWith = "Family",
+                HasOtherPets = false,
+                PreviousExperience = "None"
+            };
+
+            var jsonModel = JsonConvert.SerializeObject(adoptionRequest);
+
+            // Act
+            var result = await _client.PutAsync($"{BaseUrl}/{createdAnimalId}/adoptionrequest", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status204NoContent, (int)result.StatusCode);
+        }
+
+        [Fact, TestPriority(8)]
+        public async Task ApproveAdoptionRequest_Returns_NoContent_Successfully()
+        {
+            // Arrange & Act
+            var emptyContent = new StringContent(string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json);
+            var result = await _client.PutAsync($"{BaseUrl}/{createdAnimalId}/approveadoptionrequest/{DefaultDataSet.DefaultUserId}", emptyContent);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status204NoContent, (int)result.StatusCode);
+        }
+
+        [Fact, TestPriority(9)]
         public async Task Update_With_AdopterId_Returns_NoContent_Successfully()
         {
             // Arrange
@@ -231,7 +271,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             Assert.Equal(StatusCodes.Status204NoContent, (int)result.StatusCode);
         }
 
-        [Fact, TestPriority(8)]
+        [Fact, TestPriority(10)]
         public async Task Delete_Returns_NoContent_Successfully()
         {
             // Arrange & Act
@@ -713,6 +753,142 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             // Assert
             Assert.NotNull(result);
             Assert.Equal(StatusCodes.Status400BadRequest, (int)result.StatusCode);
+
+            // Cleanup
+            await _client.DeleteAsync($"{BaseUrl}/{createdAnimal.Id}");
+        }
+
+        [Fact]
+        public async Task AddAdoptionRequest_Returns_NotFound_With_Invalid_Id()
+        {
+            // Arrange
+            var invalidId = 999999;
+            var adoptionRequest = new AdoptionRequest
+            {
+                UserId = DefaultDataSet.DefaultUserId,
+                Name = "John Doe",
+                PhoneNumber = "1234567890",
+                Address = "123 Main St",
+                HouseType = "House",
+                HasGarden = true,
+                LivesWith = "Family",
+                HasOtherPets = false,
+                PreviousExperience = "None"
+            };
+            var jsonModel = JsonConvert.SerializeObject(adoptionRequest);
+
+            // Act
+            var result = await _client.PutAsync($"{BaseUrl}/{invalidId}/adoptionrequest", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status404NotFound, (int)result.StatusCode);
+        }
+
+        [Fact]
+        public async Task AddAdoptionRequest_Returns_NotFound_With_Invalid_UserId()
+        {
+            // Arrange - First create an animal
+            var createModel = new AdoptionAnimalCreateModel(
+                shelterId: DefaultDataSet.DefaultUserId,
+                name: "TempAnimalReq",
+                species: PetSpeciesEnum.Cat,
+                breed: null,
+                color: null,
+                sex: null,
+                size: null,
+                approximateAge: null,
+                weight: null,
+                description: null,
+                isNeutered: null,
+                personality: null,
+                goodWithKids: null,
+                goodWithDogs: null,
+                goodWithCats: null,
+                isVaccinated: null,
+                needsSpecialCare: null,
+                specialCareDetails: null
+            );
+            var createJson = JsonConvert.SerializeObject(createModel);
+            var createResult = await _client.PostAsync(BaseUrl, new StringContent(createJson, Encoding.UTF8, MediaTypeNames.Application.Json));
+            var createdAnimal = JsonConvert.DeserializeObject<AdoptionAnimalViewModel>(await createResult.Content.ReadAsStringAsync());
+
+            // Arrange adoption request with invalid user id
+            var adoptionRequest = new AdoptionRequest
+            {
+                UserId = 999999,
+                Name = "John Doe",
+                PhoneNumber = "1234567890",
+                Address = "123 Main St",
+                HouseType = "House",
+                HasGarden = true,
+                LivesWith = "Family",
+                HasOtherPets = false,
+                PreviousExperience = "None"
+            };
+            var jsonModel = JsonConvert.SerializeObject(adoptionRequest);
+
+            // Act
+            var result = await _client.PutAsync($"{BaseUrl}/{createdAnimal!.Id}/adoptionrequest", new StringContent(jsonModel, Encoding.UTF8, MediaTypeNames.Application.Json));
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status404NotFound, (int)result.StatusCode);
+
+            // Cleanup
+            await _client.DeleteAsync($"{BaseUrl}/{createdAnimal.Id}");
+        }
+
+        [Fact]
+        public async Task ApproveAdoptionRequest_Returns_NotFound_With_Invalid_Id()
+        {
+            // Arrange
+            var invalidId = 999999;
+            var emptyContent = new StringContent(string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json);
+
+            // Act
+            var result = await _client.PutAsync($"{BaseUrl}/{invalidId}/approveadoptionrequest/{DefaultDataSet.DefaultUserId}", emptyContent);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status404NotFound, (int)result.StatusCode);
+        }
+
+        [Fact]
+        public async Task ApproveAdoptionRequest_Returns_NotFound_With_Invalid_AdopterId()
+        {
+            // Arrange - First create an animal
+            var createModel = new AdoptionAnimalCreateModel(
+                shelterId: DefaultDataSet.DefaultUserId,
+                name: "TempAnimalApp",
+                species: PetSpeciesEnum.Cat,
+                breed: null,
+                color: null,
+                sex: null,
+                size: null,
+                approximateAge: null,
+                weight: null,
+                description: null,
+                isNeutered: null,
+                personality: null,
+                goodWithKids: null,
+                goodWithDogs: null,
+                goodWithCats: null,
+                isVaccinated: null,
+                needsSpecialCare: null,
+                specialCareDetails: null
+            );
+            var createJson = JsonConvert.SerializeObject(createModel);
+            var createResult = await _client.PostAsync(BaseUrl, new StringContent(createJson, Encoding.UTF8, MediaTypeNames.Application.Json));
+            var createdAnimal = JsonConvert.DeserializeObject<AdoptionAnimalViewModel>(await createResult.Content.ReadAsStringAsync());
+
+            // Act
+            var emptyContent = new StringContent(string.Empty, Encoding.UTF8, MediaTypeNames.Application.Json);
+            var result = await _client.PutAsync($"{BaseUrl}/{createdAnimal!.Id}/approveadoptionrequest/999999", emptyContent);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(StatusCodes.Status404NotFound, (int)result.StatusCode);
 
             // Cleanup
             await _client.DeleteAsync($"{BaseUrl}/{createdAnimal.Id}");

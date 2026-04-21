@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using PetRadar.Common;
 using PetRadar.Core.Data.Entities;
+using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
 using PetRadar.Core.Helpers;
@@ -158,6 +159,35 @@ namespace PetRadar.Core.Domain
 
             int result = await _repo.SaveChangesAsync();
 
+            return result;
+        }
+        public async Task<int> AddAdoptionRequestAsync(AdoptionAnimalEntity animalDb, AdoptionRequest request, long createdByUserId, CancellationToken token)
+        {
+           if (animalDb.AdoptionRequests.Any(x => x.UserId == request.UserId))
+           {
+                throw new BadHttpRequestException("User has already submitted an adoption request for this animal.");
+           }
+
+            animalDb.AdoptionRequests.Add(request);
+            _repo.Update(animalDb);
+
+            int result = await _repo.SaveChangesAsync();
+            return result;
+        }
+        public async Task<int> ApproveAdoptionRequestAsync(AdoptionAnimalEntity animalDb, long adopterId, long modifiedByUserId, CancellationToken token)
+        {
+            var request = animalDb.AdoptionRequests.FirstOrDefault(x => x.UserId == adopterId);
+
+            if (request == null)
+            {
+                throw new BadHttpRequestException("Adoption request not found for the specified user.");
+            }
+            animalDb.AdopterId = adopterId;
+            animalDb.Status = AdoptionStatusEnum.Adopted;
+            animalDb.AdoptionDate = DateTime.UtcNow;
+            animalDb.UpdatedByUser(modifiedByUserId);
+            _repo.Update(animalDb);
+            int result = await _repo.SaveChangesAsync();
             return result;
         }
 
