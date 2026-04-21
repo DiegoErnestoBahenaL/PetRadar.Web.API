@@ -154,6 +154,67 @@ namespace PetRadar.Web.API.Controllers
             }
         }
 
+        [HttpPut("{id}/adoptionrequest")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Consumes(MediaTypeNames.Application.Json)]
+
+        public async Task<IActionResult> AddAdoptionRequest([FromRoute] long id, [FromBody] AdoptionRequest request, CancellationToken token)
+        {
+            var animalDb = await _domain.FindByIdAsync(id, token);
+
+            if (animalDb == default)
+                return NotFound(Constants.NotFoundProblemDetails);
+
+          
+            var adopterUser = await _userDomain.FindByIdAsync(request.UserId, token);
+
+            if (adopterUser == default)
+                return NotFound(Constants.NotFoundProblemDetails);
+            
+            try
+            {
+                await _domain.AddAdoptionRequestAsync(animalDb, request, UserJwt.Id, token);
+                return NoContent();
+            }
+            catch (BadHttpRequestException ex)
+            {
+                return BadRequest(Constants.BadRequestProblemDetails(ex.Message));
+            }
+        }
+        
+        [HttpPut("{id}/approveadoptionrequest/{adopterId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Consumes(MediaTypeNames.Application.Json)]
+        public async Task<IActionResult> ApproveAdoptionRequest([FromRoute] long id, [FromRoute] long adopterId, CancellationToken token)
+        {
+            var animalDb = await _domain.FindByIdAsync(id, token);
+
+            if (animalDb == default)
+                return NotFound(Constants.NotFoundProblemDetails);
+
+            var adopterUser = await _userDomain.FindByIdAsync(adopterId, token);
+
+            if (adopterUser == default)
+                return NotFound(Constants.NotFoundProblemDetails);
+
+            if (animalDb.ShelterId != UserJwt.Id)
+                return BadRequest(Constants.BadRequestProblemDetails("Only the shelter that owns the animal can approve adoption requests."));
+
+            try
+            {
+                await _domain.ApproveAdoptionRequestAsync(animalDb, adopterId, UserJwt.Id, token);
+                return NoContent();
+            }
+            catch (BadHttpRequestException ex)
+            {
+                return BadRequest(Constants.BadRequestProblemDetails(ex.Message));
+            }
+        }
+
         [HttpGet("{id}/additionalphotos")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
