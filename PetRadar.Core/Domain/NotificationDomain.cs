@@ -1,6 +1,7 @@
 using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
+using PetRadar.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +13,12 @@ namespace PetRadar.Core.Domain
     public class NotificationDomain : INotificationDomain
     {
         private readonly INotificationRepository _repo;
+        private readonly IPushNotificationService _pushService;
 
-        public NotificationDomain(INotificationRepository repo)
+        public NotificationDomain(INotificationRepository repo, IPushNotificationService pushService)
         {
             _repo = repo;
+            _pushService = pushService;
         }
 
         public Task<List<NotificationEntity>> GetAllAsync(CancellationToken token)
@@ -52,6 +55,13 @@ namespace PetRadar.Core.Domain
 
             await _repo.AddAsync(notificationDb);
             await _repo.SaveChangesAsync();
+
+            await _pushService.SendToUserAsync(
+                notificationDb.UserId,
+                notificationDb.Title,
+                notificationDb.Message,
+                token);
+
             return notificationDb;
         }
 
