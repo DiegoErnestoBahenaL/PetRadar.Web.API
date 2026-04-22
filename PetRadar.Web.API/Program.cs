@@ -138,7 +138,11 @@ static void InitializeFirebase(WebApplicationBuilder builder)
     if (FirebaseApp.DefaultInstance != null)
         return;
 
-    var json = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS_JSON");
+    string? json = null;
+
+    var base64 = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS_JSON_BASE64");
+    if (!string.IsNullOrWhiteSpace(base64))
+        json = Encoding.UTF8.GetString(Convert.FromBase64String(base64));
 
     if (string.IsNullOrWhiteSpace(json))
     {
@@ -149,7 +153,7 @@ static void InitializeFirebase(WebApplicationBuilder builder)
 
     if (string.IsNullOrWhiteSpace(json))
         throw new InvalidOperationException(
-            "Firebase credentials not configured. Set FIREBASE_CREDENTIALS_JSON env var (deployed) " +
+            "Firebase credentials not configured. Set FIREBASE_CREDENTIALS_JSON_BASE64 env var (deployed) " +
             "or Firebase:CredentialsPath in appsettings (local).");
 
     FirebaseApp.Create(new AppOptions
