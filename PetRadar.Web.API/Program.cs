@@ -29,6 +29,7 @@ builder.Services.AddSingleton<IPasswordHelper, PasswordHelper>();
 builder.Services.AddSingleton<IFileHelperService, FileHelperService>();
 builder.Services.AddSingleton<IEmailHelperService, EmailHelperService>();
 builder.Services.AddSingleton<IPetRadarProcessingHelperService, PetRadarProcessingHelperService>();
+builder.Services.AddScoped<IPushNotificationService, FcmPushNotificationService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserPetRepository, UserPetRepository>();

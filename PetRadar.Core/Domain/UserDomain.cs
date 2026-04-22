@@ -166,6 +166,15 @@ namespace PetRadar.Core.Domain
             int result = await _repo.SaveChangesAsync();
             return result;
         }
+        public async Task<int> UpdateFcmTokenAsync(UserEntity userdb, string? fcmToken, long modifiedByUserId, CancellationToken token)
+        {
+            userdb.FcmToken = string.IsNullOrWhiteSpace(fcmToken) ? null : fcmToken;
+            userdb.UpdatedByUser(modifiedByUserId);
+            _repo.Update(userdb);
+
+            return await _repo.SaveChangesAsync();
+        }
+
         public async Task<int> UpdateProfilePictureAsync(UserEntity userdb, IFormFile file, long modifiedByUserId, CancellationToken token)
         {
 

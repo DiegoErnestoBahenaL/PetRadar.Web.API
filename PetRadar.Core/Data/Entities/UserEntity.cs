@@ -52,6 +52,9 @@ namespace PetRadar.Core.Data.Entities
         [Required]
         public bool EmailVerified  { get; set; } = false;
 
+        [StringLength(maximumLength: 4096)]
+        public string? FcmToken { get; set; } = null;
+
         public UserEntity() { }
 
         public UserEntity(string email, byte[] password, byte[] salt, string name, string? lastName, string? phoneNumber, 
