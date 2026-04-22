@@ -416,3 +416,7 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Firebase service account credentials (loaded via FIREBASE_CREDENTIALS_JSON env var in deployed envs)
+**/petradar-*-firebase-adminsdk-*.json
+**/firebase-adminsdk-*.json

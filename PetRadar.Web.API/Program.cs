@@ -1,3 +1,5 @@
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,6 +18,8 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+InitializeFirebase(builder);
 
 builder.Services.AddHttpClient();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -128,6 +132,31 @@ app.MapHealthChecks("/api/health");
 
 app.Run();
 
+
+static void InitializeFirebase(WebApplicationBuilder builder)
+{
+    if (FirebaseApp.DefaultInstance != null)
+        return;
+
+    var json = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS_JSON");
+
+    if (string.IsNullOrWhiteSpace(json))
+    {
+        var localPath = builder.Configuration["Firebase:CredentialsPath"];
+        if (!string.IsNullOrWhiteSpace(localPath) && File.Exists(localPath))
+            json = File.ReadAllText(localPath);
+    }
+
+    if (string.IsNullOrWhiteSpace(json))
+        throw new InvalidOperationException(
+            "Firebase credentials not configured. Set FIREBASE_CREDENTIALS_JSON env var (deployed) " +
+            "or Firebase:CredentialsPath in appsettings (local).");
+
+    FirebaseApp.Create(new AppOptions
+    {
+        Credential = GoogleCredential.FromJson(json)
+    });
+}
 
 // This public partial class is used in order to make integration testing possible
 // by implicitly exposing the Program class
