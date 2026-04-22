@@ -17,5 +17,7 @@ namespace PetRadar.Core.Data.Entities
         public string LivesWith { get; set; } = string.Empty;
         public bool HasOtherPets { get; set; } = false;
         public string PreviousExperience { get; set; } = string.Empty;
+        public string Motivations { get; set; } = string.Empty;
+        public string AdditionalComments { get; set; } = string.Empty;
     }
 }
