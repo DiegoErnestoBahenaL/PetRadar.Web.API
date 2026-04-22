@@ -71,7 +71,7 @@ namespace PetRadar.Core.Domain
             await _repo.SaveChangesAsync();
 
             string matchMessage = "Has recibido un nuevo mensaje sobre la mascota reportada";
-            string adoptionMessage = "Has recibido un nuevo mensaje sobre la mascota en adopción";
+            string adoptionMessage = "Has recibido un nuevo mensaje sobre la mascota en adopcion";
 
             string messageBody = string.Empty;
 
@@ -89,7 +89,7 @@ namespace PetRadar.Core.Domain
                  new NotificationCreateModel(
                      message.RecipientId,
                      NotificationTypeEnum.Message,
-                     "¡Tienes un nuevo mensaje!",
+                     "Tienes un nuevo mensaje!",
                      messageBody,
                      null,
                      null),
