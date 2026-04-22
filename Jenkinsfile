@@ -61,11 +61,14 @@ pipeline {
         stage('Deploy stack QA') {
             when { expression { env.BRANCH_NAME == 'QA' } }
             steps {
-                sh '''
-                    set -e
-                    cd ${PROJECT_ROOT}
-                    DOCKER_BUILDKIT=${DOCKER_BUILDKIT} docker compose -f ${COMPOSE_FILE} up -d
-                '''
+                withCredentials([string(credentialsId: 'firebaseCredentialsJson', variable: 'FIREBASE_CREDENTIALS_JSON')]) {
+                    sh '''
+                        set -e
+                        cd ${PROJECT_ROOT}
+                        DOCKER_BUILDKIT=${DOCKER_BUILDKIT} FIREBASE_CREDENTIALS_JSON="${FIREBASE_CREDENTIALS_JSON}" \
+                            docker compose -f ${COMPOSE_FILE} up -d
+                    '''
+                }
             }
         }
     }
