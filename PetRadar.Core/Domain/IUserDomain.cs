@@ -20,6 +20,7 @@ namespace PetRadar.Core.Domain
         Task<int> UpdateAsync(UserEntity userdb, UserUpdateModel user, long modifiedByUserId, CancellationToken token);
         Task<int> VerifyEmailAsync(UserEntity userdb, long modifiedByUserId);
         Task<int> UpdateProfilePictureAsync(UserEntity userdb, IFormFile file, long modifiedByUserId, CancellationToken token);
+        Task<int> UpdateFcmTokenAsync(UserEntity userdb, string? fcmToken, long modifiedByUserId, CancellationToken token);
         Task<int> DeleteAsync(UserEntity user, long modifiedByUserId, CancellationToken token);
     }
 }

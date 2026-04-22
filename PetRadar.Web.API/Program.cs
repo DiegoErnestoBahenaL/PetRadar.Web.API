@@ -1,3 +1,5 @@
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -17,6 +19,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+InitializeFirebase(builder);
+
 builder.Services.AddHttpClient();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
@@ -25,6 +29,7 @@ builder.Services.AddSingleton<IPasswordHelper, PasswordHelper>();
 builder.Services.AddSingleton<IFileHelperService, FileHelperService>();
 builder.Services.AddSingleton<IEmailHelperService, EmailHelperService>();
 builder.Services.AddSingleton<IPetRadarProcessingHelperService, PetRadarProcessingHelperService>();
+builder.Services.AddScoped<IPushNotificationService, FcmPushNotificationService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserPetRepository, UserPetRepository>();
@@ -128,6 +133,35 @@ app.MapHealthChecks("/api/health");
 
 app.Run();
 
+
+static void InitializeFirebase(WebApplicationBuilder builder)
+{
+    if (FirebaseApp.DefaultInstance != null)
+        return;
+
+    string? json = null;
+
+    var base64 = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS_JSON_BASE64");
+    if (!string.IsNullOrWhiteSpace(base64))
+        json = Encoding.UTF8.GetString(Convert.FromBase64String(base64));
+
+    if (string.IsNullOrWhiteSpace(json))
+    {
+        var localPath = builder.Configuration["Firebase:CredentialsPath"];
+        if (!string.IsNullOrWhiteSpace(localPath) && File.Exists(localPath))
+            json = File.ReadAllText(localPath);
+    }
+
+    if (string.IsNullOrWhiteSpace(json))
+        throw new InvalidOperationException(
+            "Firebase credentials not configured. Set FIREBASE_CREDENTIALS_JSON_BASE64 env var (deployed) " +
+            "or Firebase:CredentialsPath in appsettings (local).");
+
+    FirebaseApp.Create(new AppOptions
+    {
+        Credential = GoogleCredential.FromJson(json)
+    });
+}
 
 // This public partial class is used in order to make integration testing possible
 // by implicitly exposing the Program class

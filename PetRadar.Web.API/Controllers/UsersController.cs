@@ -165,6 +165,21 @@ namespace PetRadar.Web.API.Controllers
             return NoContent();
         }
 
+        [HttpPut("{id}/fcm-token")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Consumes(MediaTypeNames.Application.Json)]
+        public async Task<IActionResult> UpdateFcmToken([FromRoute] long id, [FromBody] FcmTokenUpdateModel body, CancellationToken token)
+        {
+            var userdb = await _domain.FindByIdAsync(id, token);
+
+            if (userdb == default)
+                return NotFound(Constants.NotFoundProblemDetails);
+
+            await _domain.UpdateFcmTokenAsync(userdb, body.FcmToken, UserJwt.Id, token);
+            return NoContent();
+        }
+
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

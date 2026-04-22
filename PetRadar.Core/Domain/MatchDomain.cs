@@ -15,11 +15,13 @@ namespace PetRadar.Core.Domain
     {
         private readonly IMatchRepository _repo;
         private readonly IReportRepository _reportRepo;
+        private readonly INotificationDomain _notificationDomain;   
 
-        public MatchDomain(IMatchRepository repo, IReportRepository reportRepo)
+        public MatchDomain(IMatchRepository repo, IReportRepository reportRepo, INotificationDomain notificationDomain)
         {
             _repo = repo;
             _reportRepo = reportRepo;
+            _notificationDomain = notificationDomain;
         }
 
         public Task<List<MatchEntity>> GetAllAsync(CancellationToken token)
@@ -253,7 +255,25 @@ namespace PetRadar.Core.Domain
                     matchToCreate.UpdatedByUser(Constants.SuperAdminId);
 
                     await _repo.AddAsync(matchToCreate);
+
+
+
+
                 }
+            }
+            if (possibleMatches.Any())
+            {
+                // Create a notification for the user about the new match
+                await _notificationDomain.CreateAsync(
+                     new NotificationCreateModel(
+                         reportCreated.UserId,
+                         NotificationTypeEnum.Match,
+                         "¡Nuevo match encontrado!",
+                         "Un nuevo match se ha generado a partir de tu reporte.",
+                         null,
+                         null),
+                     Constants.SuperAdminId,
+                 token);
             }
 
             return await _repo.SaveChangesAsync();
