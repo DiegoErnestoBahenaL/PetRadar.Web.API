@@ -86,8 +86,7 @@ namespace PetRadar.Web.API.Controllers
 
             var messages = await _domain.GetAllByMatchIdConversationAsync(matchId, recipientId, senderId, token);
 
-            if (messages == default)
-                return NotFound(Constants.NotFoundProblemDetails);
+
             return Ok(MessageViewModel.FromList(messages));
         }
 
@@ -115,8 +114,7 @@ namespace PetRadar.Web.API.Controllers
 
             var messages = await _domain.GetAllByAdoptionAnimalIdConversationAsync(adoptionAnimalId, recipientId, senderId, token);
 
-            if (messages == default)
-                return NotFound(Constants.NotFoundProblemDetails);
+           
             return Ok(MessageViewModel.FromList(messages));
         }
 
