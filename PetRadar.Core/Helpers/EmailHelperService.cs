@@ -40,5 +40,23 @@ namespace PetRadar.Core.Helpers
             return await client.ExecuteAsync(request);
 
         }
+        public async Task<RestResponse> SendMatchFoundEmail(UserEntity user)
+        {
+            var options = new RestClientOptions("https://api.mailgun.net")
+            {
+                Authenticator = new HttpBasicAuthenticator("api", _apiKey)
+            };
+
+            var client = new RestClient(options);
+            var request = new RestRequest("/v3/petradar-qa.org/messages", Method.Post);
+            request.AlwaysMultipartFormData = false;
+
+            request.AddParameter("from", "PetRadar <noreply@petradar-qa.org>");
+            request.AddParameter("to", user.Email);
+            request.AddParameter("subject", $"Actualización de reporte para {user.Name} {user.LastName}");
+            request.AddParameter("text", $"El reporte que subiste ha hecho match con otro reporte en nuestro sistema. Ingresa a la aplicación para revisarlo.");
+            return await client.ExecuteAsync(request);
+
+        }
     }
 }

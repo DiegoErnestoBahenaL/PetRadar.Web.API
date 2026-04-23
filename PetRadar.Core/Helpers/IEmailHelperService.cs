@@ -11,5 +11,6 @@ namespace PetRadar.Core.Helpers
     public interface IEmailHelperService
     {
         Task<RestResponse> SendVerificationEmail(UserEntity user, string token);
+        Task<RestResponse> SendMatchFoundEmail(UserEntity user);
     }
 }
