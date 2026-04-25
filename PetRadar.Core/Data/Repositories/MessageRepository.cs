@@ -39,14 +39,16 @@ namespace PetRadar.Core.Data.Repositories
         public Task<List<MessageEntity>> GetAllByMatchIdConversationAsync(long matchId, long recipientId, long senderId, CancellationToken token)
         {
             var query = ConstructQuery()
-                .Where(x => x.IsActive == true && x.MatchId == matchId && x.RecipientId == recipientId && x.SenderId == senderId);
+                .Where(x => x.IsActive == true && x.MatchId == matchId && 
+                ((x.RecipientId == recipientId && x.SenderId == senderId) || (x.RecipientId == senderId && x.SenderId == recipientId)));
             return query.ToListAsync(token);
         }
 
         public Task<List<MessageEntity>> GetAllByAdoptionAnimalIdConversationAsync(long adoptionAnimalId, long recipientId, long senderId, CancellationToken token)
         {
             var query = ConstructQuery()
-                .Where(x => x.IsActive == true && x.AdoptionAnimalId == adoptionAnimalId && x.RecipientId == recipientId && x.SenderId == senderId);
+                .Where(x => x.IsActive == true && x.AdoptionAnimalId == adoptionAnimalId && 
+                ((x.RecipientId == recipientId && x.SenderId == senderId) || (x.RecipientId == senderId && x.SenderId == recipientId)));
             return query.ToListAsync(token);
         }
 

@@ -1,4 +1,6 @@
+using PetRadar.Common;
 using PetRadar.Core.Data.Entities;
+using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
 using System;
@@ -12,10 +14,12 @@ namespace PetRadar.Core.Domain
     public class MessageDomain : IMessageDomain
     {
         private readonly IMessageRepository _repo;
+        private readonly INotificationDomain _notificationDomain;
 
-        public MessageDomain(IMessageRepository repo)
+        public MessageDomain(IMessageRepository repo, INotificationDomain notificationDomain)
         {
             _repo = repo;
+            _notificationDomain = notificationDomain;
         }
 
         public Task<List<MessageEntity>> GetAllAsync(CancellationToken token)
@@ -65,6 +69,33 @@ namespace PetRadar.Core.Domain
 
             await _repo.AddAsync(messageDb);
             await _repo.SaveChangesAsync();
+
+            string matchMessage = "Has recibido un nuevo mensaje sobre la mascota reportada";
+            string adoptionMessage = "Has recibido un nuevo mensaje sobre la mascota en adopcion";
+
+            string messageBody = string.Empty;
+
+            if (messageDb.MatchId != null)
+            {
+                messageBody = matchMessage;
+            }
+            else if (adoptionMessage != null)
+            {
+                messageBody = adoptionMessage;
+            }
+
+            // Create a notification for the user about the new message
+            await _notificationDomain.CreateAsync(
+                 new NotificationCreateModel(
+                     message.RecipientId,
+                     NotificationTypeEnum.Message,
+                     "Tienes un nuevo mensaje!",
+                     messageBody,
+                     null,
+                     null),
+                 Constants.SuperAdminId,
+            token);
+
             return messageDb;
         }
 

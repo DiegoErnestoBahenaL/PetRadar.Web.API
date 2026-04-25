@@ -3,6 +3,7 @@ using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
+using PetRadar.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,13 +16,16 @@ namespace PetRadar.Core.Domain
     {
         private readonly IMatchRepository _repo;
         private readonly IReportRepository _reportRepo;
+        private readonly IUserRepository _userRepo;
         private readonly INotificationDomain _notificationDomain;   
-
-        public MatchDomain(IMatchRepository repo, IReportRepository reportRepo, INotificationDomain notificationDomain)
+        private readonly IEmailHelperService _emailHelperService;
+        public MatchDomain(IMatchRepository repo, IReportRepository reportRepo, INotificationDomain notificationDomain, IEmailHelperService emailHelperService, IUserRepository userRepo)
         {
             _repo = repo;
             _reportRepo = reportRepo;
             _notificationDomain = notificationDomain;
+            _emailHelperService = emailHelperService;
+            _userRepo = userRepo;
         }
 
         public Task<List<MatchEntity>> GetAllAsync(CancellationToken token)
@@ -268,12 +272,16 @@ namespace PetRadar.Core.Domain
                      new NotificationCreateModel(
                          reportCreated.UserId,
                          NotificationTypeEnum.Match,
-                         "¡Nuevo match encontrado!",
+                         "Nuevo match encontrado!",
                          "Un nuevo match se ha generado a partir de tu reporte.",
                          null,
                          null),
                      Constants.SuperAdminId,
                  token);
+
+                var user = await _userRepo.FindByIdAsync(reportCreated.UserId, token);
+
+                await _emailHelperService.SendMatchFoundEmail(user);
             }
 
             return await _repo.SaveChangesAsync();
