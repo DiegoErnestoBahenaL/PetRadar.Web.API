@@ -20,6 +20,8 @@ namespace PetRadar.Common
 
         public const string ImagesDirectoryName = "Images";
 
+        public const string DbBackupsDirectoryName = "DbBackups";
+
         public const string AdditionalPhotosDirectoryName = "AdditionalPhotos";
 
         public const string SecuredDirectoryName = "Secured";
