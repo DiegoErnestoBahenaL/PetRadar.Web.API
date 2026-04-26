@@ -119,5 +119,35 @@ namespace PetRadar.Core.Helpers.PetRadarProcessing
             // Spanish (Mexican context) before handing the response back.
             return BreedTranslationHelper.TranslateCharacteristicsResponse(species, characteristics);
         }
+
+        public async Task<ConfigsResponse> GetConfigs()
+        {
+            using var response = await _httpClient.GetAsync("/configs", CancellationToken.None);
+            var body = await response.Content.ReadAsStringAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorResponse = JsonConvert.DeserializeObject<HttpExceptionResponse>(body);
+                throw new HttpRequestException($"Error calling PetRadarProcessing API: {response.StatusCode}, Body: {errorResponse.Detail}");
+            }
+            return JsonConvert.DeserializeObject<ConfigsResponse>(body);
+        }
+
+
+        public async Task<UpdateConfigsResponse> UpdateConfigs(string yoloConfThreshold, string topKBreedPrediction)
+        {
+            using var response = await _httpClient
+                .PutAsync($"/configs?yolo_conf_threshold={yoloConfThreshold}&&top_k_breed_predictions={topKBreedPrediction}", new StringContent(string.Empty), CancellationToken.None);
+           
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                var errorResponse = JsonConvert.DeserializeObject<HttpExceptionResponse>(body);
+                throw new HttpRequestException($"Error calling PetRadarProcessing API: {response.StatusCode}, Body: {errorResponse.Detail}");
+            }
+            var updateResponse = JsonConvert.DeserializeObject<UpdateConfigsResponse>(await response.Content.ReadAsStringAsync());
+            
+            return updateResponse;
+        }
+
     }
 }
