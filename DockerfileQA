@@ -5,7 +5,7 @@ EXPOSE 8080
 
 # Install postgresql-client to enable pg_dump backups
 RUN apt-get update \
-    && apt-get install -y postgresql-client \
+    && apt-get install -y postgresql-client-18 \
     && rm -rf /var/lib/apt/lists/*
 
 # Etapa de build
