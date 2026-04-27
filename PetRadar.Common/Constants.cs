@@ -20,12 +20,15 @@ namespace PetRadar.Common
 
         public const string ImagesDirectoryName = "Images";
 
+        public const string DbBackupsDirectoryName = "DbBackups";
+
         public const string AdditionalPhotosDirectoryName = "AdditionalPhotos";
 
         public const string SecuredDirectoryName = "Secured";
 
         public const string MediaTypeNamesImagePng = "image/png";
 
+        public const string TopBreedPredictionsConfidenceConfigKey = "TopBreedPredictionsConfidenceTreshold";
 
         #region Exception messages
 

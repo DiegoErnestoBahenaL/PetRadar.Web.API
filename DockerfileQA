@@ -3,6 +3,11 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy-arm64v8 AS base
 WORKDIR /app
 EXPOSE 8080
 
+# Install postgresql-client to enable pg_dump backups
+RUN apt-get update \
+    && apt-get install -y postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
 # Etapa de build
 FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy-arm64v8 AS build
 WORKDIR /src

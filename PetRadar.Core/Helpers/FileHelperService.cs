@@ -22,6 +22,28 @@ namespace PetRadar.Core.Helpers
             _hostEnv = hostEnv;
         }
 
+        public string GetImagesDirectoryPath()
+        {
+            string workingDirectory = _hostEnv.ContentRootPath;
+            string imagesDirectoryPath = Path.Combine(workingDirectory, Constants.SecuredDirectoryName, Constants.ImagesDirectoryName);
+            if (!Directory.Exists(imagesDirectoryPath))
+            {
+                Directory.CreateDirectory(imagesDirectoryPath);
+            }
+            return imagesDirectoryPath;
+        }
+
+        public string GetDbBackupsDirectoryPath()
+        {
+            string workingDirectory = _hostEnv.ContentRootPath;
+            string backupsDirectoryPath = Path.Combine(workingDirectory, Constants.SecuredDirectoryName, Constants.DbBackupsDirectoryName);
+            if (!Directory.Exists(backupsDirectoryPath))
+            {
+                Directory.CreateDirectory(backupsDirectoryPath);
+            }
+            return backupsDirectoryPath;
+        }
+
         public string GetImagePath(string relativePath)
         {
             string workingDirectory = _hostEnv.ContentRootPath;
