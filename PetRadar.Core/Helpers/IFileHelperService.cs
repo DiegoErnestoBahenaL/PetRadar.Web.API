@@ -11,6 +11,8 @@ namespace PetRadar.Core.Helpers
     public interface IFileHelperService
     {
         string GetImagePath(string relativePath);
+        string GetDbBackupsDirectoryPath();
+        string GetImagesDirectoryPath();
         Task<string> SaveImage(IFormFile image);
         void DeleteImage(string imagePath, ILogger logger);
         Task<string?> SaveImagesInGallery(List<IFormFile> images, string? guid);

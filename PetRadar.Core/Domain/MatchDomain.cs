@@ -19,13 +19,17 @@ namespace PetRadar.Core.Domain
         private readonly IUserRepository _userRepo;
         private readonly INotificationDomain _notificationDomain;   
         private readonly IEmailHelperService _emailHelperService;
-        public MatchDomain(IMatchRepository repo, IReportRepository reportRepo, INotificationDomain notificationDomain, IEmailHelperService emailHelperService, IUserRepository userRepo)
+        private readonly ISystemConfigDomain _configService;
+        public MatchDomain(IMatchRepository repo, IReportRepository reportRepo, 
+            INotificationDomain notificationDomain, IEmailHelperService emailHelperService,
+            IUserRepository userRepo, ISystemConfigDomain configService)
         {
             _repo = repo;
             _reportRepo = reportRepo;
             _notificationDomain = notificationDomain;
             _emailHelperService = emailHelperService;
             _userRepo = userRepo;
+            _configService = configService;
         }
 
         public Task<List<MatchEntity>> GetAllAsync(CancellationToken token)
@@ -142,18 +146,25 @@ namespace PetRadar.Core.Domain
             }
 
             var possibleMatches = reports.Where(x => x.ImageAnalysisResult != null);
+            var config = await _configService.FindByKeyAsync(Constants.TopBreedPredictionsConfidenceConfigKey, token);
+
+            decimal confidenceTreshold = 0.1m; // Default value
+            if (config != null && decimal.TryParse(config.Value, System.Globalization.CultureInfo.InvariantCulture, out var parsedValue))
+            {
+                confidenceTreshold = parsedValue;
+            }
 
             // For now, we will just look at the top predicted breed and breeds
-            // with confidence > 0.1 in the top predictions for both reports.
+            // with confidence > confidenceTreshold in the top predictions for both reports.
             possibleMatches = possibleMatches.Where(
                 x => x.ImageAnalysisResult.TopPredictedBreed == reportCreated.ImageAnalysisResult.TopPredictedBreed ||
                 reportCreated.ImageAnalysisResult.TopPredictions
-                    .Any(y => y.Breed == x.ImageAnalysisResult.TopPredictedBreed && y.Confidence > 0.1M) ||
+                    .Any(y => y.Breed == x.ImageAnalysisResult.TopPredictedBreed && y.Confidence > confidenceTreshold) ||
                 x.ImageAnalysisResult.TopPredictions    
-                    .Any(y => y.Breed == reportCreated.ImageAnalysisResult.TopPredictedBreed && y.Confidence > 0.1M) ||
+                    .Any(y => y.Breed == reportCreated.ImageAnalysisResult.TopPredictedBreed && y.Confidence > confidenceTreshold) ||
                 x.ImageAnalysisResult.TopPredictions
                     .Any(y => reportCreated.ImageAnalysisResult.TopPredictions
-                        .Any(z => z.Breed == y.Breed && z.Confidence > 0.1M))
+                        .Any(z => z.Breed == y.Breed && z.Confidence > confidenceTreshold))
             );
 
             // For now, we will also look at color matches.
@@ -183,15 +194,15 @@ namespace PetRadar.Core.Domain
                 if (possibleMatch.ImageAnalysisResult.TopPredictedBreed == reportCreated.ImageAnalysisResult.TopPredictedBreed)
                     score += 0.35;
                 else if (reportCreated.ImageAnalysisResult.TopPredictions
-                    .Any(y => y.Breed == possibleMatch.ImageAnalysisResult.TopPredictedBreed && y.Confidence > 0.1M))
+                    .Any(y => y.Breed == possibleMatch.ImageAnalysisResult.TopPredictedBreed && y.Confidence > confidenceTreshold))
                     score += 0.3;
                 else if
                     (possibleMatch.ImageAnalysisResult.TopPredictions
-                    .Any(y => y.Breed == reportCreated.ImageAnalysisResult.TopPredictedBreed && y.Confidence > 0.1M))
+                    .Any(y => y.Breed == reportCreated.ImageAnalysisResult.TopPredictedBreed && y.Confidence > confidenceTreshold))
                     score += 0.25;
                 else if (possibleMatch.ImageAnalysisResult.TopPredictions
                     .Any(y => reportCreated.ImageAnalysisResult.TopPredictions
-                        .Any(z => z.Breed == y.Breed && z.Confidence > 0.1M)))
+                        .Any(z => z.Breed == y.Breed && z.Confidence > confidenceTreshold)))
                     score += 0.2;
 
 

@@ -31,6 +31,7 @@ builder.Services.AddSingleton<IEmailHelperService, EmailHelperService>();
 builder.Services.AddSingleton<IPetRadarProcessingHelperService, PetRadarProcessingHelperService>();
 builder.Services.AddScoped<IPushNotificationService, FcmPushNotificationService>();
 
+builder.Services.AddScoped<ISystemConfigRepository, SystemConfigRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserPetRepository, UserPetRepository>();
 builder.Services.AddScoped<IVeterinaryAppointmentRepository, VeterinaryAppointmentRepository>();
@@ -40,6 +41,7 @@ builder.Services.AddScoped<IMatchRepository, MatchRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
+builder.Services.AddScoped<ISystemConfigDomain, SystemConfigDomain>();
 builder.Services.AddScoped<IUserDomain, UserDomain>();
 builder.Services.AddScoped<IUserPetDomain, UserPetDomain>();
 builder.Services.AddScoped<IVeterinaryAppointmentDomain, VeterinaryAppointmentDomain>();

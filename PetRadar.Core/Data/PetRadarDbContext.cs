@@ -23,6 +23,7 @@ namespace PetRadar.Core.Data
         public DbSet<MatchEntity> Matches { get; set; }
         public DbSet<MessageEntity> Messages { get; set; }
         public DbSet<NotificationEntity> Notifications { get; set; }
+        public DbSet<SystemConfigEntity> SystemConfigs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -129,6 +130,13 @@ namespace PetRadar.Core.Data
                         UpdatedAt = Constants.SuperAdminCreatedAt
                     }
                 );
+
+            modelBuilder.Entity<SystemConfigEntity>()
+                .HasData(new SystemConfigEntity(Constants.TopBreedPredictionsConfidenceConfigKey, "0.1")
+                {
+                        Id = 1,
+                        IsActive = true
+                });
         }
     }
 }
