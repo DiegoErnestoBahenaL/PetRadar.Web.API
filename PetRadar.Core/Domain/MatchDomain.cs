@@ -270,11 +270,23 @@ namespace PetRadar.Core.Domain
                     matchToCreate.UpdatedByUser(Constants.SuperAdminId);
 
                     await _repo.AddAsync(matchToCreate);
-
-
-
-
                 }
+
+                //Create notification for the user whose report is matching with the new report
+                await _notificationDomain.CreateAsync(
+                    new NotificationCreateModel(
+                          possibleMatch.UserId,
+                          NotificationTypeEnum.Match,
+                          "Nuevo match encontrado!",
+                          "Un nuevo match se ha generado a partir del reporte de un usuario.",
+                          null,
+                          null),
+                    Constants.SuperAdminId,
+                token);
+
+                var possibleMatchUser = await _userRepo.FindByIdAsync(possibleMatch.UserId, token);
+
+                await _emailHelperService.SendMatchFoundEmail(possibleMatchUser);
             }
             if (possibleMatches.Any())
             {
