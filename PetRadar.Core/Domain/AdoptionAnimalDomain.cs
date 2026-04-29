@@ -21,13 +21,15 @@ namespace PetRadar.Core.Domain
         private readonly IFileHelperService _fileHelperService;
         private readonly ILogger<AdoptionAnimalDomain> _logger;
         private readonly IPetRadarProcessingHelperService _processingHelperService;
+        private readonly INotificationDomain _notificationDomain;
 
-        public AdoptionAnimalDomain(IAdoptionAnimalRepository repo, IFileHelperService fileHelperService, ILogger<AdoptionAnimalDomain> logger, IPetRadarProcessingHelperService processingHelperService)
+        public AdoptionAnimalDomain(IAdoptionAnimalRepository repo, IFileHelperService fileHelperService, ILogger<AdoptionAnimalDomain> logger, IPetRadarProcessingHelperService processingHelperService, INotificationDomain notificationDomain)
         {
             _repo = repo;
             _fileHelperService = fileHelperService;
             _logger = logger;
             _processingHelperService = processingHelperService;
+            _notificationDomain = notificationDomain;
         }
 
         public Task<List<AdoptionAnimalEntity>> GetAllAsync(CancellationToken token)
@@ -172,6 +174,16 @@ namespace PetRadar.Core.Domain
             _repo.Update(animalDb);
 
             int result = await _repo.SaveChangesAsync();
+
+            await _notificationDomain.CreateAsync(new NotificationCreateModel(
+                animalDb.ShelterId, 
+                NotificationTypeEnum.Adoption,
+                "Nueva solicitud de adopcion!",
+                "Tienes una nueva solicitud de adopcion para " + animalDb.Name + " revisa los detalles en la seccion de adopciones.",
+                null,
+                null
+                ), Constants.SuperAdminId, token);
+
             return result;
         }
         public async Task<int> ApproveAdoptionRequestAsync(AdoptionAnimalEntity animalDb, long adopterId, long modifiedByUserId, CancellationToken token)
