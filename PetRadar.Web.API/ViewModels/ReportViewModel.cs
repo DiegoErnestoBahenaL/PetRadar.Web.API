@@ -1,4 +1,5 @@
 using PetRadar.Core.Data.Entities;
+using PetRadar.Core.Helpers.PetRadarProcessing;
 
 namespace PetRadar.Web.API.ViewModels
 {
@@ -35,6 +36,7 @@ namespace PetRadar.Web.API.ViewModels
         public bool OffersReward { get; set; }
         public decimal? RewardAmount { get; set; }
         public int Views { get; set; }
+        public CharacteristicsResponse? ImageAnalysisResult { get; set; }
 
         public ReportViewModel() { }
 
@@ -71,6 +73,7 @@ namespace PetRadar.Web.API.ViewModels
             OffersReward = entity.OffersReward;
             RewardAmount = entity.RewardAmount;
             Views = entity.Views;
+            ImageAnalysisResult = entity.ImageAnalysisResult;
         }
 
         public static List<ReportViewModel> FromList(List<ReportEntity> entities)
