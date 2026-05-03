@@ -27,7 +27,8 @@ namespace PetRadar.Core.Data.Repositories
             var query = ConstructQuery()
                 .Include(x => x.LostReport)
                 .Include(x => x.StrayReport)
-                .Where(x => x.IsActive == true && (x.LostReport.UserId == userId || x.StrayReport.UserId == userId));
+                .Where(x => x.IsActive == true && (x.LostReport.UserId == userId || x.StrayReport.UserId == userId) 
+                    && x.Status != Entities.Enums.MatchStatusEnum.Dismissed);
             return query.ToListAsync(token);
         }
 

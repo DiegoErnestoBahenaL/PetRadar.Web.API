@@ -130,10 +130,14 @@ namespace PetRadar.Core.Domain
             if (reportCreated.ReportType == ReportTypeEnum.Lost)
             {
                 reports = await _reportRepo.GetAllByStrayReportTypeAsync(reportCreated.Species, token);
+                // We will only consider active reports for matching
+                reports = reports.Where(r => r.ReportStatus == ReportStatusEnum.Active).ToList();
             }
             else if (reportCreated.ReportType == ReportTypeEnum.Stray)
             {
                 reports = await _reportRepo.GetAllByLostReportTypeAsync(reportCreated.Species, token);
+                // We will only consider active reports for matching
+                reports = reports.Where(r => r.ReportStatus == ReportStatusEnum.Active).ToList();
             }
             else
             {
