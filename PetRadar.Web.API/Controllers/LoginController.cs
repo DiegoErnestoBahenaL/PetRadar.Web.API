@@ -132,7 +132,7 @@ namespace PetRadar.Web.API.Controllers
                 return BadRequest(Constants.BadRequestProblemDetails(HttpStatusCode.BadRequest.ToString()));
             }
 
-            var resultSuccessful = await _userDomain.RecoverPasswordAsync(userDb, UserJwt.Id, cancellationToken);
+            var resultSuccessful = await _userDomain.RecoverPasswordAsync(userDb, Common.Constants.SuperAdminId, cancellationToken);
 
             if (!resultSuccessful)
             {
