@@ -10,5 +10,6 @@ namespace PetRadar.Core.Helpers
     {
         byte[] GenerateHash(string password, byte[] salt);
         byte[] GenerateSalt();
+        string GeneratePassword();
     }
 }

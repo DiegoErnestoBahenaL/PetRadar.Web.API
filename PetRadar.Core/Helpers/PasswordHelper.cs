@@ -27,5 +27,24 @@ namespace PetRadar.Core.Helpers
 
             return salt;
         }
+
+        public string GeneratePassword()
+        {
+            //Length of password
+            int length = 8;
+            //list of characters
+            string validCharacters = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*?_-";
+
+            Random random = new Random();
+
+            // Select one random character from the list of characters to create a char array
+
+            char[] characters = new char[length];
+            for (int i = 0; i < length; i++)
+            {
+                characters[i] = validCharacters[random.Next(0, validCharacters.Length - 1)];
+            }
+            return new string(characters);
+        }
     }
 }

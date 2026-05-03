@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using PetRadar.Core.Domain;
 using PetRadar.Core.Domain.Models;
 using PetRadar.Web.API.Services;
+using System.Net;
 using System.Net.Mime;
 using System.Security.Claims;
 
@@ -32,7 +33,7 @@ namespace PetRadar.Web.API.Controllers
         public async Task<ActionResult<UserTokenViewModel>> Post([FromBody] LoginModel login, CancellationToken token)
         {
             var userdb = await _userDomain.FindByEmailAndPasswordAsync(login.Username, login.Password, token);
-           
+
             if (userdb == default)
                 return Unauthorized();
 
@@ -86,12 +87,12 @@ namespace PetRadar.Web.API.Controllers
 
         public async Task<IActionResult> VerifyEmail([FromRoute] string token, CancellationToken cancellationToken)
         {
-           bool validToken = _jwtHelper.ValidateDateFromToken(token);
+            bool validToken = _jwtHelper.ValidateDateFromToken(token);
 
             if (validToken)
             {
                 var claimsPrincipal = _jwtHelper.GetPrincipalFromRefreshToken(token);
-                
+
                 long userId = long.Parse(claimsPrincipal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "0");
 
                 var userDb = await _userDomain.FindByIdAsync(userId, cancellationToken);
@@ -116,8 +117,32 @@ namespace PetRadar.Web.API.Controllers
             }
         }
 
+        [HttpPost("recoverpassword")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Consumes(MediaTypeNames.Application.Json)]
 
+        public async Task<IActionResult> RecoverPassword([FromBody] RecoverPasswordModel recoverPasswordModel, CancellationToken cancellationToken)
+        {
+            var userDb = await _userDomain.FindByEmailAsync(recoverPasswordModel.Email, cancellationToken);
+
+            if (userDb == default)
+            {
+                return BadRequest(Constants.BadRequestProblemDetails(HttpStatusCode.BadRequest.ToString()));
+            }
+
+            var resultSuccessful = await _userDomain.RecoverPasswordAsync(userDb, UserJwt.Id, cancellationToken);
+
+            if (!resultSuccessful)
+            {
+                var details = Constants.InternalServerErrorProblemDetails("Error sending recovery email");
+
+
+                return Problem(title: details.Title, detail: details.Detail, statusCode: details.Status);
+            }
+
+            return Ok();
+        }
     }
-
-
 }

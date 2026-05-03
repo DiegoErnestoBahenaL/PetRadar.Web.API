@@ -31,6 +31,13 @@ namespace PetRadar.Web.API
             Status = StatusCodes.Status400BadRequest
         };
 
+        public static ProblemDetails InternalServerErrorProblemDetails(string detail) => new()
+        {
+            Title = "Internal Server Error",
+            Detail = detail,
+            Status = StatusCodes.Status500InternalServerError
+        };
+
 
     }
 }

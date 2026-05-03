@@ -227,5 +227,35 @@ namespace PetRadar.Core.Domain
 
             return await _repo.SaveChangesAsync();
         }
+
+        public async Task<bool> RecoverPasswordAsync(UserEntity user, long modifiedByUserId, CancellationToken token)
+        {
+
+            string newPassword = _passwordHelper.GeneratePassword();
+
+            user.Salt = _passwordHelper.GenerateSalt();
+            user.Password = _passwordHelper.GenerateHash(newPassword, user.Salt);
+
+            user.UpdatedByUser(modifiedByUserId);
+
+            var response = await _emailHelperService.SendRecoverPasswordEmail(user, newPassword);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("Recover password email sent successfully to {email}", user.Email);
+                
+                _repo.Update(user);
+
+                await _repo.SaveChangesAsync();
+
+                return true;
+            }
+            else
+            {
+                _logger.LogWarning("Failed to send recover password email to {email}: {statusCode} - {reasonPhrase}", user.Email, response.StatusCode, response.StatusDescription);
+               
+                return false;
+            }
+        }
     }
 }
