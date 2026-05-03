@@ -12,5 +12,6 @@ namespace PetRadar.Core.Helpers
     {
         Task<RestResponse> SendVerificationEmail(UserEntity user, string token);
         Task<RestResponse> SendMatchFoundEmail(UserEntity user);
+        Task<RestResponse> SendRecoverPasswordEmail(UserEntity user, string password);
     }
 }
