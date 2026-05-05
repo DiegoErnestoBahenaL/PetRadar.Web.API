@@ -22,7 +22,7 @@ namespace PetRadar.Core.Data.Entities
         public UserPetEntity Pet { get; set; }
         
         [StringLength(maximumLength: 100)]
-        public string VeterinaryName { get; set; } = string.Empty;
+        public string? VeterinaryName { get; set; } 
 
         [Required]
         public AppointmentTypeEnum AppointmentType { get; set; }
@@ -62,7 +62,7 @@ namespace PetRadar.Core.Data.Entities
 
         public VeterinaryAppointmentEntity() { }
 
-        public VeterinaryAppointmentEntity(long petId, string veterinaryName, 
+        public VeterinaryAppointmentEntity(long petId, string? veterinaryName, 
             AppointmentTypeEnum appointmentType, AppointmentStatusEnum appointmentStatus, DateTimeOffset appointmentDate, 
             int? durationInMinutes, string reasonForVisit, string? notes, string? diagnosis, string? treatment, 
             string? prescriptions, decimal? cost, Point? location, string? addressText)

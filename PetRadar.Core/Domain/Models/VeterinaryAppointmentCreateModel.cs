@@ -17,8 +17,8 @@ namespace PetRadar.Core.Domain.Models
         [Required]
         public long? PetId { get; set; }
 
-        [StringLength(100, MinimumLength = 1, ErrorMessage = "The field VeterinaryName must be a string with a minimum length of {2} and a maximum length of {1}")]
-        public string VeterinaryName { get; set; } = string.Empty;
+        [StringLength(100, ErrorMessage = "The field VeterinaryName must be a string with a maximum length of {1}")]
+        public string? VeterinaryName { get; set; }
 
         [Required]
         [JsonConverter(typeof(StringEnumConverter))]
@@ -58,7 +58,7 @@ namespace PetRadar.Core.Domain.Models
         public string? AddressText { get; set; }
 
         public VeterinaryAppointmentCreateModel(
-            long petId, string veterinaryName, AppointmentTypeEnum appointmentType,
+            long petId, string? veterinaryName, AppointmentTypeEnum appointmentType,
             AppointmentStatusEnum appointmentStatus, DateTimeOffset appointmentDate, int? durationInMinutes,
             string reasonForVisit, string? notes, string? diagnosis, string? treatment,
             string? prescriptions, decimal? cost, string? addressText,
