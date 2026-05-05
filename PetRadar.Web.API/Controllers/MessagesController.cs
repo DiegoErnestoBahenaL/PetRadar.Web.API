@@ -90,6 +90,34 @@ namespace PetRadar.Web.API.Controllers
             return Ok(MessageViewModel.FromList(messages));
         }
 
+        [HttpGet("match/{matchId}/unreadmessages/{recipientId}/{senderId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces(MediaTypeNames.Application.Json)]
+
+        public async Task<ActionResult<UnreadMessagesViewModel>> GetUnreadMessagesByMatchIdAndRecipientIdAndSenderId([FromRoute] long matchId, [FromRoute] long recipientId, [FromRoute] long senderId, CancellationToken token)
+        {
+            var match = await _matchDomain.FindByIdAsync(matchId, token);
+
+            if (match == default)
+                return NotFound(Constants.NotFoundProblemDetails);
+
+            var recipient = await _userDomain.FindByIdAsync(recipientId, token);
+
+            if (recipient == default)
+                return NotFound(Constants.NotFoundProblemDetails);
+
+            var sender = await _userDomain.FindByIdAsync(senderId, token);
+
+            if (sender == default)
+                return NotFound(Constants.NotFoundProblemDetails);
+
+            int unreadMessages = await _domain.CountUnreadMessagesByMatchIdAsync(matchId, recipientId, senderId, token);
+          
+            return Ok(new UnreadMessagesViewModel { UnreadMessagesCount = unreadMessages });
+        }
+
         [HttpGet("adoptionAnimal/{adoptionAnimalId}/conversation/{recipientId}/{senderId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -117,6 +145,35 @@ namespace PetRadar.Web.API.Controllers
            
             return Ok(MessageViewModel.FromList(messages));
         }
+
+        [HttpGet("adoptionAnimal/{adoptionAnimalId}/unreadmessages/{recipientId}/{senderId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Produces(MediaTypeNames.Application.Json)]
+
+        public async Task<ActionResult<UnreadMessagesViewModel>> GetUnreadMessagesByAdoptionAnimalIdAndRecipientIdAndSenderId([FromRoute] long adoptionAnimalId, [FromRoute] long recipientId, [FromRoute] long senderId, CancellationToken token)
+        {
+            var adoptionAnimal = await _adoptionAnimalDomain.FindByIdAsync(adoptionAnimalId, token);
+
+            if (adoptionAnimal == default)
+                return NotFound(Constants.NotFoundProblemDetails);
+
+            var recipient = await _userDomain.FindByIdAsync(recipientId, token);
+
+            if (recipient == default)
+                return NotFound(Constants.NotFoundProblemDetails);
+
+            var sender = await _userDomain.FindByIdAsync(senderId, token);
+
+            if (sender == default)
+                return NotFound(Constants.NotFoundProblemDetails);
+
+            int unreadMessages = await _domain.CountUnreadMessagesByAdoptionAnimalIdAsync(adoptionAnimalId, recipientId, senderId, token);
+
+            return Ok(new UnreadMessagesViewModel { UnreadMessagesCount = unreadMessages });
+        }
+
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]

@@ -42,9 +42,19 @@ namespace PetRadar.Core.Domain
             return _repo.GetAllByMatchIdConversationAsync(matchId, recipientId, senderId, token);
         }
         
+        public Task<int> CountUnreadMessagesByMatchIdAsync(long matchId, long recipientId, long senderId, CancellationToken token)
+        {
+            return _repo.CountUnreadMessagesByMatchIdAsync(matchId, recipientId, senderId, token);
+        }
+
         public Task<List<MessageEntity>> GetAllByAdoptionAnimalIdConversationAsync(long adoptionAnimalId, long recipientId, long senderId, CancellationToken token)
         {
             return _repo.GetAllByAdoptionAnimalIdConversationAsync(adoptionAnimalId, recipientId, senderId, token);
+        }
+
+        public Task<int> CountUnreadMessagesByAdoptionAnimalIdAsync(long adoptionAnimalId, long recipientId, long senderId, CancellationToken token)
+        {
+            return _repo.CountUnreadMessagesByAdoptionAnimalIdAsync(adoptionAnimalId, recipientId, senderId, token);
         }
 
         public async Task<MessageEntity?> FindByIdAsync(long id, CancellationToken token = default)
