@@ -44,12 +44,30 @@ namespace PetRadar.Core.Data.Repositories
             return query.ToListAsync(token);
         }
 
+        public Task<int> CountUnreadMessagesByMatchIdAsync(long matchId, long recipientId, long senderId, CancellationToken token)
+        {
+            var query = ConstructQuery()
+                .Where(x => x.IsActive == true && x.MatchId == matchId &&
+                ((x.RecipientId == recipientId && x.SenderId == senderId) || (x.RecipientId == senderId && x.SenderId == recipientId)) &&
+                x.Read == false);
+            return query.CountAsync(token);
+        }
+
         public Task<List<MessageEntity>> GetAllByAdoptionAnimalIdConversationAsync(long adoptionAnimalId, long recipientId, long senderId, CancellationToken token)
         {
             var query = ConstructQuery()
                 .Where(x => x.IsActive == true && x.AdoptionAnimalId == adoptionAnimalId && 
                 ((x.RecipientId == recipientId && x.SenderId == senderId) || (x.RecipientId == senderId && x.SenderId == recipientId)));
             return query.ToListAsync(token);
+        }
+
+        public Task<int> CountUnreadMessagesByAdoptionAnimalIdAsync(long adoptionAnimalId, long recipientId, long senderId, CancellationToken token)
+        {
+            var query = ConstructQuery()
+                .Where(x => x.IsActive == true && x.AdoptionAnimalId == adoptionAnimalId &&
+                ((x.RecipientId == recipientId && x.SenderId == senderId) || (x.RecipientId == senderId && x.SenderId == recipientId)) &&
+                x.Read == false);
+            return query.CountAsync(token);
         }
 
         public Task<MessageEntity?> FindByIdAsync(long id, CancellationToken token)
