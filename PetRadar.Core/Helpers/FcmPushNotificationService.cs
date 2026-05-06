@@ -98,8 +98,9 @@ namespace PetRadar.Core.Helpers
                     { "extra_other_user_id", otherUser.Id.ToString() ?? "-1" },
                     { "extra_lost_report_id", match.LostReportId.ToString() },
                     { "extra_stray_report_id", match.StrayReportId.ToString() },
-                    { "extra_lost_pet_label", animalName + " · " + lostReport.ImageAnalysisResult.TopPredictedBreed },
-                    { "extra_animal_name", animalName }
+                    { "extra_lost_pet_label", lostReport.ImageAnalysisResult.TopPredictedBreed },
+                    { "extra_other_user_name", animalName }
+
                 };
 
             }
