@@ -65,6 +65,34 @@ namespace PetRadar.Core.Domain
             return notificationDb;
         }
 
+        public async Task<NotificationEntity> CreateForMessageAsync(NotificationCreateModel notification, long messageToUserId, AdoptionAnimalEntity? adoptionAnimal, MatchEntity? match, long createdByUserId, CancellationToken token)
+        {
+            var notificationDb = new NotificationEntity(
+                notification.UserId.Value, notification.Type.Value,
+                notification.Title, notification.Message,
+                notification.Metadata, notification.DeepLink,
+                false, null
+            );
+
+            notificationDb.CreatedBy = createdByUserId;
+            notificationDb.CreatedAt = notificationDb.UpdatedAt = DateTime.UtcNow;
+            notificationDb.IsActive = true;
+
+            await _repo.AddAsync(notificationDb);
+            await _repo.SaveChangesAsync();
+
+            await _pushService.SendMessageNotificationToUserAsync(
+                notificationDb.UserId,
+                messageToUserId,
+                notificationDb.Title,
+                notificationDb.Message,
+                adoptionAnimal,
+                match,
+                token);
+
+            return notificationDb;
+        }
+
         public async Task<int> UpdateAsync(NotificationEntity notificationDb, NotificationUpdateModel notification, long modifiedByUserId, CancellationToken token)
         {
             if (notificationDb == default)
