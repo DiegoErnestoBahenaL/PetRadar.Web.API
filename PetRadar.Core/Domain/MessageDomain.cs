@@ -15,11 +15,15 @@ namespace PetRadar.Core.Domain
     {
         private readonly IMessageRepository _repo;
         private readonly INotificationDomain _notificationDomain;
+        private readonly IAdoptionAnimalDomain _adoptionAnimalDomain;
+        private readonly IMatchDomain _matchDomain;
 
-        public MessageDomain(IMessageRepository repo, INotificationDomain notificationDomain)
+        public MessageDomain(IMessageRepository repo, INotificationDomain notificationDomain, IAdoptionAnimalDomain adoptionAnimalDomain, IMatchDomain matchDomain)
         {
             _repo = repo;
             _notificationDomain = notificationDomain;
+            _adoptionAnimalDomain = adoptionAnimalDomain;
+            _matchDomain = matchDomain;
         }
 
         public Task<List<MessageEntity>> GetAllAsync(CancellationToken token)
@@ -88,23 +92,44 @@ namespace PetRadar.Core.Domain
             if (messageDb.MatchId != null)
             {
                 messageBody = matchMessage;
+
+                var match = await _matchDomain.FindByIdAsync(messageDb.MatchId.Value, token);
+
+                await _notificationDomain.CreateForMessageAsync(
+                     new NotificationCreateModel(
+                         message.RecipientId,
+                         NotificationTypeEnum.Message,
+                         "Tienes un nuevo mensaje!",
+                         messageBody,
+                         null,
+                         null),
+                     message.SenderId,
+                     null,
+                     match,
+                     Constants.SuperAdminId,
+                token);
+
             }
-            else if (adoptionMessage != null)
+            else if (messageDb.AdoptionAnimalId != null)
             {
                 messageBody = adoptionMessage;
-            }
 
-            // Create a notification for the user about the new message
-            await _notificationDomain.CreateAsync(
-                 new NotificationCreateModel(
-                     message.RecipientId,
-                     NotificationTypeEnum.Message,
-                     "Tienes un nuevo mensaje!",
-                     messageBody,
-                     null,
-                     null),
-                 Constants.SuperAdminId,
-            token);
+                var adoptionAnimal = await _adoptionAnimalDomain.FindByIdAsync(messageDb.AdoptionAnimalId.Value, token);
+
+                await _notificationDomain.CreateForMessageAsync(
+                      new NotificationCreateModel(
+                          message.RecipientId,
+                          NotificationTypeEnum.Message,
+                          "Tienes un nuevo mensaje!",
+                          messageBody,
+                          null,
+                          null),
+                      message.SenderId,
+                      adoptionAnimal,
+                      null,
+                      Constants.SuperAdminId,
+                token);
+            }
 
             return messageDb;
         }
