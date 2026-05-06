@@ -90,7 +90,7 @@ namespace PetRadar.Core.Helpers
 
                 var lostReport = await _reportRepo.FindByIdAsync(match.LostReportId, token);
 
-                string animalName = lostReport.Species == PetSpeciesEnum.Dog ? "dog" : lostReport.Species == PetSpeciesEnum.Cat ? "cat" : string.Empty;
+                string animalName = lostReport.Species == PetSpeciesEnum.Dog ? "Perro" : lostReport.Species == PetSpeciesEnum.Cat ? "Gato" : string.Empty;
 
                 data = new Dictionary<string, string>
                 {
@@ -98,7 +98,7 @@ namespace PetRadar.Core.Helpers
                     { "extra_other_user_id", otherUser.Id.ToString() ?? "-1" },
                     { "extra_lost_report_id", match.LostReportId.ToString() },
                     { "extra_stray_report_id", match.StrayReportId.ToString() },
-                    { "extra_lost_pet_label", lostReport.ImageAnalysisResult.TopPredictedBreed },
+                    { "extra_lost_pet_label", animalName + " · " + lostReport.ImageAnalysisResult.TopPredictedBreed },
                     { "extra_animal_name", animalName }
                 };
 
