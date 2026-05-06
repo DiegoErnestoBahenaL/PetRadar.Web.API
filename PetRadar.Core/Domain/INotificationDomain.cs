@@ -14,6 +14,7 @@ namespace PetRadar.Core.Domain
         Task<List<NotificationEntity>> GetAllByUserIdAsync(long userId, CancellationToken token);
         Task<NotificationEntity?> FindByIdAsync(long id, CancellationToken token);
         Task<NotificationEntity> CreateAsync(NotificationCreateModel notification, long createdByUserId, CancellationToken token);
+        Task<NotificationEntity> CreateForMessageAsync(NotificationCreateModel notification, long messageToUserId, AdoptionAnimalEntity? adoptionAnimal, MatchEntity? match, long createdByUserId, CancellationToken token);
         Task<int> UpdateAsync(NotificationEntity notificationDb, NotificationUpdateModel notification, long modifiedByUserId, CancellationToken token);
         Task<int> DeleteAsync(NotificationEntity notification, long modifiedByUserId, CancellationToken token);
     }
