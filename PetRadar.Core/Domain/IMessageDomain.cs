@@ -21,5 +21,6 @@ namespace PetRadar.Core.Domain
         Task<int> DeleteAsync(MessageEntity message, long modifiedByUserId, CancellationToken token);
         Task<int> CountUnreadMessagesByMatchIdAsync(long matchId, long recipientId, long senderId, CancellationToken token);
         Task<int> CountUnreadMessagesByAdoptionAnimalIdAsync(long adoptionAnimalId, long recipientId, long senderId, CancellationToken token);
+        Task<int> EncryptUnencryptedMessagesAsync(CancellationToken token);
     }
 }
