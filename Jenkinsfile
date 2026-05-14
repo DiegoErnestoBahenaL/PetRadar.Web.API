@@ -52,7 +52,7 @@ pipeline {
             steps {
                 withCredentials([
                     string(credentialsId: 'firebaseCredentialsJson', variable: 'FIREBASE_CREDENTIALS_JSON_BASE64'),
-                    string(credentialsId: 'ENCRYPTION_KEY', variable: 'ENCRYPTION_KEY')
+                    string(credentialsId: 'ENCRYPTION_KEY', variable: 'ENCRYPTION_KEY'),
                     string(credentialsId: 'ENCRYPTION_IV', variable: 'ENCRYPTION_IV')
                 ]) {
                     sh '''
