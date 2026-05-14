@@ -25,6 +25,8 @@ builder.Services.AddHttpClient();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
+
+builder.Services.AddSingleton<IEncryptionHelper, EncryptionHelper>();
 builder.Services.AddSingleton<IPasswordHelper, PasswordHelper>();
 builder.Services.AddSingleton<IFileHelperService, FileHelperService>();
 builder.Services.AddSingleton<IEmailHelperService, EmailHelperService>();

@@ -20,13 +20,15 @@ namespace PetRadar.Web.API.Controllers
         private readonly IFileHelperService _fileHelper;
         private readonly ILogger<SystemConfigController> _logger;
         private readonly string _connectionString;
+        private readonly IMessageDomain _messageDomain;
 
-        public SystemConfigController(ISystemConfigDomain domain, IFileHelperService fileHelper, ILogger<SystemConfigController> logger, IConfiguration configuration)
+        public SystemConfigController(ISystemConfigDomain domain, IFileHelperService fileHelper, ILogger<SystemConfigController> logger, IConfiguration configuration, IMessageDomain messageDomain)
         {
             _domain = domain;
             _fileHelper = fileHelper;
             _logger = logger;
             _connectionString = configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
+            _messageDomain = messageDomain;
         }
 
         [HttpGet("configs")]
@@ -141,6 +143,23 @@ namespace PetRadar.Web.API.Controllers
             }
 
             return NotFound(Constants.NotFoundProblemDetails);
+        }
+        [HttpPost("encrypt-messages")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+
+        public async Task<IActionResult> EncryptMessages(CancellationToken token)
+        {
+            try
+            {
+                var result = await _messageDomain.EncryptUnencryptedMessagesAsync(token);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while encrypting messages");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error while encrypting messages");
+            }
         }
     }
 }
