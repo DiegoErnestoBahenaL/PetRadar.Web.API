@@ -3,6 +3,7 @@ using PetRadar.Core.Data.Entities;
 using PetRadar.Core.Data.Entities.Enums;
 using PetRadar.Core.Data.Repositories;
 using PetRadar.Core.Domain.Models;
+using PetRadar.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,13 +18,14 @@ namespace PetRadar.Core.Domain
         private readonly INotificationDomain _notificationDomain;
         private readonly IAdoptionAnimalDomain _adoptionAnimalDomain;
         private readonly IMatchDomain _matchDomain;
-
-        public MessageDomain(IMessageRepository repo, INotificationDomain notificationDomain, IAdoptionAnimalDomain adoptionAnimalDomain, IMatchDomain matchDomain)
+        private readonly IEncryptionHelper _encryptionHelper;
+        public MessageDomain(IMessageRepository repo, INotificationDomain notificationDomain, IAdoptionAnimalDomain adoptionAnimalDomain, IMatchDomain matchDomain, IEncryptionHelper encryptionHelper)
         {
             _repo = repo;
             _notificationDomain = notificationDomain;
             _adoptionAnimalDomain = adoptionAnimalDomain;
             _matchDomain = matchDomain;
+            _encryptionHelper = encryptionHelper;
         }
 
         public Task<List<MessageEntity>> GetAllAsync(CancellationToken token)
@@ -41,19 +43,33 @@ namespace PetRadar.Core.Domain
             return _repo.GetAllByRecipientIdAsync(recipientId, token);
         }
 
-        public Task<List<MessageEntity>> GetAllByMatchIdConversationAsync(long matchId, long recipientId, long senderId, CancellationToken token)
+        public async Task<List<MessageEntity>> GetAllByMatchIdConversationAsync(long matchId, long recipientId, long senderId, CancellationToken token)
         {
-            return _repo.GetAllByMatchIdConversationAsync(matchId, recipientId, senderId, token);
+            var messages = await _repo.GetAllByMatchIdConversationAsync(matchId, recipientId, senderId, token);
+
+            foreach (var message in messages)
+            {
+                message.Content = _encryptionHelper.Decrypt(message.Content);
+            }
+
+            return messages;
         }
-        
+
         public Task<int> CountUnreadMessagesByMatchIdAsync(long matchId, long recipientId, long senderId, CancellationToken token)
         {
             return _repo.CountUnreadMessagesByMatchIdAsync(matchId, recipientId, senderId, token);
         }
 
-        public Task<List<MessageEntity>> GetAllByAdoptionAnimalIdConversationAsync(long adoptionAnimalId, long recipientId, long senderId, CancellationToken token)
+        public async Task<List<MessageEntity>> GetAllByAdoptionAnimalIdConversationAsync(long adoptionAnimalId, long recipientId, long senderId, CancellationToken token)
         {
-            return _repo.GetAllByAdoptionAnimalIdConversationAsync(adoptionAnimalId, recipientId, senderId, token);
+            var messages = await _repo.GetAllByAdoptionAnimalIdConversationAsync(adoptionAnimalId, recipientId, senderId, token);
+
+            foreach (var message in messages)
+            {
+                message.Content = _encryptionHelper.Decrypt(message.Content);
+            }
+
+            return messages;
         }
 
         public Task<int> CountUnreadMessagesByAdoptionAnimalIdAsync(long adoptionAnimalId, long recipientId, long senderId, CancellationToken token)
@@ -76,6 +92,9 @@ namespace PetRadar.Core.Domain
                 message.SenderId, message.RecipientId, message.Content,
                 message.MatchId, message.AdoptionAnimalId
             );
+
+            messageDb.Content = _encryptionHelper.Encrypt(messageDb.Content);
+
 
             messageDb.CreatedBy = createdByUserId;
             messageDb.CreatedAt = messageDb.UpdatedAt = DateTime.UtcNow;
@@ -140,7 +159,7 @@ namespace PetRadar.Core.Domain
                 throw new ArgumentNullException(nameof(messageDb));
 
             if (!string.IsNullOrEmpty(message.Content))
-                messageDb.Content = message.Content;
+                messageDb.Content = _encryptionHelper.Encrypt(message.Content);
 
             if (message.Read.HasValue)
                 messageDb.Read = message.Read.Value;
@@ -166,6 +185,17 @@ namespace PetRadar.Core.Domain
             message.DeletedByUser(modifiedByUserId);
             _repo.Update(message);
 
+            return await _repo.SaveChangesAsync();
+        }
+
+        public async Task<int> EncryptUnencryptedMessagesAsync(CancellationToken token)
+        {
+            var messages = await _repo.GetAllAsync(token);
+            foreach (var message in messages)
+            {
+                message.Content = _encryptionHelper.Encrypt(message.Content);
+                _repo.Update(message);
+            }
             return await _repo.SaveChangesAsync();
         }
     }
