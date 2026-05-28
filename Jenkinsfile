@@ -72,7 +72,8 @@ pipeline {
                 withCredentials([
                     string(credentialsId: 'firebaseCredentialsJson', variable: 'FIREBASE_CREDENTIALS_JSON_BASE64'),
                     string(credentialsId: 'ENCRYPTION_KEY', variable: 'ENCRYPTION_KEY'),
-                    string(credentialsId: 'ENCRYPTION_IV', variable: 'ENCRYPTION_IV')
+                    string(credentialsId: 'ENCRYPTION_IV', variable: 'ENCRYPTION_IV'),
+                    string(credentialsId: 'MailGunAPIKey', variable: 'PetRadarCoreOptions__MailGunAPIKey')
                 ]) {
                     sh '''
                         set -e
@@ -86,6 +87,7 @@ pipeline {
                             -e FIREBASE_CREDENTIALS_JSON_BASE64 \
                             -e ENCRYPTION_KEY \
                             -e ENCRYPTION_IV \
+                            -e PetRadarCoreOptions__MailGunAPIKey \
                             -v "$(pwd)":/src \
                             -w /src \
                             mcr.microsoft.com/dotnet/sdk:8.0-jammy-arm64v8 \
@@ -96,7 +98,6 @@ pipeline {
                 }
             }
         }
-
         stage('Deploy stack QA') {
             when { expression { env.BRANCH_NAME == 'QA' } }
             steps {
