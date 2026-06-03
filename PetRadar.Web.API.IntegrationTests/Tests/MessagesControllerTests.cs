@@ -20,6 +20,8 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
 
         static long createdMessageId = 0;
 
+        private readonly MessageEncryptionHelper _encryptionHelper = new MessageEncryptionHelper();       
+
         public MessagesControllerTests(TestingWebAppFactory factory)
         {
             _factory = factory;
@@ -73,7 +75,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             Assert.True(createdMessage.Id > 0);
             Assert.Equal(DefaultDataSet.DefaultUserId, createdMessage.SenderId);
             Assert.Equal(DefaultDataSet.DefaultRecipientUserId, createdMessage.RecipientId);
-            Assert.Equal("Hello, I think I found your pet!", createdMessage.Content);
+            Assert.Equal("Hello, I think I found your pet!", _encryptionHelper.Decrypt(createdMessage.Content));
             Assert.Null(createdMessage.MatchId);
             Assert.Null(createdMessage.AdoptionAnimalId);
             Assert.False(createdMessage.Read);
@@ -99,7 +101,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
             Assert.Equal(createdMessageId, message.Id);
             Assert.Equal(DefaultDataSet.DefaultUserId, message.SenderId);
             Assert.Equal(DefaultDataSet.DefaultRecipientUserId, message.RecipientId);
-            Assert.Equal("Hello, I think I found your pet!", message.Content);
+            Assert.Equal("Hello, I think I found your pet!", _encryptionHelper.Decrypt(message.Content));
         }
 
         [Fact, TestPriority(4)]
@@ -269,7 +271,7 @@ namespace PetRadar.Web.API.IntegrationTests.Tests
 
             Assert.NotNull(message);
             Assert.Equal(createdMessageId, message.Id);
-            Assert.Equal("Updated message content", message.Content);
+            Assert.Equal("Updated message content", _encryptionHelper.Decrypt(message.Content));
             Assert.True(message.Read);
             Assert.NotNull(message.ReadDate);
         }
