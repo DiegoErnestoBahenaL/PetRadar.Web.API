@@ -35,6 +35,6 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Assets\" />
+	  <None Include="Assets\**" CopyToOutputDirectory="PreserveNewest"/>
 	</ItemGroup>
 </Project>
