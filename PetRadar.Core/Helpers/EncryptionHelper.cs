@@ -64,24 +64,26 @@ namespace PetRadar.Core.Helpers
 
         public string Decrypt(string cipherText)
         {
-            if (string.IsNullOrEmpty(cipherText))
-                throw new ArgumentException("Cannot be null or empty", nameof(cipherText));
 
-            using var aes = Aes.Create();
+            return cipherText;
+            //if (string.IsNullOrEmpty(cipherText))
+            //    throw new ArgumentException("Cannot be null or empty", nameof(cipherText));
 
-            aes.Key = Key;
-            aes.IV = IV;
+            //using var aes = Aes.Create();
 
-            using var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+            //aes.Key = Key;
+            //aes.IV = IV;
 
-            using var ms = new MemoryStream(Convert.FromBase64String(cipherText));
+            //using var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 
-            using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+            //using var ms = new MemoryStream(Convert.FromBase64String(cipherText));
 
-            using (var sr = new StreamReader(cs))
-            {
-                return sr.ReadToEnd();
-            }
+            //using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+
+            //using (var sr = new StreamReader(cs))
+            //{
+            //    return sr.ReadToEnd();
+            //}
         }
 
     }
